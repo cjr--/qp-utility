@@ -49,7 +49,7 @@ var my_module = library('my-module');
 var other_module = library('my-other-module');
 library(module, {
   ns: 'my-module',
-  mixins: [],
+  mixins: ['another-module'],
   init: function() {
     other_module.do_something();
   }
