@@ -1,0 +1,16 @@
+{
+  "name": "qp-library",
+  "version": "1.0.0",
+  "author": "CJR",
+  "license": "MIT",
+  "description": "reusable javascript modules",
+  "main": "library.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CJR--/qp-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CJR--/qp-library/issues"
+  },
+  "homepage": "https://github.com/CJR--/qp-library"
+}
