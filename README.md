@@ -6,9 +6,9 @@ modularise and reuse javascript between browser and server. introduces a global 
 
 #### Install
 
-###### node:
+##### node:
 `npm install qp-library --save`
-###### browser:
+##### browser:
 `<script src="/library.min.js"></script>`
 
 #### Usage
@@ -16,6 +16,9 @@ modularise and reuse javascript between browser and server. introduces a global 
 - my-project
   - library
     - my-module
+      - index.js
+      - package.json
+    - my-other-module
       - index.js
       - package.json
   + node_modules
@@ -43,10 +46,12 @@ var my_module = library('my-module');
 ````
 ````
 /library/my-module/index.js
+var other_module = library('my-other-module');
 library(module, {
   ns: 'my-module',
   mixins: [],
-
-  init: function() { }
+  init: function() {
+    other_module.method();
+  }
 });
 ````
