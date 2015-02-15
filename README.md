@@ -4,14 +4,14 @@
 
 modularise and reuse javascript between browser and server. introduces a global function called library which can be used like require on all platforms.
 
-#### Install
+### install
 
-##### node:
+##### node
 `npm install qp-library --save`
-##### browser:
+##### browser
 `<script src="/library.min.js"></script>`
 
-#### Usage
+### usage
 ````
 - my-project
   - library
@@ -51,7 +51,7 @@ library(module, {
   ns: 'my-module',
   mixins: [],
   init: function() {
-    other_module.method();
+    other_module.do_something();
   }
 });
 ````
