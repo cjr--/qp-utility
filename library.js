@@ -3,36 +3,38 @@
   var slice = Array.prototype.slice;
 
   if (!global.library) {
+    var library;
     if (module && module.exports) {
       var path = require('path');
       var lib = path.join(__dirname, '..');
-      global.library = function() {
+      library = function() {
         if (arguments.length === 2) {
           arguments[0].exports = define(arguments[1]);
         } else {
           return require(path.join(lib, arguments[0]));
         }
       };
-      global.library.export = function(_module, definition) {
+      library.export = function(_module, definition) {
         _module.exports = definition;
       };
     } else {
-      global.library = function() {
+      library = function() {
         if (typeof arguments[0] === 'string') {
-          return global.library.bin[arguments[0]];
+          return library.bin[arguments[0]];
         } else {
           var definition = slice.call(arguments, -1);
-          global.library.bin[definition.ns] = define(definition);
+          library.bin[definition.ns] = define(definition);
         }
       };
-      global.library.export = function(ns, definition) {
-        global.library.bin[ns] = definition;
+      library.export = function(ns, definition) {
+        library.bin[ns] = definition;
       };
-      global.library.bin = {};
+      library.bin = {};
     }
-    global.library.create = function(definition) {
+    library.create = function(definition) {
       return define(definition).create();
     };
+    global.library = library;
   }
 
   function define(definition) {
