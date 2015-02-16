@@ -13,6 +13,9 @@
           return require(path.join(lib, arguments[0]));
         }
       };
+      global.library.export = function(_module, definition) {
+        _module.exports = definition;
+      };
     } else {
       global.library = function() {
         if (typeof arguments[0] === 'string') {
@@ -21,6 +24,9 @@
           var definition = slice.call(arguments, -1);
           global.library.bin[definition.ns] = define(definition);
         }
+      };
+      global.library.export = function(ns, definition) {
+        global.library.bin[ns] = definition;
       };
       global.library.bin = {};
     }
@@ -32,7 +38,7 @@
   function define(definition) {
     if (typeof definition === 'function') definition = definition();
     var ctor = make_ctor(definition.ns);
-    
+    // TODO
     return ctor;
   }
 
@@ -40,8 +46,8 @@
     /*jslint evil: true*/
     var ctor = (new Function('return function ' + name + '(o){this.ctor.apply(this,o);}'))();
     ctor.create = function() { return new ctor(arguments); };
-    ctor.properties = {};
-    ctor.inits = [];
+    ctor.prop = {};
+    ctor.init = [];
     return ctor;
   }
 
