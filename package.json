@@ -4,7 +4,7 @@
   "author": "CJR",
   "license": "MIT",
   "description": "reusable javascript modules",
-  "main": "library.js",
+  "main": "dist/library.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/CJR--/qp-library.git"
