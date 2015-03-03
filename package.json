@@ -4,7 +4,7 @@
   "author": "CJR",
   "license": "MIT",
   "description": "javascript utilities",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/cjr--/qp-library.git"
