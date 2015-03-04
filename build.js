@@ -1,4 +1,5 @@
 var fs = require('fs');
+var uglify = require('uglify-js');
 var path = require('path');
 
 var data = {
@@ -7,8 +8,9 @@ var data = {
   qp: read_file('qp.js')
 };
 
-write_file('qp-library.js', make_browser_file(data));
 write_file('index.js', make_node_file(data));
+write_file('qp-library.js', make_browser_file(data));
+write_file('qp-library.min.js', uglify.minify(path.join(__dirname, 'dist', 'qp-library.js')).code);
 
 function make_browser_file(data) {
   return [

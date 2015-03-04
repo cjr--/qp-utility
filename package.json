@@ -12,5 +12,8 @@
   "bugs": {
     "url": "https://github.com/cjr--/qp-library/issues"
   },
-  "homepage": "https://github.com/cjr--/qp-library"
+  "homepage": "https://github.com/cjr--/qp-library",
+  "dependencies": {
+    "uglify-js": "^2.4.16"
+  }
 }
