@@ -9,8 +9,8 @@ var data = {
 };
 
 write_file('index.js', make_node_file(data));
-write_file('qp-library.js', make_browser_file(data));
-write_file('qp-library.min.js', uglify.minify(path.join(__dirname, 'dist', 'qp-library.js')).code);
+write_file('qp-utility.js', make_browser_file(data));
+write_file('qp-utility.min.js', uglify.minify(path.join(__dirname, 'dist', 'qp-utility.js')).code);
 
 function make_browser_file(data) {
   return [
