@@ -1,5 +1,5 @@
 {
-  "name": "qp-library",
+  "name": "qp-utility",
   "version": "1.0.1",
   "author": "CJR",
   "license": "MIT",
@@ -7,12 +7,12 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cjr--/qp-library.git"
+    "url": "https://github.com/cjr--/qp-utility.git"
   },
   "bugs": {
-    "url": "https://github.com/cjr--/qp-library/issues"
+    "url": "https://github.com/cjr--/qp-utility/issues"
   },
-  "homepage": "https://github.com/cjr--/qp-library",
+  "homepage": "https://github.com/cjr--/qp-utility",
   "dependencies": {
     "uglify-js": "^2.4.16"
   }
