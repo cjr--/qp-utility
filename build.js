@@ -1,35 +1,41 @@
 var fs = require('fs');
 var uglify = require('uglify-js');
 var path = require('path');
+var files = [
+  'core', 'string', 'array', 'collection', 'date', 'function', 'iteration', 'typeof',
+  'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick',
+  'async', 'find', 'id', 'make', 'sort',
+  'qp'
+];
 
-var data = {
-  core: read_file('core.js'),
-  string: read_file('string.js'),
-  qp: read_file('qp.js')
-};
+var file = files.map(function(_file) {
+  return read_file(_file + '.js');
+}).join('\n');
 
-write_file('index.js', make_node_file(data));
-write_file('qp-utility.js', make_browser_file(data));
-write_file('qp-utility.min.js', uglify.minify(path.join(__dirname, 'dist', 'qp-utility.js')).code);
+write_file('index.js', make_node_file(file));
+write_file('qp-utility.js', make_browser_file(file));
+write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
 
-function make_browser_file(data) {
+function make_browser_file(file) {
   return [
     '(function(global) {',
-      indent(data.core),
-      indent(data.string),
-      indent(data.qp),
+      indent(file),
       indent('global.qp = qp;'),
+      '',
     '})(this);'
   ].join('\n');
 }
 
-function make_node_file(data) {
+function make_node_file(file) {
   return [
-    data.core,
-    data.string,
-    data.qp,
+    file,
     'module.exports = qp;'
   ].join('\n');
+}
+
+function make_min_file(filename) {
+  var min = uglify.minify(path.join('dist', filename), { compress: { dead_code: false, unused: false } });
+  return min.code;
 }
 
 function read_file(file) {

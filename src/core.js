@@ -1,20 +1,17 @@
 var array_slice = Array.prototype.slice;
 var object_to_string = Object.prototype.toString;
+var is_array = Array.isArray;
 
-function to_array(o) {
-  if (Array.isArray(o)) {
-    return o;
-  } else if (o && o.length) {
-    return array_slice.call(o);
-  } else if (typeof o === 'string') {
-    return o.split('');
-  } else if (o) {
-    return [o];
-  } else {
-    return [];
-  }
-}
+function noop() { }
 
-function escape_re(s) {
-  return s.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1");
-}
+function is_number(o) { return o - parseFloat(o) >= 0; }
+
+function is_function(o) { return typeof o === 'function'; }
+
+function escape_re(s) { return s.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"); }
+
+function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+
+function is_empty(o) { return typeof o === 'undefined' || o === null || (o.length && o.length === 0); }
+
+function is_not_empty(o) { return !is_empty(o); }
