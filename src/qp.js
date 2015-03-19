@@ -32,7 +32,7 @@ var qp = {
   map: map,
   reduce: reduce,
   arg: arg,
-  to_array: array,
+  to_array: to_array,
   flatten: flatten,
   compact: compact,
 
