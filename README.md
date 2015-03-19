@@ -1,1 +1,1 @@
-# UNDER CONSTRUCTION
+javascript utility functions
