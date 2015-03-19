@@ -1,9 +1,9 @@
-function make(def) {
+function make(ns, def) {
 
   /*jslint evil: true*/
-  var ctor = (new Function('return function ' + def.ns + '(o){this.construct.call(this,o);}'))();
+  var ctor = (new Function('return function ' + ns + '(o){this.construct.call(this,o);}'))();
   ctor.create = function(o) { return new ctor(o); };
-  ctor.ns = def.ns;
+  ctor.ns = ns;
   ctor.properties = {};
   ctor.inits = [];
 
@@ -17,8 +17,8 @@ function make(def) {
     mixin.inits = flatten(mixin.inits);
   }
 
-  qp.each(def, function(value, name) {
-    if (name === 'ns' || name === 'mx') {
+  each(def, function(value, name) {
+    if (name === 'mixins') {
     } else if (name === 'self') {
       assign(ctor, def.self);
     } else if (qp.is(value, 'function')) {
@@ -39,7 +39,7 @@ function make(def) {
     this.reset();
     this.self = ctor;
     assign_own(this, options);
-    each(ctor.inits, function(init) { init.call(this, options); }, this);
+    invoke(ctor.inits, this, options);
   };
 
 }

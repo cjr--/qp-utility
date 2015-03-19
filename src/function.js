@@ -7,8 +7,11 @@ function bind(o, scope) {
 }
 
 function invoke(fn, ctx) {
-  if (fn && is(fn, 'function')) {
+  if (is(fn, 'function')) {
     return fn.apply(ctx, array_slice.call(arguments, 2));
+  } else if (is(fn, 'array')) {
+    var args = array_slice.call(arguments, 2);
+    return map(fn, function(func) { return func.apply(ctx, args); });
   }
   return undefined;
 }
