@@ -8,7 +8,7 @@ function is_number(o) { return o - parseFloat(o) >= 0; }
 
 function is_function(o) { return typeof o === 'function'; }
 
-function escape_re(s) { return s.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"); }
+function escape_re(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
 function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
 
