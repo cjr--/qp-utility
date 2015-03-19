@@ -26,7 +26,7 @@ function rtrim(s, chars) {
 }
 
 function build() {
-  return flatten(arguments).join('');
+  return compact(flatten(arguments)).join('');
 }
 
 function escape(s) {

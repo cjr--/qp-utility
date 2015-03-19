@@ -1,181 +1,198 @@
 javascript utility functions;
 
-`noop()`
+#### `noop()`
 
-  no operation
+no operation
 
-`escape_re(regexp)`
+#### `escape_re(regexp)`
 
-  escape a regular expression string
+escape a regular expression string
 
-`is_number(value)`
+#### `is_number(value)`
 
-  checks if `value` is a `Number`
+checks if `value` is a `Number`
 
-`is_function(value)`
+#### `is_function(value)`
 
-  checks if `value` is a `Function`
+checks if `value` is a `Function`
 
-`random(min, max)`
+#### `random(min, max)`
 
-  create a random number between `min` and `max`
+create a random number between `min` and `max`
 
-`is_empty(value)`
+#### `is_empty(value)`
 
-  is `value`; `undefined`, `null` or has a `length` equal to zero
+is `value`; `undefined`, `null` or has a `length` equal to zero
 
-`is_not_empty()`
+#### `is_not_empty()`
 
-  reverse of `is_empty`
+reverse of `is_empty`
 
-`trim()`
+#### `trim([string=' '], [chars=' '])`
 
-`ltrim()`
+remove `chars` from both sides of `string`
 
-`rtrim()`
+#### `ltrim([string=' '], [chars=' '])`
 
-`build()`
+remove `chars` from the left side of `string`
 
-`escape()`
+#### `rtrim([string=' '], [chars=' '])`
 
-`unescape()`
+remove `chars` from the right side of `string`
 
-`lpad()`
+#### `build(string|array)`
 
-`rpad()`
+flattens and compacts arguments of string arrays or strings
 
-`starts()`
+````
+var content = 'hello world';
+var fragment = qp.build(
+  '<h1>',
+    content,
+  '</h1>'
+);
+````
 
-`ends()`
+#### `escape(string)`
 
-`between()`
+escape special chars to html entities
 
-`snake_to_camel()`
+#### `unescape(string)`
 
-`camel_to_snake()`
+unescape html entities to special chars
 
-`repeat()`
+#### `lpad()`
 
-`replace_all()`
+#### `rpad()`
 
-`get_utf8_length()`
+#### `starts()`
 
-`stringify()`
+#### `ends()`
 
-`map()`
+#### `between()`
 
-`reduce()`
+#### `snake_to_camel()`
 
-`arg()`
+#### `camel_to_snake()`
 
-`to_array()`
+#### `repeat()`
 
-`flatten()`
+#### `replace_all()`
 
-`compact()`
+#### `get_utf8_length()`
 
-`now()`
+#### `stringify()`
 
-`date()`
+#### `map()`
 
-`file_date()`
+#### `reduce()`
 
-`bind()`
+#### `arg()`
 
-`invoke()`
+#### `to_array()`
 
-`invoke_after()`
+#### `flatten()`
 
-`invoke_delay()`
+#### `compact()`
 
-`typeof()`
+#### `now()`
 
-`is()`
+#### `date()`
 
-`is_not()`
+#### `file_date()`
 
-`size()`
+#### `bind()`
 
-`each()`
+#### `invoke()`
 
-`each_own()`
+#### `invoke_after()`
 
-`assign()`
+#### `invoke_delay()`
 
-`assign_own()`
+#### `typeof()`
 
-`assign_if()`
+#### `is()`
 
-`equals()`
+#### `is_not()`
 
-`clone()`
+#### `size()`
 
-`copy()`
+#### `each()`
 
-`merge()`
+#### `each_own()`
 
-`extend()`
+#### `assign()`
 
-`override()`
+#### `assign_if()`
 
-`first()`
+#### `equals()`
 
-`last()`
+#### `clone()`
 
-`rest()`
+#### `copy()`
 
-`at()`
+#### `merge()`
 
-`range()`
+#### `extend()`
 
-`in()`
+#### `override()`
 
-`not_in()`
+#### `first()`
 
-`find_predicate()`
+#### `last()`
 
-`find()`
+#### `rest()`
 
-`any()`
+#### `at()`
 
-`find_all()`
+#### `range()`
 
-`find_index()`
+#### `in()`
 
-`remove()`
+#### `not_in()`
 
-`remove_all()`
+#### `find_predicate()`
 
-`pick_predicate()`
+#### `find()`
 
-`pick()`
+#### `any()`
 
-`pick_own()`
+#### `find_all()`
 
-`pairs()`
+#### `find_index()`
 
-`keys()`
+#### `remove()`
 
-`values()`
+#### `pick_predicate()`
 
-`pick_values()`
+#### `pick()`
 
-`sort()`
+#### `pick_own()`
 
-`sort_on()`
+#### `pairs()`
 
-`group_on()`
+#### `keys()`
 
-`group_by()`
+#### `values()`
 
-`ns()`
+#### `pick_values()`
 
-`options()`
+#### `sort()`
 
-`id()`
+#### `sort_on()`
 
-`uuid()`
+#### `group_on()`
 
-`series()`
+#### `group_by()`
 
-`parallel()`
+#### `ns()`
+
+#### `options()`
+
+#### `id()`
+
+#### `uuid()`
+
+#### `series()`
+
+#### `parallel()`
