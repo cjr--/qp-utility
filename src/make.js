@@ -42,4 +42,5 @@ function make(ns, def) {
     invoke(ctor.inits, this, options);
   };
 
+  return ctor;
 }
