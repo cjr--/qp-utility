@@ -1,7 +1,8 @@
 function series() {
-  var data = arguments[2] ? arguments[0] : null;
-  var actions = arguments[2] ? arguments[1] : arguments[0];
-  var done = arguments[2] ? arguments[2] : arguments[1];
+  var args = arg(arguments);
+  var data = args[2] ? args[0] : null;
+  var actions = args[2] ? args[1] : args[0];
+  var done = args[2] ? args[2] : args[1];
   var results = {};
   function next() {
     var action = actions.shift();
@@ -22,9 +23,10 @@ function series() {
 }
 
 function parallel() {
-  var data = arguments[2] ? arguments[0] : null;
-  var actions = arguments[2] ? arguments[1] : arguments[0];
-  var done = arguments[2] ? arguments[2] : arguments[1];
+  var args = arg(arguments);
+  var data = args[2] ? args[0] : null;
+  var actions = args[2] ? args[1] : args[0];
+  var done = args[2] ? args[2] : args[1];
   var errors = null;
   var results = {};
   var remaining = size(actions) - 1;

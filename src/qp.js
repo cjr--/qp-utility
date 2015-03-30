@@ -72,6 +72,8 @@ var qp = {
   extend: extend,
   // override
   override: override,
+  // make.js
+  make: make,
 
   // collection.js
   first: first,

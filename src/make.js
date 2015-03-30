@@ -1,7 +1,8 @@
 function make(ns, def) {
 
+  var name = ns.split('/').pop().toLowerCase();
   /*jslint evil: true*/
-  var ctor = (new Function('return function ' + ns + '(o){this.construct.call(this,o);}'))();
+  var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
   ctor.create = function(o) { return new ctor(o); };
   ctor.ns = ns;
   ctor.properties = {};

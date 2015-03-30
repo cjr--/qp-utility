@@ -2,21 +2,21 @@
   var array_slice = Array.prototype.slice;
   var object_to_string = Object.prototype.toString;
   var is_array = Array.isArray;
-  
+
   function noop() { }
-  
+
   function is_number(o) { return o - parseFloat(o) >= 0; }
-  
+
   function is_function(o) { return typeof o === 'function'; }
-  
-  function escape_re(s) { return s.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"); }
-  
+
+  function escape_re(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
   function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
-  
+
   function is_empty(o) { return typeof o === 'undefined' || o === null || (o.length && o.length === 0); }
-  
+
   function is_not_empty(o) { return !is_empty(o); }
-  
+
   function trim(s, chars) {
     chars = escape_re(chars || ' ');
     if (s === undefined || s === null) {
@@ -25,7 +25,7 @@
       return String(s).replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
     }
   }
-  
+
   function ltrim(s, chars) {
     chars = escape_re(chars || ' ');
     if (s === undefined || s === null) {
@@ -34,7 +34,7 @@
       return String(s).replace(new RegExp('^' + chars + '+'), '');
     }
   }
-  
+
   function rtrim(s, chars) {
     chars = escape_re(chars || ' ');
     if (s === undefined || s === null) {
@@ -43,11 +43,11 @@
       return String(s).replace(new RegExp(chars + '+$'), '');
     }
   }
-  
+
   function build() {
-    return flatten(arguments).join('');
+    return compact(flatten(arguments)).join('');
   }
-  
+
   function escape(s) {
     return String(s)
       .replace(/&/g, '&amp;')
@@ -56,7 +56,7 @@
       .replace(/\"/g, '&quot;')
       .replace(/\'/g, '&#39;');
   }
-  
+
   function unescape(s) {
     return String(s)
       .replace(/&amp;/g, '&')
@@ -65,7 +65,7 @@
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
   }
-  
+
   function lpad(s, padding, width) {
     if (s === undefined || s === null) {
       return '';
@@ -76,7 +76,7 @@
       return s;
     }
   }
-  
+
   function rpad(s, padding, width) {
     if (s === undefined || s === null) {
       return '';
@@ -87,15 +87,15 @@
       return s;
     }
   }
-  
+
   function starts(s, str) {
     return s.lastIndexOf(str, 0) === 0;
   }
-  
+
   function ends(s, str) {
     return s.indexOf(str, s.length - str.length) !== -1;
   }
-  
+
   function between(s, left, right) {
     if (!right) right = left;
     if (s && left && right) {
@@ -105,7 +105,7 @@
       return s;
     }
   }
-  
+
   function snake_to_camel(input) {
     var output = '';
     for (var i = 0, l = input.length; i < l; i++) {
@@ -120,7 +120,7 @@
     }
     return output;
   }
-  
+
   function camel_to_snake(input) {
     var output = '';
     var chr = '';
@@ -140,14 +140,14 @@
     }
     return output;
   }
-  
+
   function repeat(o, times, delim) {
     for (var buffer = [], i = times; i--;) {
       buffer.push(o);
     }
     return buffer.join(delim || '');
   }
-  
+
   function replace_all(s0, s1, s2) {
     s1 = s1 ? escape_re(s1) : '';
     if (s0 === undefined || s0 === null) {
@@ -156,7 +156,7 @@
       return String(s0).replace(new RegExp(s1, 'g'), s2 || '');
     }
   }
-  
+
   // http://stackoverflow.com/a/12206089
   function get_utf8_length(s) {
     var len = 0;
@@ -178,7 +178,7 @@
     }
     return len;
   }
-  
+
   function stringify(o, simple) {
     if (simple) {
       return is_empty(o) ? '' : pairs(o).map(function(pair) {
@@ -192,13 +192,13 @@
       }).join(', ') + ' }';
     }
   }
-  
+
   function map(o, fn, scope) { return o.map(fn, scope); }
-  
+
   function reduce(o, fn, init) { return is_empty(o) ? undefined : o.reduce(fn, init); }
-  
+
   function arg(o) { return array_slice.call(o); }
-  
+
   function to_array(o) {
     if (is_array(o)) {
       return o;
@@ -212,7 +212,7 @@
       return [];
     }
   }
-  
+
   function flatten() {
     function _flatten(items) {
       return items.reduce(function(output, input) {
@@ -222,7 +222,7 @@
     var args = slice.call(arguments);
     return args.some(is_array) ? _flatten(args) : args;
   }
-  
+
   function compact(array) {
     var index = -1;
     var length = array ? array.length : 0;
@@ -235,7 +235,7 @@
     }
     return result;
   }
-  
+
   function first(o, count) {
     if (count) {
       return o && o.length ? array_slice.call(o, 0, count) : undefined;
@@ -243,7 +243,7 @@
       return o && o.length ? o[0] : undefined;
     }
   }
-  
+
   function last(o, count) {
     if (count) {
       return o && o.length ? array_slice.call(o, -count) : undefined;
@@ -251,22 +251,22 @@
       return o && o.length ? o[o.length -1] : undefined;
     }
   }
-  
+
   function rest(o, index) {
     return o && o.length ? array_slice.call(o, index || 1) : undefined;
   }
-  
+
   function at(o, i) {
     if (o && o.length) {
       return i < 0 ? o[((o.length - 1) + i)] : o[i];
     }
     return undefined;
   }
-  
+
   function range(o, from, to) {
     return o && o.length ? array_slice.call(o, from, to) : undefined;
   }
-  
+
   function _in(item, items) {
     if (is_array(items)) {
       return items.indexOf(item) != -1;
@@ -274,9 +274,9 @@
       return rest(arguments).indexOf(item) != -1;
     }
   }
-  
+
   function not_in() { return !_in.apply(null, arguments); }
-  
+
   function now(format) {
     var _now = new Date();
     if (format) {
@@ -296,11 +296,11 @@
     };
     return _now;
   }
-  
+
   function date(dt) {
     return new Date(dt);
   }
-  
+
   function file_date() {
     var dt = now();
     var year = dt.getUTCFullYear().toString();
@@ -308,7 +308,7 @@
     var day = lpad(dt.getUTCDate().toString(), '0', 2);
     return [year, month, day].join('');
   }
-  
+
   function bind(o, scope) {
     scope = scope || o;
     each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
@@ -316,7 +316,7 @@
     });
     return o;
   }
-  
+
   function invoke(fn, ctx) {
     if (is(fn, 'function')) {
       return fn.apply(ctx, array_slice.call(arguments, 2));
@@ -326,7 +326,7 @@
     }
     return undefined;
   }
-  
+
   function invoke_after(n, fn, ctx) {
     var count = 0;
     return function() {
@@ -335,7 +335,7 @@
       }
     };
   }
-  
+
   function invoke_delay(milli, fn) {
     var args = rest(arguments, 2);
     var id = setTimeout(function() {
@@ -343,7 +343,7 @@
       fn.apply(null, args);
     }, milli);
   }
-  
+
   function size(o) {
     if (is_array(o)) {
       return o.length;
@@ -351,7 +351,7 @@
       return Object.keys(o).length;
     }
   }
-  
+
   function each(o, fn, scope) {
     var no_exit = true;
     if (is_array(o)) {
@@ -372,7 +372,7 @@
     }
     return no_exit;
   }
-  
+
   function each_own(o, fn, scope) {
     var no_exit = true;
     var index = 0;
@@ -386,7 +386,7 @@
     }
     return no_exit;
   }
-  
+
   function assign() {
     var target = first(arguments);
     each(rest(arguments), function(source) {
@@ -398,7 +398,7 @@
     });
     return target;
   }
-  
+
   function assign_own() {
     var target = first(arguments);
     each(rest(arguments), function(source) {
@@ -410,7 +410,7 @@
     });
     return target;
   }
-  
+
   function assign_if() {
     var target = first(arguments);
     each(rest(arguments), function(source) {
@@ -423,7 +423,7 @@
     });
     return target;
   }
-  
+
   function qp_typeof(o, ctor) {
     var type = object_to_string.call(o).slice(8, -1).toLowerCase();
     if (ctor && type === 'object') {
@@ -436,7 +436,7 @@
     }
     return type;
   }
-  
+
   function is(o, o_class) {
     var type = qp_typeof(o);
     if (arguments.length > 2) {
@@ -446,9 +446,9 @@
       return type === o_class || (type === 'object' && qp_typeof(o, true) === o_class);
     }
   }
-  
+
   function is_not() { return !is.apply(null, arguments); }
-  
+
   function clone(original) {
     function _clone(o) {
       var copy;
@@ -474,7 +474,7 @@
     }
     return _clone(original);
   }
-  
+
   function copy(o) {
     if (is(o, 'array')) {
       return o.slice(0);
@@ -486,7 +486,7 @@
       return o;
     }
   }
-  
+
   function equals(o1, o2) {
     function _equals(a, b) {
       if (a === b) {
@@ -524,7 +524,7 @@
     }
     return _equals(o1, o2);
   }
-  
+
   function extend(a, b) {
     if (is_function(b)) {
       b.apply(null, array_slice.call(arguments, 2));
@@ -535,7 +535,7 @@
       }
     }
   }
-  
+
   function merge() {
     function _merge(a, b) {
       var type_a = qp_typeof(a);
@@ -576,7 +576,7 @@
     }
     return target;
   }
-  
+
   function ns(scope, _ns, value) {
     scope = scope || global;
     var setter = arguments.length === 3;
@@ -592,7 +592,7 @@
     });
     return scope;
   }
-  
+
   function options(_options, defaults) {
     if (is(_options, 'object') && is(defaults, 'object')) {
       each_own(defaults, function(v, k) {
@@ -605,7 +605,7 @@
     }
     return _options;
   }
-  
+
   function override(a, b) {
     function _override(a, b) {
       var type_a = qp_typeof(a);
@@ -624,7 +624,7 @@
     }
     return _override(a, b);
   }
-  
+
   function pick_predicate() {
     if (is(arguments[0], 'function')) {
       return arguments[1] ? arguments[0].bind(arguments[1]) : arguments[0];
@@ -634,7 +634,7 @@
     }
     return undefined;
   }
-  
+
   function _pick(o, predicate, options) {
     options = options || {};
     if (predicate) {
@@ -650,15 +650,15 @@
     }
     return undefined;
   }
-  
+
   function pick(o) {
     return _pick(o, pick_predicate.apply(null, rest(arguments)));
   }
-  
+
   function pick_own(o) {
     return _pick(o, pick_predicate.apply(null, rest(arguments)), { own: true });
   }
-  
+
   function pairs(o) {
     var _pairs = [];
     if (is(o, 'object')) {
@@ -666,7 +666,7 @@
     }
     return _pairs;
   }
-  
+
   function keys(o) {
     var _keys = [];
     for (var key in o) {
@@ -676,7 +676,7 @@
     }
     return _keys;
   }
-  
+
   function values(o) {
     var _values = [];
     for (var key in o) {
@@ -686,7 +686,7 @@
     }
     return _values;
   }
-  
+
   function pick_values(o) {
     var keys = flatten(rest(arguments));
     var output = [];
@@ -699,11 +699,12 @@
     }
     return output;
   }
-  
+
   function series() {
-    var data = arguments[2] ? arguments[0] : null;
-    var actions = arguments[2] ? arguments[1] : arguments[0];
-    var done = arguments[2] ? arguments[2] : arguments[1];
+    var args = arg(arguments);
+    var data = args[2] ? args[0] : null;
+    var actions = args[2] ? args[1] : args[0];
+    var done = args[2] ? args[2] : args[1];
     var results = {};
     function next() {
       var action = actions.shift();
@@ -722,11 +723,12 @@
     }
     next();
   }
-  
+
   function parallel() {
-    var data = arguments[2] ? arguments[0] : null;
-    var actions = arguments[2] ? arguments[1] : arguments[0];
-    var done = arguments[2] ? arguments[2] : arguments[1];
+    var args = arg(arguments);
+    var data = args[2] ? args[0] : null;
+    var actions = args[2] ? args[1] : args[0];
+    var done = args[2] ? args[2] : args[1];
     var errors = null;
     var results = {};
     var remaining = size(actions) - 1;
@@ -744,7 +746,7 @@
       });
     });
   }
-  
+
   function find_predicate(arg1, arg2) {
     var predicate;
     if (is(arg1, 'function')) {
@@ -764,7 +766,7 @@
     }
     return predicate;
   }
-  
+
   function find(items, arg1, arg2, options) {
     options = options || {};
     var output_all = options.find_all || options.remove_all;
@@ -790,29 +792,29 @@
     }
     return output_all ? match_value : match_value[0];
   }
-  
+
   function any(items, arg1, arg2) {
     return find(items, arg1, arg2, { find: true }) !== undefined;
   }
-  
+
   function find_all(items, arg1, arg2) {
     return find(items, arg1, arg2, { find_all: true });
   }
-  
+
   function find_index(items, arg1, arg2) {
     return find(items, arg1, arg2, { index: true });
   }
-  
+
   function remove(items, arg1, arg2) {
     return find(items, arg1, arg2, { remove: true });
   }
-  
+
   function remove_all(items, arg1, arg2) {
     return find(items, arg1, arg2, { remove_all: true });
   }
-  
+
   var identity = 101;
-  
+
   function id(use_date) {
     if (use_date) {
       return String(new Date().getTime() + identity++);
@@ -820,7 +822,7 @@
       return String(identity++);
     }
   }
-  
+
   function uuid() {
     var d = new Date().getTime();
     var _uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -828,18 +830,19 @@
       d = Math.floor(d / 16);
       return (c == 'x' ? r : (r&0x7|0x8)).toString(16);
     });
-    return _uuid;
+    return _uuid; 
   }
-  
+
   function make(ns, def) {
-  
+
+    var name = ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
-    var ctor = (new Function('return function ' + ns + '(o){this.construct.call(this,o);}'))();
+    var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
     ctor.create = function(o) { return new ctor(o); };
     ctor.ns = ns;
     ctor.properties = {};
     ctor.inits = [];
-  
+
     if (def.mx) {
       each(def.mx.reverse(), function(mixin) {
         ctor.mixins.push(mixin.ns);
@@ -849,7 +852,7 @@
       });
       mixin.inits = flatten(mixin.inits);
     }
-  
+
     each(def, function(value, name) {
       if (name === 'mixins') {
       } else if (name === 'self') {
@@ -864,7 +867,7 @@
         ctor.properties[name] = override(ctor.properties[name], value);
       }
     });
-  
+
     ctor.prototype.construct = function(options) {
       var reset = clone(ctor.properties);
       this.reset = function() { merge(this, reset); };
@@ -874,17 +877,18 @@
       assign_own(this, options);
       invoke(ctor.inits, this, options);
     };
-  
+
     return ctor;
   }
-  
+
   function sort(items, fn) {
     return items.sort(fn);
   }
-  
-  function sort_on(items, keys, options) {
-    var stable_sort = true;
-    if (stable_sort) {
+
+  function sort_on(items, keys, _options) {
+    var opts = options(_options, { stable: true });
+    keys = is_array(keys) ? keys : keys.split(',');
+    if (opts.stable) {
       for (var i = 0, l = items.length; i < l; i++) {
         items[i].sort_index = i;
       }
@@ -894,20 +898,19 @@
         var v1 = o1[key], v2 = o2[key];
         if (v1 > v2) { return 1; }
         if (v1 < v2) { return -1; }
-        if (stable_sort) {
+        if (opts.stable) {
           return o1.sort_index > o2.sort_index ? 1 : -1;
         }
         return 0;
       });
     });
+    return items;
   }
-  
+
   function group_on(items, key, name, sort_key) {
     var sort = [ key ];
-    if (sort_key) {
-      sort.push(sort_key);
-    }
-    sort_on(items, sort);
+    if (sort_key) sort.push(sort_key);
+    sort_on(items, sort, { stable: true });
     var group;
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
@@ -919,21 +922,20 @@
     }
     return items;
   }
-  
-  function group_by(items, key, name, sort_key) {
-    var sort = [ key ];
-    if (sort_key) {
-      sort.push(sort_key);
-    }
+
+  function group_by(items, group_key, group_name, sort_key) {
+    group_name = group_name || group_key;
+    var sort = [ group_key ];
+    if (sort_key) sort.push(sort_key);
     var groups = [];
     var group;
-    each(sort_on(items, sort), function(item) {
-      var item_key = ns(item, key);
+    sort_on(items, sort, { stable: true }).forEach(function(item) {
+      var item_key = ns(item, group_key);
       if (!group || item_key !== group.key) {
         group = {
           group: true,
           key: item_key,
-          name: ns(item, name),
+          name: ns(item, group_name),
           items: [item]
         };
         groups.push(group);
@@ -943,9 +945,9 @@
     });
     return groups;
   }
-  
+
   var qp = {
-  
+
     // core.js
     noop: noop,
     escape_re: escape_re,
@@ -954,7 +956,7 @@
     random: random,
     is_empty: is_empty,
     is_not_empty: is_not_empty,
-  
+
     // string.js
     trim: trim,
     ltrim: ltrim,
@@ -973,7 +975,7 @@
     replace_all: replace_all,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
-  
+
     // array.js
     map: map,
     reduce: reduce,
@@ -981,23 +983,23 @@
     to_array: to_array,
     flatten: flatten,
     compact: compact,
-  
+
     // date.js
     now: now,
     date: date,
     file_date: file_date,
-  
+
     // function.js
     bind: bind,
     invoke: invoke,
     invoke_after: invoke_after,
     invoke_delay: invoke_delay,
-  
+
     // typeof.js
     typeof: qp_typeof,
     is: is,
     is_not: is_not,
-  
+
     // iteration.js
     size: size,
     each: each,
@@ -1005,7 +1007,7 @@
     assign: assign,
     assign_own: assign_own,
     assign_if: assign_if,
-  
+
     // equals.js
     equals: equals,
     // clone.js
@@ -1018,7 +1020,9 @@
     extend: extend,
     // override
     override: override,
-  
+    // make.js
+    make: make,
+
     // collection.js
     first: first,
     last: last,
@@ -1027,7 +1031,7 @@
     range: range,
     in: _in,
     not_in: not_in,
-  
+
     // find.js
     find_predicate: find_predicate,
     find: find,
@@ -1036,7 +1040,7 @@
     find_index: find_index,
     remove: remove,
     remove_all: remove_all,
-  
+
     // pick
     pick_predicate: pick_predicate,
     pick: pick,
@@ -1045,29 +1049,29 @@
     keys: keys,
     values: values,
     pick_values: pick_values,
-  
+
     // sort.js
     sort: sort,
     sort_on: sort_on,
     group_on: group_on,
     group_by: group_by,
-  
+
     // ns.js
     ns: ns,
-  
+
     // options.js
     options: options,
-  
+
     // id.js
     id: id,
     uuid: uuid,
-  
+
     // async.js
     series: series,
     parallel: parallel
-  
+
   };
-  
+
   global.qp = qp;
 
 })(this);

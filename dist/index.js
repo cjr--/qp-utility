@@ -8,7 +8,7 @@ function is_number(o) { return o - parseFloat(o) >= 0; }
 
 function is_function(o) { return typeof o === 'function'; }
 
-function escape_re(s) { return s.replace(/([.*+?^${}()|\[\]\/\\])/g, "\\$1"); }
+function escape_re(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
 function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
 
@@ -44,7 +44,7 @@ function rtrim(s, chars) {
 }
 
 function build() {
-  return flatten(arguments).join('');
+  return compact(flatten(arguments)).join('');
 }
 
 function escape(s) {
@@ -700,9 +700,10 @@ function pick_values(o) {
 }
 
 function series() {
-  var data = arguments[2] ? arguments[0] : null;
-  var actions = arguments[2] ? arguments[1] : arguments[0];
-  var done = arguments[2] ? arguments[2] : arguments[1];
+  var args = arg(arguments);
+  var data = args[2] ? args[0] : null;
+  var actions = args[2] ? args[1] : args[0];
+  var done = args[2] ? args[2] : args[1];
   var results = {};
   function next() {
     var action = actions.shift();
@@ -723,9 +724,10 @@ function series() {
 }
 
 function parallel() {
-  var data = arguments[2] ? arguments[0] : null;
-  var actions = arguments[2] ? arguments[1] : arguments[0];
-  var done = arguments[2] ? arguments[2] : arguments[1];
+  var args = arg(arguments);
+  var data = args[2] ? args[0] : null;
+  var actions = args[2] ? args[1] : args[0];
+  var done = args[2] ? args[2] : args[1];
   var errors = null;
   var results = {};
   var remaining = size(actions) - 1;
@@ -832,8 +834,9 @@ function uuid() {
 
 function make(ns, def) {
 
+  var name = ns.split('/').pop().toLowerCase();
   /*jslint evil: true*/
-  var ctor = (new Function('return function ' + ns + '(o){this.construct.call(this,o);}'))();
+  var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
   ctor.create = function(o) { return new ctor(o); };
   ctor.ns = ns;
   ctor.properties = {};
@@ -881,9 +884,10 @@ function sort(items, fn) {
   return items.sort(fn);
 }
 
-function sort_on(items, keys, options) {
-  var stable_sort = true;
-  if (stable_sort) {
+function sort_on(items, keys, _options) {
+  var opts = options(_options, { stable: true });
+  keys = is_array(keys) ? keys : keys.split(',');
+  if (opts.stable) {
     for (var i = 0, l = items.length; i < l; i++) {
       items[i].sort_index = i;
     }
@@ -893,20 +897,19 @@ function sort_on(items, keys, options) {
       var v1 = o1[key], v2 = o2[key];
       if (v1 > v2) { return 1; }
       if (v1 < v2) { return -1; }
-      if (stable_sort) {
+      if (opts.stable) {
         return o1.sort_index > o2.sort_index ? 1 : -1;
       }
       return 0;
     });
   });
+  return items;
 }
 
 function group_on(items, key, name, sort_key) {
   var sort = [ key ];
-  if (sort_key) {
-    sort.push(sort_key);
-  }
-  sort_on(items, sort);
+  if (sort_key) sort.push(sort_key);
+  sort_on(items, sort, { stable: true });
   var group;
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
@@ -919,20 +922,19 @@ function group_on(items, key, name, sort_key) {
   return items;
 }
 
-function group_by(items, key, name, sort_key) {
-  var sort = [ key ];
-  if (sort_key) {
-    sort.push(sort_key);
-  }
+function group_by(items, group_key, group_name, sort_key) {
+  group_name = group_name || group_key;
+  var sort = [ group_key ];
+  if (sort_key) sort.push(sort_key);
   var groups = [];
   var group;
-  each(sort_on(items, sort), function(item) {
-    var item_key = ns(item, key);
+  sort_on(items, sort, { stable: true }).forEach(function(item) {
+    var item_key = ns(item, group_key);
     if (!group || item_key !== group.key) {
       group = {
         group: true,
         key: item_key,
-        name: ns(item, name),
+        name: ns(item, group_name),
         items: [item]
       };
       groups.push(group);
@@ -1017,6 +1019,8 @@ var qp = {
   extend: extend,
   // override
   override: override,
+  // make.js
+  make: make,
 
   // collection.js
   first: first,
