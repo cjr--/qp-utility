@@ -1,5 +1,3 @@
-javascript utility functions;
-
 #### `noop()`
 
 no operation
@@ -42,7 +40,7 @@ remove `chars` from the right side of `string`
 
 #### `build(string|array)`
 
-flattens and compacts arguments of string arrays or strings
+flattens and compacts arguments of string arrays or strings and joins them
 
 ````
 var content = 'hello world';
