@@ -1,3 +1,8 @@
+var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 function now(format) {
   var _now = new Date();
   if (format) {
@@ -28,4 +33,33 @@ function file_date() {
   var month = lpad(dt.getUTCMonth().toString(), '0', 2);
   var day = lpad(dt.getUTCDate().toString(), '0', 2);
   return [year, month, day].join('');
+}
+
+function date_time(dt) {
+  dt = (typeof dt === 'string' ? new Date(dt) : dt);
+  return {
+    format: function(format) {
+      if (format === 'utc') {
+        return dt.toUTCString();
+      } else if (format === 'month day, year') {
+        return month_short[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+      }
+      return dt;
+    }
+  };
+}
+
+function timer() {
+  var start = new Date();
+  var lap = start;
+  return {
+    elapsed: function() {
+      return ((new Date() - start) / 1000).toFixed(2);
+    },
+    lap: function() {
+      var last_lap = lap;
+      lap = new Date();
+      return ((lap - last_lap) / 1000).toFixed(2);
+    }
+  };
 }

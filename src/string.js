@@ -87,40 +87,47 @@ function between(s, left, right) {
   }
 }
 
-function snake_to_camel(input) {
-  var output = '';
-  for (var i = 0, l = input.length; i < l; i++) {
-    var chr = input[i];
+function to_camel(s, sep) {
+  var out = '';
+  for (var i = 0, l = s.length; i < l; i++) {
+    var chr = s[i];
     if (i === 0) {
-      output += chr.toUpperCase();
-    } else if (chr === '_' || chr === '-') {
-      output += input[++i].toUpperCase();
+      out += chr.toUpperCase();
+    } else if (chr === sep) {
+      out += s[++i].toUpperCase();
     } else {
-      output += chr;
+      out += chr;
     }
   }
-  return output;
+  return out;
 }
 
-function camel_to_snake(input) {
-  var output = '';
+function camel_to(s, sep) {
+  var out = '';
   var chr = '';
   var last = '';
   var lower = '';
-  for (var i = 0, l = input.length; i < l; i++) {
+  for (var i = 0, l = s.length; i < l; i++) {
     last = chr;
-    chr = input[i];
+    chr = s[i];
     lower = chr.toLowerCase();
-    if (i === 0 || last == '.' || chr == '.' || chr == '_' || is_number(chr)) {
-      output += lower;
+    if (i === 0 || last == '.' || chr == '.' || chr == sep || is_number(chr)) {
+      out += lower;
     } else if (chr == chr.toUpperCase()) {
-      output += '_' + lower;
+      out += sep + lower;
     } else {
-      output += lower;
+      out += lower;
     }
   }
-  return output;
+  return out;
 }
+
+function snake_to_kebab(s) { return replace_all(s, '_', '-'); }
+function snake_to_camel(s) { return to_camel(s, '_'); }
+function camel_to_snake(s) { return camel_to(s, '_'); }
+function camel_to_kebab(s) { return camel_to(s, '-'); }
+function kebab_to_camel(s) { return to_camel(s, '-'); }
+function kebab_to_snake(s) { return replace_all(s, '-', '_'); }
 
 function repeat(o, times, delim) {
   for (var buffer = [], i = times; i--;) {

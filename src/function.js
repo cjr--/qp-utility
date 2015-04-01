@@ -32,3 +32,11 @@ function invoke_delay(milli, fn) {
     fn.apply(null, args);
   }, milli);
 }
+
+function invoke_next(fn) {
+  if (global.process && global.process.nextTick) {
+    process.nextTick(fn);
+  } else {
+    setTimeout(fn, 0);
+  }
+}
