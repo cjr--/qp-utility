@@ -103,8 +103,10 @@ pad the right hand side of a string with the pad characters until to total lengt
 - (string) left hand delimiter
 - (string) right hand delimiter
 
-`qp.between('<div>hello</div>', '<div>', '</div>');`
-`> hello`
+````
+qp.between('<div>hello</div>', '<div>', '</div>');
+> hello
+````
 
 #### `snake_to_camel(string)`
 
@@ -157,8 +159,10 @@ Returns to the string length in bytes with regard for the encoding
 - (object) the object to convert to a string
 - (boolean) if true, procduces simplified output, does not process children
 
-`qp.stringify({ one: 'two', three: { four: 'five' } });`
-`> "{ one: two, three: { four: five } }"`
+````
+qp.stringify({ one: 'two', three: { four: 'five' } });
+> "{ one: two, three: { four: five } }"
+````
 
 #### `map(array, function, object)`
 
