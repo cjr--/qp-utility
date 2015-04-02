@@ -88,6 +88,7 @@ var qp = {
   find_predicate: find_predicate,
   find: find,
   any: any,
+  exists: any,
   find_all: find_all,
   find_index: find_index,
   remove: remove,

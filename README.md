@@ -2,192 +2,223 @@
 
 no operation
 
-#### `escape_re(string)`
+#### `string escape_re(string reg_exp)`
 
-escape a regular expression string
+escape special chars in a regular expression string
 
-#### `is_number(value)`
+`reg_exp` regular expression string
 
-checks if `value` is a `Number`
+`string` escaped string
 
-#### `is_function(value)`
+#### `boolean is_number(object value)`
 
-checks if `value` is a `Function`
+`value` to check
 
-#### `random(number, number)`
+`boolean` true if value is a `function`
 
-- (number) minimum value
-- (number) maximum value
+#### `boolean is_function(object value)`
 
-create a random number between minimum and maximum values
+`value` to check
 
-#### `is_empty(value)`
+`boolean` true if value is a `function`
 
-is `value`; `undefined`, `null` or has a `length` equal to zero
+#### `number random(number min, number max)`
 
-#### `is_not_empty(value)`
+`number` minimum value
+`number` maximum value
 
-reverse of `is_empty`
+`number` a random number between minimum and maximum values
 
-#### `trim(string, string=' ')`
+#### `boolean is_empty(object value)`
 
-- (string) the string to trim
-- (string) trim characters
+`value` to check
 
-remove the trim characters from both sides of the string
+`boolean` true if value is `undefined`, `null` or `length === 0`
 
-#### `ltrim(string, string=' ')`
+#### `boolean not_empty(object value)`
 
-- (string) the string to trim
-- (string) trim characters
+`value` to check
 
-remove the trim characters from the left side of the string
+`boolean` inverse of `is_empty`
 
-#### `rtrim(string, string=' ')`
+#### `string trim(string value, string chars)`
 
-- (string) the string to trim
-- (string) trim characters
+`value` the string to trim
+`chars` the characters to trim from `value`
 
-remove the trim characters from the right side of the string
+`string` remove characters from both sides of the string
 
-#### `build(string|[string], ...)`
+#### `string ltrim(string value, string chars)`
 
-flattens and compacts arguments of string arrays or strings and joins them
+`value` the string to trim
+`chars` trim characters
+
+`string` remove the trim characters from the left side of the string
+
+#### `string rtrim(string value, string chars)`
+
+`value` the string to trim
+`chars` trim characters
+
+`string` remove the trim characters from the right side of the string
+
+#### `string build(string | string[], ...)`
+
+flattens and compacts arguments of strings string arrays and joins them
 
 ````
-var content = 'hello world';
-var fragment = qp.build(
+qp.build(
   '<h1>',
-    content,
+    'hello world',
   '</h1>'
 );
+
+=> <h1>hello world</h1>
 ````
 
-#### `escape(string)`
+#### `string escape(string html)`
 
-escape special chars to html entities
+`html` string to escape
 
-#### `unescape(string)`
+`string` escape special chars to html entities
 
-unescape html entities to special chars
+#### `string unescape(string html)`
 
-#### `lpad(string, string, number)`
+`html` string to unescape
 
-- (string) the string to pad
-- (string) padding characters
-- (number) pad to length
+`string` unescape html entities to special chars
 
-pad the left hand side of a string with the pad characters until to total length of the string is greater than or equal to the length.
+#### `string lpad(string value, string pad, number len)`
 
-#### `rpad(string, string, number)`
+`value` the string to pad
+`pad` padding characters
+`len` pad to length
 
-- (string) the string to pad
-- (string) padding characters
-- (number) pad to length
+`string` pad left side of `value`
 
-pad the right hand side of a string with the pad characters until to total length of the string is greater than or equal to the length.
+#### `string rpad(string value, string pad, number len)`
 
-#### `starts(string, string)`
+`value` the string to pad
+`pad` padding characters
+`len` pad to length
 
-- (string) the string to test
-- (string) starts with
+`string` pad right side of `value`
 
-#### `ends(string, string)`
+#### `boolean starts(string value, string match)`
 
-- (string) the string to test
-- (string) ends with
+`value` the string to test
+`match` starts with
 
-#### `between(string, string, string=left_delimiter)`
+`boolean` does the string start with `match`
 
-- (string) the string to process
-- (string) left hand delimiter
-- (string) right hand delimiter
+#### `boolean ends(string value, string match)`
+
+`value` the string to test
+`match` ends with
+
+`boolean` does the string end with `match`
+
+#### `string between(string value, string left, string right)`
+
+`value` the string to process
+`left` left hand delimiter
+`right` right hand delimiter (defaults to `left`)
 
 ````
-qp.between('<div>hello</div>', '<div>', '</div>');
-> hello
+qp.between('<div>hello world</div>', '<div>', '</div>');
+=> hello world
 ````
 
-#### `snake_to_camel(string)`
+#### `string camel_case(string value)`
 
-convert `snake_case` to upper `CamelCase`
+`value` the string to process
 
-#### `snake_to_kebab(string)`
+`string` convert to `CamelCase`
 
-convert `snake_case` to `kebab-case`
+#### `string kebab_case(string value)`
 
-#### `camel_to_snake(string)`
+`value` the string to process
 
-convert upper `CamelCase` to `snake_case`
+`string` convert to `kebab-case`
 
-#### `camel_to_kebab(string)`
+#### `string snake_case(string value)`
 
-convert upper `CamelCase` to `kebab-case`
+`value` the string to process
 
-#### `kebab_to_camel(string)`
+`string` convert to `snake_case`
 
-convert `kebab-case` to upper `CamelCase`
+#### `string repeat(string value, number times, string delimiter)`
 
-#### `kebab_to_snake(string)`
+`value` the string to repeat
+`times` the number of times to repeat the string
+`delimiter` the delimiter between the repeats (defaults to '')
 
-convert `kebab-case` to `snake_case`
+`string` repeated string
 
-#### `repeat(string, number, string='')`
+#### `string replace_all(string value, string|regexp search, string replace)`
 
-- (string) the string to repeat
-- (number) the number of times to repeat the string
-- (string) the delimiter between the repeats
+`value` the string to process
+`search` the string to search for | regular expression
+`replace` the replacement string
 
-#### `replace_all(string, string='', string='')`
+`string` replace all occurrences of one string within another
 
-- (string) the string to process
-- (string) the string to search for | regular expression
-- (string) the replacement string
-
-Replace all occurences of one string within another, optionally search using a RegExp
-
-#### `get_utf8_length(string)`
+#### `string get_utf8_length(string value)`
 
 see <http://stackoverflow.com/a/12206089>
 
-- (string) the string to process
+`value` the string to process
 
-Returns to the string length in bytes with regard for the encoding
+`string` the string length in bytes with regard for the encoding
 
-#### `stringify(object, boolean)`
+#### `string stringify(object value, boolean simple)`
 
-- (object) the object to convert to a string
-- (boolean) if true, procduces simplified output, does not process children
+'value' the object to convert to a string
+'simple' if true, produces simplified output, does not process children
+
+`string` string representation of `value`
 
 ````
 qp.stringify({ one: 'two', three: { four: 'five' } });
 > "{ one: two, three: { four: five } }"
 ````
 
-#### `map(array, function, object)`
+#### `array map(array items, function map, object context)`
 
-- (array) the source array
-- (function) the map function
-- (object) scope within which to call the map function
+`items` the source array
+`map` the map function
 
-#### `reduce(array, function, value)`
+> `object function map(object item, number index, array items)`
+>
+> `item` current item being processed
+> `index` current item index
+> `items` the source array
+>
+> `object:` the item to be added to the mapped array
 
-- (array) the source array
-- (function) the reduce function
-- (value) the initial reduce value
+`context` context of map function
 
-#### `arg(arguments)`
+`array:` a new array produced via the `map` function
 
-- (arguments) the array like arguments object
+#### `object reduce(array items, function reduce, object value)`
 
-returns a array containing the passed arguments
+`items` the source array
+`reduce` the reduce function
+`value` the initial reduce value
+
+`object:`
+
+#### `array arg(arguments args)`
+
+`args` the arguments object
+
+`array:` containing the passed arguments
 
 #### `to_array(value)`
 
 - (value) the value to convert to an array
 
-attempts to convert the passed value to an array. converts array like objects, strings are split to chars,
-single values are placed inside a new array, otherwise an empty array is returned
+attempts to convert the passed value to an array. converts array like objects, strings are split to chars, single values are placed inside a new array, otherwise an empty array is returned
 
 #### `flatten(value|array, ...)`
 
@@ -207,9 +238,16 @@ removes `falsey` values from an array
 
 #### `date_time()`
 
-#### `bind()`
+#### `bind(object, object)`
 
-#### `invoke()`
+- (object) source object
+- (object) context object (defaults to source object)
+
+Iterates functions of source object and binds them to the context object
+
+#### `invoke(function|[function], object)`
+
+- (function)
 
 #### `invoke_after()`
 
