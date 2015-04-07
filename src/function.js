@@ -40,3 +40,15 @@ function invoke_next(fn) {
     setTimeout(fn, 0);
   }
 }
+
+function invoke_when(fn, check, interval) {
+  (function timer_event() {
+    invoke_delay(interval || 500, function() {
+      if (check()) {
+        fn();
+      } else {
+        timer_event();
+      }
+    });
+  })();
+}
