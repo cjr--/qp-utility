@@ -9,21 +9,21 @@ no operation
 
 escape special chars in a regular expression string
 
-`return` escaped string
+**`return`** escaped string
 
 ---
 #### `boolean is_number(object value)`
 
 - `value` to check
 
-`return` true if value is a `function`
+**`return`** true if value is a `function`
 
 ---
 #### `boolean is_function(object value)`
 
 - `value` to check
 
-`return` true if value is a `function`
+**`return`** true if value is a `function`
 
 ---
 #### `number random(number min, number max)`
@@ -31,21 +31,21 @@ escape special chars in a regular expression string
 - `number` minimum value
 - `number` maximum value
 
-`return` a random number between minimum and maximum values
+**`return`** a random number between minimum and maximum values
 
 ---
 #### `boolean is_empty(object value)`
 
 - `value` to check
 
-`return` true if value is `undefined`, `null` or `length === 0`
+**`return`** true if value is `undefined`, `null` or `length === 0`
 
 ---
 #### `boolean not_empty(object value)`
 
 - `value` to check
 
-`return` inverse of `is_empty`
+**`return`** inverse of `is_empty`
 
 ---
 #### `string trim(string value, string chars)`
@@ -53,7 +53,7 @@ escape special chars in a regular expression string
 - `value` the string to trim
 - `chars` the characters to trim from `value`
 
-`return` remove characters from both sides of the string
+**`return`** remove characters from both sides of the string
 
 ---
 #### `string ltrim(string value, string chars)`
@@ -61,7 +61,7 @@ escape special chars in a regular expression string
 - `value` the string to trim
 - `chars` trim characters
 
-`return` remove the trim characters from the left side of the string
+**`return`** remove the trim characters from the left side of the string
 
 ---
 #### `string rtrim(string value, string chars)`
@@ -69,16 +69,16 @@ escape special chars in a regular expression string
 - `value` the string to trim
 - `chars` trim characters
 
-`return` remove the trim characters from the right side of the string
+**`return`** remove the trim characters from the right side of the string
 
 ---
 #### `string build(string | string[], ...)`
 
 - `values` any combination of strings, string arrays and arguments
 
-flattens and compacts `values` into a flat array and then `join`s them
+`flatten` and `compact` `values` into a flat array and then `join`s them
 
-`return` string
+**`return`** string
 
 ````
 qp.build(
@@ -95,14 +95,14 @@ qp.build(
 
 - `html` string to escape
 
-`return` escape special chars to html entities
+**`return`** escape special chars to html entities
 
 ---
 #### `string unescape(string html)`
 
 - `html` string to unescape
 
-`return` unescape html entities to special chars
+**`return`** unescape html entities to special chars
 
 ---
 #### `string lpad(string value, string pad, number len)`
@@ -111,7 +111,7 @@ qp.build(
 - `pad` padding characters
 - `len` pad to length
 
-`return` pad left side of `value`
+**`return`** pad left side of `value`
 
 ---
 #### `string rpad(string value, string pad, number len)`
@@ -120,7 +120,7 @@ qp.build(
 - `pad` padding characters
 - `len` pad to length
 
-`return` pad right side of `value`
+**`return`** pad right side of `value`
 
 ---
 #### `boolean starts(string value, string match)`
@@ -128,7 +128,7 @@ qp.build(
 - `value` the string to test
 - `match` starts with
 
-`return` does the string start with `match`
+**`return`** does the string start with `match`
 
 ---
 #### `boolean ends(string value, string match)`
@@ -136,7 +136,7 @@ qp.build(
 - `value` the string to test
 - `match` ends with
 
-`return` does the string end with `match`
+**`return`** does the string end with `match`
 
 ---
 #### `string between(string value, string left, string right)`
@@ -145,7 +145,7 @@ qp.build(
 - `left` left hand delimiter
 - `right` right hand delimiter (defaults to `left`)
 
-`return` the string between the delimiters
+**`return`** the string between the delimiters
 
 ````
 qp.between('<div>hello world</div>', '<div>', '</div>');
@@ -157,39 +157,39 @@ qp.between('<div>hello world</div>', '<div>', '</div>');
 
 - `value` the string to process
 
-`return` converted to `CamelCase`
+**`return`** converted to `CamelCase`
 
 ---
 #### `string kebab_case(string value)`
 
 - `value` the string to process
 
-`return` converted to `kebab-case`
+**`return`** converted to `kebab-case`
 
 ---
 #### `string snake_case(string value)`
 
 - `value` the string to process
 
-`return` converted to `snake_case`
+**`return`** converted to `snake_case`
 
 ---
 #### `string repeat(string value, number times, string delimiter)`
 
 - `value` the string to repeat
 - `times` the number of times to repeat the string
-- `delimiter` the delimiter between the repeats (defaults to '')
+- `delimiter` the delimiter between the repeats (defaults to `''`)
 
-`return` repeated string
+**`return`** repeated string
 
 ---
-#### `string replace_all(string value, string|regexp search, string replace)`
+#### `string replace_all(string value, string search, string replace)`
 
 - `value` the string to process
-- `search` the string to search for | regular expression
+- `search` the string to search for. optionally a regular expression
 - `replace` the replacement string
 
-`return` replace all occurrences of one string within another
+**`return`** replace all occurrences of one string within another
 
 ---
 #### `string get_utf8_length(string value)`
@@ -198,15 +198,15 @@ see <http://stackoverflow.com/a/12206089>
 
 - `value` the string to process
 
-`return` the string length in bytes with regard for the encoding
+**`return`** the string length in bytes with regard for the encoding
 
 ---
 #### `string stringify(object value, boolean simple)`
 
-- 'value' the object to convert to a string
-- 'simple' if true, produces simplified output, does not process children
+- `value` the object to convert to a string
+- `simple` if true, produces simplified output, does not process children
 
-`return` string representation of `value`
+**`return`** string representation of `value`
 
 ````
 qp.stringify({ one: 'two', three: { four: 'five' } });
@@ -220,15 +220,15 @@ qp.stringify({ one: 'two', three: { four: 'five' } });
 - `map` the map function
 - `context` context of map function
 
-> `object function map(object item, number index, array items)`
->
-> - `item` current item being processed
-> - `index` current item index
-> - `items` the source array
->
-> `return` the item to be added to the mapped array
+    **`object function map(object item, number index, array items)`**
 
-`return` a new array produced via the `map` function
+    - `item` current item being processed
+    - `index` current item index
+    - `items` the source array
+
+    **`return`** the item to be added to the mapped array
+
+**`return`** a new array produced via the `map` function
 
 ---
 #### `object reduce(array items, function reduce, object value)`
@@ -237,14 +237,14 @@ qp.stringify({ one: 'two', three: { four: 'five' } });
 - `reduce` the reduce function
 - `value` the initial reduce value
 
-`return`
+**`return`**
 
 ---
 #### `array arg(arguments args)`
 
 - `args` the arguments object
 
-`return` containing the passed arguments
+**`return`** containing the passed arguments
 
 ---
 #### `array to_array(object value)`
@@ -253,7 +253,7 @@ qp.stringify({ one: 'two', three: { four: 'five' } });
 
 attempts to convert the passed value to an array. converts array like objects, strings are split to chars, single values are placed inside a new array, otherwise an empty array is returned
 
-`return` value converted to array
+**`return`** value converted to array
 
 ---
 #### `flatten(value|array, ...)`
@@ -288,37 +288,95 @@ removes `falsey` values from an array
 
 Iterates functions of source object and binds them to the context object
 
-`return` source object
+**`return`** source object
 
 ---
-#### `invoke(function|[function], object)`
+#### `object invoke(function fn, object context)`
+
+- `fn` the function to invoke (also function[])
+- `context` the context object
+
+**`return`** the return value of `fn` (or array if function[] is passed)
 
 ---
-#### `invoke_after()`
+#### `function invoke_after(number n, function fn, object context)`
 
 ---
-#### `invoke_delay()`
+#### `invoke_delay(number milli)`
 
 ---
-#### `invoke_next()`
+#### `invoke_next(function fn, function check, number milli)`
 
 ---
-#### `typeof()`
+#### `string typeof(object value, boolean ctor)`
+
+- `value` the value on which to call `Object.prototype.toString`
+- `ctor` pass true to return constructor.name if available (defaults to false)
+
+if `ctor` is true and the class name is `object` then `pojo` is returned if a constructor name is not available.
+
+possible values of class name;
+
+`Object`, `Array`, `Function`, `Date`, `RegExp`, `String`, `Number`, `Boolean`, `Error`, `Math`, `JSON`, `Arguments`, `null` & `undefined`
+
+**`return`** the class name of `value`;
 
 ---
-#### `is()`
+#### `boolean is(object value, string class, ...)`
+
+- `value` the value to test
+- `class` the class name (or constructor name) to match
+- `...` further class names to match
+
+**`return`** if the class name of `value` equals `class`
 
 ---
-#### `is_not()`
+#### `boolean is_not(object value, string class, ...)`
+
+- `value` the value to test
+- `class` the class name (or constructor name) to match
+- `...` further class names to match
+
+**`return`** if the class name of `value` does not equal `class`
 
 ---
-#### `size()`
+#### `number size(object value)`
+
+- `value` to test
+
+if `value` is an array then `length` is returned else `Object.keys().length`
+
+**`return`** the "size" of `value`
 
 ---
-#### `each()`
+#### `boolean each(object value, function fn, object context)`
+
+- `value`
+- `boolean function fn(object item, number index, object value)`
+
+    - `item`
+    - `index`
+    - `value`
+
+    **`return`**
+- `context`
+
+**`return`** if the loop exited early
 
 ---
-#### `each_own()`
+#### `boolean each_own(object value, function fn, object context)`
+
+- `value`
+- `boolean function fn(object item, number index, object value)`
+
+    - `item`
+    - `index`
+    - `value`
+
+    **`return`**
+- `context`
+
+**`return`** if the loop exited early
 
 ---
 #### `assign()`
