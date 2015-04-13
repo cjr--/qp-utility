@@ -2,7 +2,7 @@ var fs = require('fs');
 var uglify = require('uglify-js');
 var path = require('path');
 var files = [
-  'core', 'string', 'array', 'collection', 'date', 'function', 'iteration', 'typeof',
+  'core', 'string', 'array', 'collection', 'date', 'function', 'iteration', 'assign', 'typeof',
   'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick',
   'async', 'find', 'id', 'make', 'sort',
   'qp'

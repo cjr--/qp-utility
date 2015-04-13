@@ -7,7 +7,7 @@ var qp = {
   is_function: is_function,
   random: random,
   is_empty: is_empty,
-  is_not_empty: is_not_empty,
+  not_empty: not_empty,
 
   // string.js
   trim: trim,
@@ -46,6 +46,7 @@ var qp = {
   invoke: invoke,
   invoke_after: invoke_after,
   invoke_delay: invoke_delay,
+  invoke_next: invoke_next,
 
   // typeof.js
   typeof: qp_typeof,
@@ -56,6 +57,8 @@ var qp = {
   size: size,
   each: each,
   each_own: each_own,
+
+  // assign.js
   assign: assign,
   assign_own: assign_own,
   assign_if: assign_if,

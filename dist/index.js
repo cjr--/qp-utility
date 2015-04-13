@@ -14,7 +14,7 @@ function random(min, max) { return Math.floor(Math.random() * (max - min)) + min
 
 function is_empty(o) { return typeof o === 'undefined' || o === null || (o.length && o.length === 0); }
 
-function is_not_empty(o) { return !is_empty(o); }
+function not_empty(o) { return !is_empty(o); }
 
 function trim(s, chars) {
   chars = escape_re(chars || ' ');
@@ -105,40 +105,47 @@ function between(s, left, right) {
   }
 }
 
-function snake_to_camel(input) {
-  var output = '';
-  for (var i = 0, l = input.length; i < l; i++) {
-    var chr = input[i];
+function to_camel(s, sep) {
+  var out = '';
+  for (var i = 0, l = s.length; i < l; i++) {
+    var chr = s[i];
     if (i === 0) {
-      output += chr.toUpperCase();
-    } else if (chr === '_' || chr === '-') {
-      output += input[++i].toUpperCase();
+      out += chr.toUpperCase();
+    } else if (chr === sep) {
+      out += s[++i].toUpperCase();
     } else {
-      output += chr;
+      out += chr;
     }
   }
-  return output;
+  return out;
 }
 
-function camel_to_snake(input) {
-  var output = '';
+function camel_to(s, sep) {
+  var out = '';
   var chr = '';
   var last = '';
   var lower = '';
-  for (var i = 0, l = input.length; i < l; i++) {
+  for (var i = 0, l = s.length; i < l; i++) {
     last = chr;
-    chr = input[i];
+    chr = s[i];
     lower = chr.toLowerCase();
-    if (i === 0 || last == '.' || chr == '.' || chr == '_' || is_number(chr)) {
-      output += lower;
+    if (i === 0 || last == '.' || chr == '.' || chr == sep || is_number(chr)) {
+      out += lower;
     } else if (chr == chr.toUpperCase()) {
-      output += '_' + lower;
+      out += sep + lower;
     } else {
-      output += lower;
+      out += lower;
     }
   }
-  return output;
+  return out;
 }
+
+function snake_to_kebab(s) { return replace_all(s, '_', '-'); }
+function snake_to_camel(s) { return to_camel(s, '_'); }
+function camel_to_snake(s) { return camel_to(s, '_'); }
+function camel_to_kebab(s) { return camel_to(s, '-'); }
+function kebab_to_camel(s) { return to_camel(s, '-'); }
+function kebab_to_snake(s) { return replace_all(s, '-', '_'); }
 
 function repeat(o, times, delim) {
   for (var buffer = [], i = times; i--;) {
@@ -212,6 +219,12 @@ function to_array(o) {
   }
 }
 
+function union() {
+  return slice.call(arguments).reduce(function(output, input) {
+    return output.concat(input);
+  }, []);
+}
+
 function flatten() {
   function _flatten(items) {
     return items.reduce(function(output, input) {
@@ -276,6 +289,11 @@ function _in(item, items) {
 
 function not_in() { return !_in.apply(null, arguments); }
 
+var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 function now(format) {
   var _now = new Date();
   if (format) {
@@ -308,6 +326,35 @@ function file_date() {
   return [year, month, day].join('');
 }
 
+function date_time(dt) {
+  dt = (typeof dt === 'string' ? new Date(dt) : dt);
+  return {
+    format: function(format) {
+      if (format === 'utc') {
+        return dt.toUTCString();
+      } else if (format === 'month day, year') {
+        return month_short[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+      }
+      return dt;
+    }
+  };
+}
+
+function timer() {
+  var start = new Date();
+  var lap = start;
+  return {
+    elapsed: function() {
+      return ((new Date() - start) / 1000).toFixed(2);
+    },
+    lap: function() {
+      var last_lap = lap;
+      lap = new Date();
+      return ((lap - last_lap) / 1000).toFixed(2);
+    }
+  };
+}
+
 function bind(o, scope) {
   scope = scope || o;
   each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
@@ -326,7 +373,7 @@ function invoke(fn, ctx) {
   return undefined;
 }
 
-function invoke_after(n, fn, ctx) {
+function invoke_after(fn, n, ctx) {
   var count = 0;
   return function() {
     if (++count === n) {
@@ -335,12 +382,32 @@ function invoke_after(n, fn, ctx) {
   };
 }
 
-function invoke_delay(milli, fn) {
+function invoke_delay(fn, milli) {
   var args = rest(arguments, 2);
   var id = setTimeout(function() {
     clearTimeout(id);
     fn.apply(null, args);
   }, milli);
+}
+
+function invoke_next(fn) {
+  if (global.process && global.process.nextTick) {
+    process.nextTick(fn);
+  } else {
+    setTimeout(fn, 0);
+  }
+}
+
+function invoke_when(fn, check, interval) {
+  (function timer_event() {
+    invoke_delay(interval || 500, function() {
+      if (check()) {
+        fn();
+      } else {
+        timer_event();
+      }
+    });
+  })();
 }
 
 function size(o) {
@@ -954,7 +1021,7 @@ var qp = {
   is_function: is_function,
   random: random,
   is_empty: is_empty,
-  is_not_empty: is_not_empty,
+  not_empty: not_empty,
 
   // string.js
   trim: trim,
@@ -993,6 +1060,7 @@ var qp = {
   invoke: invoke,
   invoke_after: invoke_after,
   invoke_delay: invoke_delay,
+  invoke_next: invoke_next,
 
   // typeof.js
   typeof: qp_typeof,
@@ -1003,6 +1071,8 @@ var qp = {
   size: size,
   each: each,
   each_own: each_own,
+
+  // assign.js
   assign: assign,
   assign_own: assign_own,
   assign_if: assign_if,
@@ -1035,6 +1105,7 @@ var qp = {
   find_predicate: find_predicate,
   find: find,
   any: any,
+  exists: any,
   find_all: find_all,
   find_index: find_index,
   remove: remove,

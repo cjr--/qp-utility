@@ -18,6 +18,12 @@ function to_array(o) {
   }
 }
 
+function union() {
+  return slice.call(arguments).reduce(function(output, input) {
+    return output.concat(input);
+  }, []);
+}
+
 function flatten() {
   function _flatten(items) {
     return items.reduce(function(output, input) {

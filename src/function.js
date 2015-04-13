@@ -16,7 +16,7 @@ function invoke(fn, ctx) {
   return undefined;
 }
 
-function invoke_after(n, fn, ctx) {
+function invoke_after(fn, n, ctx) {
   var count = 0;
   return function() {
     if (++count === n) {
@@ -25,7 +25,7 @@ function invoke_after(n, fn, ctx) {
   };
 }
 
-function invoke_delay(milli, fn) {
+function invoke_delay(fn, milli) {
   var args = rest(arguments, 2);
   var id = setTimeout(function() {
     clearTimeout(id);

@@ -72,9 +72,10 @@ escape special chars in a regular expression string
 **`return`** remove the trim characters from the right side of the string
 
 ---
-#### `string build(string | string[], ...)`
+#### `string build(string | string[] value, ...)`
 
-- `values` any combination of strings, string arrays and arguments
+- `value` any combination of strings, string arrays and arguments
+- `...` further `value`s
 
 `flatten` and `compact` `values` into a flat array and then `join`s them
 
@@ -253,15 +254,31 @@ attempts to convert the passed value to an array. converts array like objects, s
 
 **`return`** value converted to array
 
+#### `array union(array items, ...)`
+
+- `items` array of items
+- `...` further items to concatenate
+
+concatenate arrays passed as items
+
+**`return`** a single array
+
 ---
-#### `flatten(value|array, ...)`
+#### `flatten(object | array value, ...)`
 
-concatenates arrays, values and arguments to a single array
+- `value`
+- `...`
+
+concatenates items, arrays and arguments to a single array
+
+**`return`** a one dimensional array
 
 ---
-#### `compact(array)`
+#### `compact(array items)`
 
-removes `falsey` values from an array
+- `items` the items to compact
+
+**`return`** items with `falsey` values removed
 
 ---
 #### `now()`
@@ -297,13 +314,26 @@ Iterates functions of source object and binds them to the context object
 **`return`** the return value of `fn` (or array if function[] is passed)
 
 ---
-#### `function invoke_after(number n, function fn, object context)`
+#### `function invoke_after(function fn, number n, object context)`
+
+- `fn` the function to invoke
+- `n` the number of times `fn` is called before it is to be invoked
+- `context` the context object
+
+**`return`** the wrapped `function`
 
 ---
-#### `invoke_delay(number milli)`
+#### `invoke_delay(function fn, number milli)`
+
+- `fn` the function to invoke
+- `milli` the delay in milliseconds
 
 ---
 #### `invoke_next(function fn, function check, number milli)`
+
+- `fn` the function to invoke
+- `check` the check function must return `true` for `fn` to be invoked
+- `milli` the interval to invoke `check` at
 
 ---
 #### `string typeof(object value, boolean ctor)`
@@ -401,10 +431,31 @@ if `value` is an array then `length` is returned else `Object.keys().length`
 **`return`** if the loop exited early
 
 ---
-#### `assign()`
+#### `object assign(object target, object source, ...)`
+
+- `target`
+- `source`
+- `...`
+
+**`return`**
+
+---
+#### `object assign_own(object target, object source, ...)`
+
+- `target`
+- `source`
+- `...`
+
+**`return`**
 
 ---
 #### `assign_if()`
+
+- `target`
+- `source`
+- `...`
+
+**`return`**
 
 ---
 #### `equals()`
