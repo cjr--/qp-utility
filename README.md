@@ -217,16 +217,14 @@ qp.stringify({ one: 'two', three: { four: 'five' } });
 #### `array map(array items, function map, object context)`
 
 - `items` the source array
-- `map` the map function
-- `context` context of map function
-
-    **`object function map(object item, number index, array items)`**
+- `object function map(object item, number index, array items)`
 
     - `item` current item being processed
     - `index` current item index
     - `items` the source array
 
     **`return`** the item to be added to the mapped array
+- `context` context of map function
 
 **`return`** a new array produced via the `map` function
 
@@ -311,15 +309,39 @@ Iterates functions of source object and binds them to the context object
 #### `string typeof(object value, boolean ctor)`
 
 - `value` the value on which to call `Object.prototype.toString`
-- `ctor` pass true to return constructor.name if available (defaults to false)
+- `ctor` pass true to return `constructor.name` if available (defaults to false)
 
 if `ctor` is true and the class name is `object` then `pojo` is returned if a constructor name is not available.
 
-possible values of class name;
+possible values of class name (lower case);
 
-`Object`, `Array`, `Function`, `Date`, `RegExp`, `String`, `Number`, `Boolean`, `Error`, `Math`, `JSON`, `Arguments`, `null` & `undefined`
+`object`, `array`, `function`, `date`, `regexp`, `string`, `number`, `boolean`, `error`, `math`, `json`, `arguments`, `null` & `undefined`
 
-**`return`** the class name of `value`;
+**`return`** the class name of `value`
+
+````
+var example = { str: 's', int: 1, bool: true };
+
+qp.typeof(example);
+> 'object'
+
+qp.typeof(example, true);
+> 'pojo'
+
+qp.typeof(example.bool)
+> 'boolean'
+
+function Shape() { }
+Shape.prototype.draw = function() { };
+var s = new Shape();
+
+qp.typeof(s);
+> 'object'
+
+qp.typeof(s, true);
+> 'shape'
+
+````
 
 ---
 #### `boolean is(object value, string class, ...)`
