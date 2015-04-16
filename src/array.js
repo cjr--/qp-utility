@@ -27,11 +27,11 @@ function union() {
 function flatten() {
   function _flatten(items) {
     return items.reduce(function(output, input) {
-      return input.some(is_array) ? output.concat(flatten(input)) : output.concat(input);
+      return any(input, is_array) ? output.concat(flatten(input)) : output.concat(input);
     }, []);
   }
   var args = slice.call(arguments);
-  return args.some(is_array) ? _flatten(args) : args;
+  return any(args, is_array) ? _flatten(args) : args;
 }
 
 function compact(array) {
