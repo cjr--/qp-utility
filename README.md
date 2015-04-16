@@ -573,7 +573,7 @@ copy keys from `source` to `target`. if `source` is `function` its return value 
   - `string`
 - `arg2`
   - `object` context
-  -
+  - `undefined`
   - `object` value to match
 
 **`return`**
