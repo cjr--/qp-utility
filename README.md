@@ -563,4 +563,10 @@ if `value` is an array then `length` is returned else `Object.keys().length`
 #### `series()`
 
 ---
+#### `each_series()`
+
+---
 #### `parallel()`
+
+---
+#### `each_parallel()`
