@@ -264,7 +264,7 @@ concatenate arrays passed as items
 **`return`** a single array
 
 ---
-#### `flatten(object | array value, ...)`
+#### `array flatten(object | array value, ...)`
 
 - `value`
 - `...`
@@ -274,7 +274,7 @@ concatenates items, arrays and arguments to a single array
 **`return`** a one dimensional array
 
 ---
-#### `compact(array items)`
+#### `array compact(array items)`
 
 - `items` the items to compact
 
@@ -314,7 +314,7 @@ Iterates functions of source object and binds them to the context object
 **`return`** the return value of `fn` (or array if function[] is passed)
 
 ---
-#### `function invoke_after(function fn, number n, object context)`
+#### `void function invoke_after(function fn, number n, object context)`
 
 - `fn` the function to invoke
 - `n` the number of times `fn` is called before it is to be invoked
@@ -323,13 +323,13 @@ Iterates functions of source object and binds them to the context object
 **`return`** the wrapped `function`
 
 ---
-#### `invoke_delay(function fn, number milli)`
+#### `void invoke_delay(function fn, number milli)`
 
 - `fn` the function to invoke
 - `milli` the delay in milliseconds
 
 ---
-#### `invoke_next(function fn, function check, number milli)`
+#### `void invoke_next(function fn, function check, number milli)`
 
 - `fn` the function to invoke
 - `check` the check function must return `true` for `fn` to be invoked
@@ -449,7 +449,7 @@ if `value` is an array then `length` is returned else `Object.keys().length`
 **`return`**
 
 ---
-#### `assign_if()`
+#### `object assign_if(object target, object source, ...)`
 
 - `target`
 - `source`
@@ -458,115 +458,244 @@ if `value` is an array then `length` is returned else `Object.keys().length`
 **`return`**
 
 ---
-#### `equals()`
+#### `boolean equals(object value_a, object value_b)`
+
+- `value_a` first object
+- `value_b` second object
+
+performs a deep comparison of objects, and arrays
+
+**`return`** `true` if value_a exactly equals value_b
 
 ---
-#### `clone()`
+#### `object clone(object value)`
+
+- `value` the value to clone
+
+performas a deep clone of object and arrays. also clones `Date` objects
+
+**`return`** a copy of `value`
 
 ---
-#### `copy()`
+#### `object copy(object value)`
+
+- `value` the value to copy
+
+performs a shallow copy
+
+**`return`** a copy `value`
 
 ---
-#### `merge()`
+#### `object merge(object target, object source, ...)`
+
+- `target` the destination object
+- `source` the values to merge into `target`
+- `...` further `source` objects
+
+merges `source` objects into `target`, working from left to right
+
+**`return`** the `target` object
 
 ---
-#### `extend()`
+#### `object extend(object target, function | object source, ...)`
+
+- `target` the object to extend
+- `source`
+  - `function` the function is called and the return value is used as `source`
+  - `...` the arguments passed to `function`
+  - `object` copy `source` keys to `target`
+
+copy keys from `source` to `target`. if `source` is `function` its return value is used as `source`
+
+**`return`** the extended `target` object
 
 ---
-#### `override()`
+#### `object override(object value_a, object value_b)`
+
+- `value_a`
+- `value_b`
+
+**`return`**
 
 ---
-#### `first()`
+#### `object | array first(array items, number count)`
+
+- `items`
+- `count`
+
+**`return`** the first item in `items`, or first `count` items
 
 ---
-#### `last()`
+#### `object | array last(array items, number count)`
+
+- `items`
+- `count`
+
+**`return`** the last item in `items`, or last `count` items
 
 ---
-#### `rest()`
+#### `array rest(array items, number from)`
+
+- `items`
+- `from`
+
+**`return`**
 
 ---
-#### `at()`
+#### `object at(array items, number index)`
+
+- `items`
+- `index`
+
+**`return`**
 
 ---
-#### `range()`
+#### `array range(array items, number from, number to)`
+
+**`return`**
 
 ---
-#### `in()`
+#### `boolean in(object item, array items)`
+
+**`return`**
 
 ---
-#### `not_in()`
+#### `boolean not_in(object item, array items)`
+
+**`return`**
 
 ---
-#### `find_predicate()`
+#### `function find_predicate(function | object | string arg1, object arg2)`
+
+- `arg1`
+  - `function`
+  - `object`
+  - `string`
+- `arg2`
+  - `object` context
+  -
+  - `object` value to match
+
+**`return`**
 
 ---
 #### `find()`
 
+**`return`**
+
 ---
 #### `any()`
+
+**`return`**
 
 ---
 #### `find_all()`
 
+**`return`**
+
 ---
 #### `find_index()`
+
+**`return`**
 
 ---
 #### `remove()`
 
+**`return`**
+
 ---
 #### `pick_predicate()`
+
+**`return`**
 
 ---
 #### `pick()`
 
+**`return`**
+
 ---
 #### `pick_own()`
+
+**`return`**
 
 ---
 #### `pairs()`
 
+**`return`**
+
 ---
 #### `keys()`
+
+**`return`**
 
 ---
 #### `values()`
 
+**`return`**
+
 ---
 #### `pick_values()`
+
+**`return`**
 
 ---
 #### `sort()`
 
+**`return`**
+
 ---
 #### `sort_on()`
+
+**`return`**
 
 ---
 #### `group_on()`
 
+**`return`**
+
 ---
 #### `group_by()`
+
+**`return`**
 
 ---
 #### `ns()`
 
+**`return`**
+
 ---
 #### `options()`
+
+**`return`**
 
 ---
 #### `id()`
 
+**`return`**
+
 ---
 #### `uuid()`
+
+**`return`**
 
 ---
 #### `series()`
 
+**`return`**
+
 ---
 #### `each_series()`
+
+**`return`**
 
 ---
 #### `parallel()`
 
+**`return`**
+
 ---
 #### `each_parallel()`
+
+**`return`**
+
+---
