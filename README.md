@@ -2,6 +2,8 @@
 
 `npm install qp-utility --save`
 
+`<script src="qp-utility.min.js"></script>`
+
 ### build
 
 ````
@@ -9,10 +11,10 @@ cd qp-utility
 node build
 ````
 
-### functions;
+&nbsp;
 
 ---
-#### `noop()`
+#### `void noop()`
 
 no operation
 
