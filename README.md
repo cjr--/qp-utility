@@ -9,8 +9,9 @@ cd qp-utility
 node build
 ````
 
-### functions
+### functions;
 
+---
 #### `noop()`
 
 no operation
