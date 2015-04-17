@@ -4,8 +4,10 @@
 
 ### build
 
-`cd qp-utility`
-`node build`
+````
+cd qp-utility
+node build
+````
 
 ### functions
 
