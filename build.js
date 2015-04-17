@@ -12,9 +12,11 @@ var file = files.map(function(_file) {
   return read_file(_file + '.js');
 }).join('\n');
 
+console.log('');
 write_file('index.js', make_node_file(file));
 write_file('qp-utility.js', make_browser_file(file));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
+console.log('');
 
 function make_browser_file(file) {
   return [
@@ -43,11 +45,21 @@ function read_file(file) {
 }
 
 function write_file(file, data) {
-  return fs.writeFileSync(path.join(__dirname, 'dist', file), data);
+  var filename = path.join(__dirname, 'dist', file);
+  fs.writeFileSync(filename, data);
+  var stat = fs.statSync(filename);
+  console.log(rpad(file, 20), Math.round(stat.size / 1000), ' kb');
 }
 
 function indent(txt) {
   return txt.split(/\n/).map(function(line) {
     return '  ' + line;
   }).join('\n');
+}
+
+function rpad(s, width) {
+  while (s.length < width) {
+    s = s + ' ';
+  }
+  return s;
 }
