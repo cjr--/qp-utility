@@ -13,6 +13,7 @@ var qp = {
   trim: trim,
   ltrim: ltrim,
   rtrim: rtrim,
+  split: split,
   build: build,
   escape: escape,
   unescape: unescape,

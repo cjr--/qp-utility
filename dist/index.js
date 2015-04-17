@@ -43,6 +43,10 @@ function rtrim(s, chars) {
   }
 }
 
+function split(s, chars) {
+  return s.split(chars);
+}
+
 function build() {
   return compact(flatten(arguments)).join('');
 }
@@ -228,11 +232,11 @@ function union() {
 function flatten() {
   function _flatten(items) {
     return items.reduce(function(output, input) {
-      return input.some(is_array) ? output.concat(flatten(input)) : output.concat(input);
+      return any(input, is_array) ? output.concat(flatten(input)) : output.concat(input);
     }, []);
   }
   var args = slice.call(arguments);
-  return args.some(is_array) ? _flatten(args) : args;
+  return any(args, is_array) ? _flatten(args) : args;
 }
 
 function compact(array) {
@@ -593,13 +597,14 @@ function equals(o1, o2) {
 
 function extend(a, b) {
   if (is_function(b)) {
-    b.apply(null, array_slice.call(arguments, 2));
+    b = b.apply(null, array_slice.call(arguments, 2));
   }
   for (var key in b) {
     if (b.hasOwnProperty(key)) {
       a[key] = b[key];
     }
   }
+  return a;
 }
 
 function merge() {
@@ -695,7 +700,7 @@ function pick_predicate() {
   if (is(arguments[0], 'function')) {
     return arguments[1] ? arguments[0].bind(arguments[1]) : arguments[0];
   } else {
-    var picks = flatten(arguments);
+    var picks = flatten(array_slice.call(arguments));
     return function(v, k, o) { return picks.indexOf(k) !== -1; };
   }
   return undefined;
@@ -1027,6 +1032,7 @@ var qp = {
   trim: trim,
   ltrim: ltrim,
   rtrim: rtrim,
+  split: split,
   build: build,
   escape: escape,
   unescape: unescape,

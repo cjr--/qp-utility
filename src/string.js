@@ -25,6 +25,10 @@ function rtrim(s, chars) {
   }
 }
 
+function split(s, chars) {
+  return s.split(chars);
+}
+
 function build() {
   return compact(flatten(arguments)).join('');
 }
