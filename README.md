@@ -1,3 +1,14 @@
+### install
+
+`npm install qp-utility --save`
+
+### build
+
+`cd qp-utility`
+`node build`
+
+### functions
+
 #### `noop()`
 
 no operation
