@@ -192,14 +192,28 @@
   
   function stringify(o, simple) {
     if (simple) {
-      return is_empty(o) ? '' : pairs(o).map(function(pair) {
-        return pair[0] + ':' + pair[1];
-      }).join(', ');
-    } else {
-      if (is_empty(o)) return '{ }';
-      return '{ ' + pairs(o).map(function(pair) {
+      return qp.is_empty(o) ? '' : '{ ' + qp.pairs(o).map(function(pair) {
         var value = pair[1];
-        return pair[0] + ': ' + (is(value, 'object') ? stringify(value) : value);
+        if (qp.is(value, 'array')) value = '[ ' + value.length + ' ]';
+        if (qp.is(value, 'object')) value = '{ }';
+        return pair[0] + ': ' + value;
+      }).join(', ') + ' }';
+    } else {
+      if (qp.is_empty(o)) return '{ }';
+      if (qp.is_not(o, 'object', 'array')) return o;
+      return '{ ' + qp.pairs(o).map(function(pair) {
+        var value = pair[1];
+        if (qp.is(value, 'function')) {
+          return pair[0] + ': fn';
+        } else if (qp.is(value, 'array')) {
+          return pair[0] + ': [ ' + qp.map(value, function(item) {
+            return qp.stringify(item);
+          }).join(', ') + ' ]';
+        } else if (qp.is(value, 'object')) {
+          return pair[0] + ': ' + qp.stringify(value);
+        } else {
+          return pair[0] + ': ' + value;
+        }
       }).join(', ') + ' }';
     }
   }
@@ -821,16 +835,15 @@
   
   function find_predicate(arg1, arg2) {
     var predicate;
-    if (is(arg1, 'function')) {
-      predicate = arg2 ? arg1.bind(arg2) : arg1;
-    } else if (is(arg1, 'object')) {
-      var keys = keys(arg1);
-      var values = values(arg1);
+    if (qp.is(arg1, 'function')) {
+      predicate = qp.is_not_empty(arg2) ? arg1.bind(arg2) : arg1;
+    } else if (qp.is(arg1, 'object')) {
+      var keys = qp.keys(arg1);
       predicate = function(item, index, items) {
-        return equals(pick_values(item, keys), values);
+        return qp.eq(qp.pick(item, keys), arg1);
       };
-    } else if (is(arg1, 'string')) {
-      var truthy = is(arg2, 'undefined');
+    } else if (qp.is(arg1, 'string')) {
+      var truthy = qp.is(arg2, 'undefined');
       predicate = function(item, index, items) {
         var value = item[arg1];
         return truthy ? value : value === arg2;
@@ -867,6 +880,14 @@
   
   function any(items, arg1, arg2) {
     return find(items, arg1, arg2, { find: true }) !== undefined;
+  }
+  
+  function all(items, arg1, arg2) {
+    return qp.find_all(items, arg1, arg2, { find_all: true }).length !== 0;
+  }
+  
+  function none(items, arg1, arg2) {
+    return qp.find_all(items, arg1, arg2, { find_all: true }).length === 0;
   }
   
   function find_all(items, arg1, arg2) {
@@ -979,17 +1000,27 @@
     return items;
   }
   
-  function group_on(items, key, name, sort_key) {
+  function group_on(items, key, name, sort_key, options) {
+    options = options || {};
+    name = name || key;
     var sort = [ key ];
     if (sort_key) sort.push(sort_key);
-    sort_on(items, sort, { stable: true });
+    qp.sort_on(items, sort, { stable: true });
     var group;
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
-      var item_key = ns(item, key);
+      var item_key = qp.ns(item, key);
       if (!group || item_key !== group.key) {
-        group = { group: true, key: item_key, name: ns(item, name) };
+        var group_name = typeof name === 'function' ? name(item, item_key, i) : qp.ns(item, name);
+        group = { group: true, key: item_key, name: group_name, count: 1 };
+        if (options.group_items) {
+          group.items = [ item ];
+        }
         items.splice(i, 0, group);
+      }
+      group.count++;
+      if (group.items) {
+        group.items.push(item);
       }
     }
     return items;
@@ -1016,6 +1047,90 @@
       }
     });
     return groups;
+  }
+  
+  function sum(o, key) {
+    if (is_array(o)) {
+      if (key) {
+        return o.reduce(function(sum, item) { return sum + item[key]; }, 0);
+      } else {
+        return o.reduce(function(sum, item) { return sum + item; }, 0);
+      }
+    }
+    return 0;
+  }
+  
+  function min_max(o, k, op) {
+    if (is_array(o)) {
+      if (k) {
+        o = o.map(function(item) { return item[k]; });
+      }
+      return Math[op].apply(Math, o);
+    }
+    return 0;
+  }
+  
+  function avg(o, k) { return sum(o, k) / (o.length || 1); }
+  function max(o, k) { return min_max(o, k, 'max'); }
+  function min(o, k) { return min_max(o, k, 'min'); }
+  
+  function http_request(options) {
+    options.done = options.done || noop;
+    options.headers = options.headers || {};
+    options.method = options.method || 'GET';
+    options.data = options.data || null;
+  
+    var response = { ok: false };
+    var construct_response = function(req, res) {
+      res.status = req.status;
+      if (options.json) { res.data = JSON.parse(req.responseText); }
+      else if (options.html) { res.data = req.responseText; }
+      else { res.data = req.responseText; }
+    };
+    var request = new XMLHttpRequest();
+    if (options.json) {
+      options.method = 'POST';
+      var json = JSON.stringify(options.json);
+      if (json.length) {
+        options.data = json;
+      }
+      options.headers['content-type'] = 'application/json';
+    } else if (options.html) {
+      options.method = 'GET';
+      options.headers['content-type'] = 'text/html';
+    }
+    for (var name in options.headers) {
+      request.setRequestHeader(name.toLowerCase(), options.headers[name]);
+    }
+    request.open(options.method.toUpperCase(), options.url, true);
+    request.onload = function() {
+      if (options.timeout_id) { clearTimeout(options.timeout_id); }
+      construct_response(request, response);
+      if (request.status >= 200 && request.status < 400) {
+        response.ok = true;
+        request.getAllResponseHeaders().split('\r\n').forEach(function(header) {
+          var h = header.split(':');
+          if (h.length > 1) {
+            response.headers = response.headers || {};
+            response.headers[h[0].toLowerCase()] = h.slice(1).join(':').trim();
+          }
+        });
+        options.done.call(options.bind, null, response);
+      } else {
+        options.done.call(options.bind, response, null);
+      }
+    };
+    request.onerror = function() {
+      construct_response(request, response);
+      options.done.call(options.bind, response, null);
+    };
+    if (options.timeout) {
+      options.timeout_id = setTimeout(function() {
+        response.timeout = true;
+        request.abort();
+      }, options.timeout);
+    }
+    request.send(options.data);
   }
   
   var qp = {
@@ -1048,6 +1163,12 @@
     replace_all: replace_all,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
+  
+    // math.js
+    sum: sum,
+    min: min,
+    max: max,
+    avg: avg,
   
     // array.js
     map: map,
@@ -1145,10 +1266,17 @@
   
     // async.js
     series: series,
-    parallel: parallel
+    parallel: parallel,
+  
+    http_request: http_request
   
   };
   
-  global.qp = qp;
+
+  if (module && module.exports) {
+    module.exports = qp;
+  } else {
+    global.qp = qp;
+  }
 
 })(this);

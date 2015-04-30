@@ -24,17 +24,27 @@ function sort_on(items, keys, _options) {
   return items;
 }
 
-function group_on(items, key, name, sort_key) {
+function group_on(items, key, name, sort_key, options) {
+  options = options || {};
+  name = name || key;
   var sort = [ key ];
   if (sort_key) sort.push(sort_key);
-  sort_on(items, sort, { stable: true });
+  qp.sort_on(items, sort, { stable: true });
   var group;
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
-    var item_key = ns(item, key);
+    var item_key = qp.ns(item, key);
     if (!group || item_key !== group.key) {
-      group = { group: true, key: item_key, name: ns(item, name) };
+      var group_name = typeof name === 'function' ? name(item, item_key, i) : qp.ns(item, name);
+      group = { group: true, key: item_key, name: group_name, count: 1 };
+      if (options.group_items) {
+        group.items = [ item ];
+      }
       items.splice(i, 0, group);
+    }
+    group.count++;
+    if (group.items) {
+      group.items.push(item);
     }
   }
   return items;

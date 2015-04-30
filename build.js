@@ -1,37 +1,37 @@
 var fs = require('fs');
 var uglify = require('uglify-js');
 var path = require('path');
-var files = [
+
+var common_files = [
   'core', 'string', 'array', 'collection', 'date', 'function', 'iteration', 'assign', 'typeof',
   'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick',
-  'async', 'find', 'id', 'make', 'sort',
-  'qp'
+  'async', 'find', 'id', 'make', 'sort', 'math'
 ];
 
-var file = files.map(function(_file) {
-  return read_file(_file + '.js');
-}).join('\n');
+var node_files = [ 'node' ];
+var browser_files = [ 'request', 'browser' ];
 
 console.log('');
-write_file('index.js', make_node_file(file));
-write_file('qp-utility.js', make_browser_file(file));
+write_file('index.js', make_file(common_files.concat(node_files)));
+write_file('qp-utility.js', make_file(common_files.concat(browser_files)));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
 console.log('');
 
-function make_browser_file(file) {
+function make_file(files) {
+  var file = files.map(function(_file) {
+    return read_file(_file + '.js');
+  }).join('\n');
   return [
     '(function(global) {',
       indent(file),
-      indent('global.qp = qp;'),
+      '',
+      '  if (module && module.exports) {',
+      '    module.exports = qp;',
+      '  } else {',
+      '    global.qp = qp;',
+      '  }',
       '',
     '})(this);'
-  ].join('\n');
-}
-
-function make_node_file(file) {
-  return [
-    file,
-    'module.exports = qp;'
   ].join('\n');
 }
 

@@ -29,6 +29,12 @@ var qp = {
   get_utf8_length: get_utf8_length,
   stringify: stringify,
 
+  // math.js
+  sum: sum,
+  min: min,
+  max: max,
+  avg: avg,
+
   // array.js
   map: map,
   reduce: reduce,

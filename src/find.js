@@ -1,15 +1,14 @@
 function find_predicate(arg1, arg2) {
   var predicate;
-  if (is(arg1, 'function')) {
-    predicate = arg2 ? arg1.bind(arg2) : arg1;
-  } else if (is(arg1, 'object')) {
-    var keys = keys(arg1);
-    var values = values(arg1);
+  if (qp.is(arg1, 'function')) {
+    predicate = qp.is_not_empty(arg2) ? arg1.bind(arg2) : arg1;
+  } else if (qp.is(arg1, 'object')) {
+    var keys = qp.keys(arg1);
     predicate = function(item, index, items) {
-      return equals(pick_values(item, keys), values);
+      return qp.eq(qp.pick(item, keys), arg1);
     };
-  } else if (is(arg1, 'string')) {
-    var truthy = is(arg2, 'undefined');
+  } else if (qp.is(arg1, 'string')) {
+    var truthy = qp.is(arg2, 'undefined');
     predicate = function(item, index, items) {
       var value = item[arg1];
       return truthy ? value : value === arg2;
@@ -46,6 +45,14 @@ function find(items, arg1, arg2, options) {
 
 function any(items, arg1, arg2) {
   return find(items, arg1, arg2, { find: true }) !== undefined;
+}
+
+function all(items, arg1, arg2) {
+  return qp.find_all(items, arg1, arg2, { find_all: true }).length !== 0;
+}
+
+function none(items, arg1, arg2) {
+  return qp.find_all(items, arg1, arg2, { find_all: true }).length === 0;
 }
 
 function find_all(items, arg1, arg2) {

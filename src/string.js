@@ -173,14 +173,28 @@ function get_utf8_length(s) {
 
 function stringify(o, simple) {
   if (simple) {
-    return is_empty(o) ? '' : pairs(o).map(function(pair) {
-      return pair[0] + ':' + pair[1];
-    }).join(', ');
-  } else {
-    if (is_empty(o)) return '{ }';
-    return '{ ' + pairs(o).map(function(pair) {
+    return qp.is_empty(o) ? '' : '{ ' + qp.pairs(o).map(function(pair) {
       var value = pair[1];
-      return pair[0] + ': ' + (is(value, 'object') ? stringify(value) : value);
+      if (qp.is(value, 'array')) value = '[ ' + value.length + ' ]';
+      if (qp.is(value, 'object')) value = '{ }';
+      return pair[0] + ': ' + value;
+    }).join(', ') + ' }';
+  } else {
+    if (qp.is_empty(o)) return '{ }';
+    if (qp.is_not(o, 'object', 'array')) return o;
+    return '{ ' + qp.pairs(o).map(function(pair) {
+      var value = pair[1];
+      if (qp.is(value, 'function')) {
+        return pair[0] + ': fn';
+      } else if (qp.is(value, 'array')) {
+        return pair[0] + ': [ ' + qp.map(value, function(item) {
+          return qp.stringify(item);
+        }).join(', ') + ' ]';
+      } else if (qp.is(value, 'object')) {
+        return pair[0] + ': ' + qp.stringify(value);
+      } else {
+        return pair[0] + ': ' + value;
+      }
     }).join(', ') + ' }';
   }
 }
