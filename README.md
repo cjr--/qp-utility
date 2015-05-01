@@ -1,3 +1,8 @@
+[![npm license][licence-image]][licence-url]
+[![npm version][npm-version-image]][npm-version-url]
+[![dependency status][david-dm-image]][david-dm-url]
+[![dev dependency status][david-dm-dev-image]][david-dm-dev-url]
+
 ### install
 
 `npm install qp-utility --save`
@@ -715,3 +720,14 @@ copy keys from `source` to `target`. if `source` is `function` its return value 
 **`return`**
 
 ---
+
+
+[licence-image]: https://img.shields.io/npm/l/qp-utility.svg?style=flat-square
+[npm-version-image]: http://img.shields.io/npm/v/qp-utility.svg?style=flat-square
+[david-dm-image]:https://david-dm.org/cjr--/qp-utility.svg?style=flat-square
+[david-dm-dev-image]:https://david-dm.org/cjr--/qp-utility/dev-status.svg?style=flat-square
+
+[licence-url]: https://github.com/cjr--/qp-utility/blob/master/LICENSE
+[npm-version-url]: https://npmjs.org/package/qp-utility
+[david-dm-url]:https://david-dm.org/cjr--/qp-utility
+[david-dm-dev-url]:https://david-dm.org/cjr--/qp-utility#info=devDependencies
