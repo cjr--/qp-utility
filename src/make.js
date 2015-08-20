@@ -1,4 +1,12 @@
-function make(ns, def) {
+function make() {
+  var ns, def;
+  if (arguments.length === 1) {
+    ns = arguments[0].ns;
+    def = arguments[0];
+  } else {
+    ns = arguments[0];
+    def = arguments[1];
+  }
 
   var name = ns.split('/').pop().toLowerCase();
   /*jslint evil: true*/
@@ -8,8 +16,8 @@ function make(ns, def) {
   ctor.properties = {};
   ctor.inits = [];
 
-  if (def.mx) {
-    each(def.mx.reverse(), function(mixin) {
+  if (def.mixin) {
+    each(def.mixin.reverse(), function(mixin) {
       ctor.mixins.push(mixin.ns);
       ctor.inits.unshift(mixin.inits);
       override(ctor.properties, mixin.properties);
@@ -19,7 +27,7 @@ function make(ns, def) {
   }
 
   each(def, function(value, name) {
-    if (name === 'mixins') {
+    if (name === 'mixin') {
     } else if (name === 'self') {
       assign(ctor, def.self);
     } else if (qp.is(value, 'function')) {

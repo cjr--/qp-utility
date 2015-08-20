@@ -926,7 +926,15 @@
     return _uuid;
   }
   
-  function make(ns, def) {
+  function make() {
+    var ns, def;
+    if (arguments.length === 1) {
+      ns = arguments[0].ns;
+      def = arguments[0];
+    } else {
+      ns = arguments[0];
+      def = arguments[1];
+    }
   
     var name = ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
@@ -936,8 +944,8 @@
     ctor.properties = {};
     ctor.inits = [];
   
-    if (def.mx) {
-      each(def.mx.reverse(), function(mixin) {
+    if (def.mixin) {
+      each(def.mixin.reverse(), function(mixin) {
         ctor.mixins.push(mixin.ns);
         ctor.inits.unshift(mixin.inits);
         override(ctor.properties, mixin.properties);
@@ -947,7 +955,7 @@
     }
   
     each(def, function(value, name) {
-      if (name === 'mixins') {
+      if (name === 'mixin') {
       } else if (name === 'self') {
         assign(ctor, def.self);
       } else if (qp.is(value, 'function')) {
@@ -1268,11 +1276,119 @@
     series: series,
     parallel: parallel,
   
-    http_request: http_request
+    http_request: http_request,
+  
+    dom_ready: dom_ready
   
   };
   
+  function show(el) {
+    el.style.display = '';
+  }
+  
+  function hide(el) {
+    el.style.display = 'none';
+  }
+  
+  function is_element(el) {
+    if (el) {
+      var node_type = el.nodeType;
+      return node_type && (node_type === 1 || node_type === 9);
+    }
+    return false;
+  }
+  
+  function element(el) {
+    if (qp.typeof(el) === 'string') {
+      return qp.select_first(el);
+    } else if (qp.is_element(el)) {
+      return el;
+    } else {
+      return null;
+    }
+  }
+  
+  function add_class(el, class_name) {
+    el = qp.element(el);
+    if (el) { el.classList.add(class_name); }
+  }
+  
+  function remove_class(el, class_name) {
+    el = qp.element(el);
+    if (el) { el.classList.remove(class_name); }
+  }
+  
+  var dom_ready = (function() {
+    var ready = false;
+    return function(fn) {
+      if (fn && ready) {
+        fn.call(app);
+      } else if (fn) {
+        ready = fn;
+      } else if (ready) {
+        ready.call(app);
+      } else {
+        ready = true;
+      }
+    };
+  })();
+  
+  document.addEventListener('DOMContentLoaded', dom_ready);
+  
+  function fade_in(el) {
+    el.style.opacity = 0;
+    var last = Number(new Date());
+    var tick = function() {
+      el.style.opacity = Number(el.style.opacity) + (new Date() - last) / 400;
+      last = Number(new Date());
+      if (Number(el.style.opacity) < 1) {
+        requestAnimationFrame(tick);
+      }
+    };
+    tick();
+  }
+  
+  function fade_out(el) {
+    el.style.opacity = 1;
+    var last = Number(new Date());
+    var tick = function() {
+      el.style.opacity = Number(el.style.opacity) + (new Date() + last) / 400;
+      last = Number(new Date());
+      if (Number(el.style.opacity) > 0) {
+        requestAnimationFrame(tick);
+      }
+    };
+    tick();
+  }
+  
+  var class_re = /^\.([\w\-]+)$/;
+  
+  function select_all() {
+    var one_arg = arguments.length === 1;
+    var element = one_arg ? document : arguments[0];
+    var selector = one_arg ? arguments[0] : arguments[1];
+    var elements;
+    var class_name = selector.match(class_re);
+    if (class_name) {
+      elements = element.getElementsByClassName(class_name[1]);
+    } else {
+      elements = element.querySelectorAll(selector);
+    }
+    return slice.call(elements);
+  }
+  
+  function select_each() {
+    var args = arguments.length === 2 ? [arguments[0]] : [arguments[0], arguments[1]];
+    var elements = qp.select_all.apply(null, args);
+    forEach.call(elements, arguments[arguments.length - 1]);
+  }
+  
+  function select_first() {
+    return qp.select_all.apply(null, arguments)[0];
+  }
+  
 
+  if (global.define) global.define.make = qp.make
   if (module && module.exports) {
     module.exports = qp;
   } else {

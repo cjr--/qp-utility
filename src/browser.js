@@ -133,6 +133,8 @@ var qp = {
   series: series,
   parallel: parallel,
 
-  http_request: http_request
+  http_request: http_request,
+
+  dom_ready: dom_ready
 
 };

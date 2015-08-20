@@ -9,7 +9,7 @@ var common_files = [
 ];
 
 var node_files = [ 'node' ];
-var browser_files = [ 'request', 'browser' ];
+var browser_files = [ 'request', 'browser', 'dom', 'animate', 'selector' ];
 
 console.log('');
 write_file('index.js', make_file(common_files.concat(node_files)));
@@ -21,14 +21,17 @@ function make_file(files) {
   var file = files.map(function(_file) {
     return read_file(_file + '.js');
   }).join('\n');
+
   return [
     '(function(global) {',
       indent(file),
       '',
-      '  if (module && module.exports) {',
-      '    module.exports = qp;',
+      '  if (global.define) global.define.make = qp.make;',
+      '  if (global.module && global.module.exports) {',
+      '    global.module.exports = qp;',
       '  } else {',
       '    global.qp = qp;',
+      '    console.clear();',
       '  }',
       '',
     '})(this);'
