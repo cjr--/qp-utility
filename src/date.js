@@ -8,6 +8,8 @@ function now(format) {
   if (format) {
     if (format === 'utc') {
       return _now.toUTCString();
+    } else if (format === 'iso') {
+      return _now.toISOString();
     } else if (format === 'int') {
       return _now.valueOf();
     }

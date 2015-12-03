@@ -2,10 +2,15 @@ var qp = {
 
   // core.js
   noop: noop,
+  noop_callback: noop_callback,
   escape_re: escape_re,
   is_number: is_number,
   is_function: is_function,
+  is_not_function: is_not_function,
+  is_defined: is_defined,
+  is_undefined: is_undefined,
   random: random,
+  dfault: dfault,
   is_empty: is_empty,
   not_empty: not_empty,
 
@@ -49,6 +54,9 @@ var qp = {
   file_date: file_date,
 
   // function.js
+  get_fn_name: get_fn_name,
+  combine: combine,
+  done: done,
   bind: bind,
   invoke: invoke,
   invoke_after: invoke_after,

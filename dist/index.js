@@ -318,6 +318,8 @@
     if (format) {
       if (format === 'utc') {
         return _now.toUTCString();
+      } else if (format === 'iso') {
+        return _now.toISOString();
       } else if (format === 'int') {
         return _now.valueOf();
       }
@@ -1220,11 +1222,12 @@
   };
   
 
-  if (global.define) global.define.make = qp.make
+  if (global.define) global.define.make = qp.make;
   if (module && module.exports) {
     module.exports = qp;
   } else {
     global.qp = qp;
+    console.clear();
   }
 
-})(this);
+})(global || this);

@@ -23,18 +23,19 @@ function make_file(files) {
   }).join('\n');
 
   return [
-    '(function(global) {',
+    '(function(global, undefined) {',
+      '',
       indent(file),
       '',
       '  if (global.define) global.define.make = qp.make;',
-      '  if (global.module && global.module.exports) {',
-      '    global.module.exports = qp;',
+      '  if (module && module.exports) {',
+      '    module.exports = qp;',
       '  } else {',
       '    global.qp = qp;',
       '    console.clear();',
       '  }',
       '',
-    '})(this);'
+    '})(global || window);'
   ].join('\n');
 }
 
