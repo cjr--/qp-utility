@@ -1,6 +1,6 @@
 function first(o, count) {
   if (count) {
-    return o && o.length ? array_slice.call(o, 0, count) : undefined;
+    return o && o.length ? slice.call(o, 0, count) : undefined;
   } else {
     return o && o.length ? o[0] : undefined;
   }
@@ -8,14 +8,14 @@ function first(o, count) {
 
 function last(o, count) {
   if (count) {
-    return o && o.length ? array_slice.call(o, -count) : undefined;
+    return o && o.length ? slice.call(o, -count) : undefined;
   } else {
     return o && o.length ? o[o.length -1] : undefined;
   }
 }
 
 function rest(o, index) {
-  return o && o.length ? array_slice.call(o, index || 1) : undefined;
+  return o && o.length ? slice.call(o, index || 1) : undefined;
 }
 
 function at(o, i) {
@@ -26,7 +26,7 @@ function at(o, i) {
 }
 
 function range(o, from, to) {
-  return o && o.length ? array_slice.call(o, from, to) : undefined;
+  return o && o.length ? slice.call(o, from, to) : undefined;
 }
 
 function _in(item, items) {
@@ -38,3 +38,27 @@ function _in(item, items) {
 }
 
 function not_in() { return !_in.apply(null, arguments); }
+
+function contains(o) {
+  var contains = false;
+  var items = rest(arguments);
+  for (var i = 0, l = o.length; i < l; i++) {
+    contains = o.indexOf(items[i]) !== -1;
+    if (contains) break;
+  }
+  return contains;
+}
+
+function inlist(o) {
+  return rest(arguments).indexOf(o) !== -1;
+}
+
+function pick_path(o) {
+  var keys = flatten(rest(arguments));
+  var output = {};
+  for (var i = 0, l = keys.length; i < l; i++) {
+    var key = keys[i];
+    ns(o, key, ns(o, key));
+  }
+  return output;
+}

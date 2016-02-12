@@ -1,4 +1,4 @@
-function options(_options, defaults) {
+function qp_options(_options, defaults) {
   if (is(_options, 'object') && is(defaults, 'object')) {
     each_own(defaults, function(v, k) {
       if (is(_options[k], 'undefined')) {

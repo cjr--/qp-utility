@@ -1,9 +1,10 @@
 function copy(o) {
-  if (is(o, 'array')) {
+  var type = qp_typeof(o);
+  if (type === 'array') {
     return o.slice(0);
-  } else if (is(o, 'object')) {
+  } else if (type === 'object') {
     return assign({}, o);
-  } else if (is(o, 'date')) {
+  } else if (type === 'date') {
     return new Date(o.getTime());
   } else {
     return o;

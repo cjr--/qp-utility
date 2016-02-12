@@ -1,12 +1,6 @@
-var identity = 101;
+var _id = Math.round(+(new Date()) * 0.001);
 
-function id(use_date) {
-  if (use_date) {
-    return String(new Date().getTime() + identity++);
-  } else {
-    return String(identity++);
-  }
-}
+function id() { return _id++; }
 
 function uuid() {
   var d = new Date().getTime();

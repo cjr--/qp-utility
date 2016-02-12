@@ -1,8 +1,8 @@
 function qp_typeof(o, ctor) {
-  var type = object_to_string.call(o).slice(8, -1).toLowerCase();
+  var type = to_string.call(o).slice(8, -1).toLowerCase();
   if (ctor && type === 'object') {
-    if (o.constructor && o.constructor.name) {
-      type = o.constructor.name.toLowerCase();
+    if (o.constructor) {
+      type = get_fn_name(o.constructor).toLowerCase();
       return type === 'object' ? 'pojo' : type;
     } else {
       return 'pojo';

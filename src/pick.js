@@ -1,8 +1,8 @@
 function pick_predicate() {
-  if (is(arguments[0], 'function')) {
+  if (is_function(arguments[0])) {
     return arguments[1] ? arguments[0].bind(arguments[1]) : arguments[0];
   } else {
-    var picks = flatten(array_slice.call(arguments));
+    var picks = flatten(slice.call(arguments));
     return function(v, k, o) { return picks.indexOf(k) !== -1; };
   }
   return undefined;

@@ -1,14 +1,17 @@
 function trim(s, chars) {
-  chars = escape_re(chars || ' ');
   if (s === undefined || s === null) {
     return '';
+  } else if (chars === undefined || chars === null) {
+    var trim_re = /(^\s+|\s+$)/g;
+    return String(s).replace(trim_re, '');
   } else {
+    chars = escape_re(chars);
     return String(s).replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
   }
 }
 
 function ltrim(s, chars) {
-  chars = escape_re(chars || ' ');
+  chars = chars ? escape_re(chars) : ' ';
   if (s === undefined || s === null) {
     return '';
   } else {
@@ -17,7 +20,7 @@ function ltrim(s, chars) {
 }
 
 function rtrim(s, chars) {
-  chars = escape_re(chars || ' ');
+  chars = chars ? escape_re(chars) : ' ';
   if (s === undefined || s === null) {
     return '';
   } else {
@@ -25,12 +28,31 @@ function rtrim(s, chars) {
   }
 }
 
+function clean_whitespace(s) {
+  var newline_re = /\r?\n|\r/g;
+  var trim_re = /(^\s+|\s+$)/g;
+  if (s === undefined || s === null) {
+    return '';
+  } else {
+    return String(s).replace(newline_re, ' ').replace(trim_re, '');
+  }
+}
+
 function split(s, chars) {
   return s.split(chars);
 }
 
+function lines(s) {
+  return String(s).split(/\r\n|\r|\n/g);
+}
+
 function build() {
-  return compact(flatten(arguments)).join('');
+  return compact(flatten(array(arguments))).join('');
+}
+
+function plural(o, prefix, single, multi, suffix) {
+  var size = size(o);
+  return size + ' ' + (prefix || '') + (size > 1 ? multi : single) + (suffix || '');
 }
 
 function escape(s) {
@@ -52,22 +74,25 @@ function unescape(s) {
 }
 
 function lpad(s, padding, width) {
-  if (s === undefined || s === null) {
-    return '';
-  } else {
-    while (s.length < width) {
-      s = padding + s;
-    }
-    return s;
-  }
+  return pad(s, padding, width, 'lpad');
 }
 
 function rpad(s, padding, width) {
+  return pad(s, padding, width, 'rpad');
+}
+
+function pad(s, padding, width, fn) {
+  var rpad = fn === 'rpad';
   if (s === undefined || s === null) {
     return '';
   } else {
+    if (arguments.length === 2) {
+      width = padding;
+      padding = ' ';
+    }
+    s = String(s);
     while (s.length < width) {
-      s = s + padding;
+      s = rpad ? s + padding : padding + s;
     }
     return s;
   }
@@ -89,6 +114,12 @@ function between(s, left, right) {
   } else {
     return s;
   }
+}
+
+function title_case(s) {
+  return s.replace(/\w+/g, function(o) {
+    return o.charAt(0).toUpperCase() + o.substr(1).toLowerCase();
+  });
 }
 
 function to_camel(s, sep) {
@@ -171,27 +202,47 @@ function get_utf8_length(s) {
   return len;
 }
 
+function format(s, o, options) {
+  if (is(o, 'object')) {
+    options = qp_options(options, { leave_unmatched: false });
+    return s.replace(/\{{([A-Za-z0-9_\.]+)\}}/g, function(t, k) {
+      var v = get(o, k);
+      return v === undefined ? options.leave_unmatched ? t : '' : v;
+    });
+  } else {
+    o = flatten(slice.call(arguments, 1));
+    return s.replace(/\{{([0-9]+)\}}/g, function (_, i) {
+      var v = o[i];
+      return v === undefined ? '' : v;
+    });
+  }
+}
+
 function stringify(o, simple) {
   if (simple) {
-    return qp.is_empty(o) ? '' : '{ ' + qp.pairs(o).map(function(pair) {
+    return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
       var value = pair[1];
-      if (qp.is(value, 'array')) value = '[ ' + value.length + ' ]';
-      if (qp.is(value, 'object')) value = '{ }';
+      var type = qp_typeof(value);
+      if (type === 'function') value = value.name || 'fn';
+      if (type === 'array') value = '[ ' + value.length + ' ]';
+      if (type === 'object') {
+        if (empty(value)) value = '{ }'; else value = '{ … }';
+      }
       return pair[0] + ': ' + value;
     }).join(', ') + ' }';
   } else {
-    if (qp.is_empty(o)) return '{ }';
-    if (qp.is_not(o, 'object', 'array')) return o;
-    return '{ ' + qp.pairs(o).map(function(pair) {
+    if (empty(o)) return '{ }';
+    if (is_not(o, 'object', 'array')) return o;
+    return '{ ' + pairs(o).map(function(pair) {
       var value = pair[1];
-      if (qp.is(value, 'function')) {
-        return pair[0] + ': fn';
-      } else if (qp.is(value, 'array')) {
-        return pair[0] + ': [ ' + qp.map(value, function(item) {
-          return qp.stringify(item);
+      if (is(value, 'function')) {
+        return pair[0] + ': ' + value.name || 'fn';
+      } else if (is(value, 'array')) {
+        return pair[0] + ': [ ' + map(value, function(item) {
+          return stringify(item);
         }).join(', ') + ' ]';
-      } else if (qp.is(value, 'object')) {
-        return pair[0] + ': ' + qp.stringify(value);
+      } else if (is(value, 'object')) {
+        return pair[0] + ': ' + stringify(value);
       } else {
         return pair[0] + ': ' + value;
       }

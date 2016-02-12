@@ -2,6 +2,7 @@ var month_long = ['January','February','March','April','May','June','July','Augu
 var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
 
 function now(format) {
   var _now = new Date();
@@ -11,7 +12,9 @@ function now(format) {
     } else if (format === 'iso') {
       return _now.toISOString();
     } else if (format === 'int') {
-      return _now.valueOf();
+      return _now.getTime();
+    } else if (format === 'string') {
+      return String(_now.getTime());
     }
   }
   now.offset = function(offset, unit) {

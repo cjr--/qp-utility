@@ -1,9 +1,13 @@
 function sum(o, key) {
   if (is_array(o)) {
     if (key) {
-      return o.reduce(function(sum, item) { return sum + item[key]; }, 0);
+      return o.reduce(function(sum, item) {
+        return sum + Number(get(item, key));
+      }, 0);
     } else {
-      return o.reduce(function(sum, item) { return sum + item; }, 0);
+      return o.reduce(function(sum, item) {
+        return sum + Number(item); 
+      }, 0);
     }
   }
   return 0;

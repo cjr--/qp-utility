@@ -1,4 +1,6 @@
-function equals(o1, o2) {
+function neq(o1, o2) { return !eq(o1, o2); }
+
+function eq(o1, o2) {
   function _equals(a, b) {
     if (a === b) {
       return true;

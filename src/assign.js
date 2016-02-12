@@ -1,5 +1,5 @@
 function assign() {
-  var target = first(arguments);
+  var target = first(arguments) || {};
   each(rest(arguments), function(source) {
     each(source, function(value, key) {
       if (typeof value !== 'undefined') {
@@ -11,7 +11,7 @@ function assign() {
 }
 
 function assign_own() {
-  var target = first(arguments);
+  var target = first(arguments) || {};
   each(rest(arguments), function(source) {
     each_own(source, function(value, key) {
       if (typeof value !== 'undefined' && target.hasOwnProperty(key)) {

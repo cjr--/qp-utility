@@ -1,45 +1,55 @@
 (function(global, undefined) {
 
   var is_array = Array.isArray;
-  var array_slice = Array.prototype.slice;
-  var array_concat = Array.prototype.concat;
-  var object_to_string = Object.prototype.toString;
+  var slice = Array.prototype.slice;
+  var concat = Array.prototype.concat;
+  var to_string = Object.prototype.toString;
+  var for_each = Array.prototype.forEach;
+  var class_re = /^\.([\w\-]+)$/;
   
-  function noop() { }
+  function noop(o) { return o; }
   
-  function noop_callback(data, done) { qp.invoke_next(done, null, data); }
+  function noop_callback(data, done) { invoke_next(done, null, data); }
   
   function is_number(o) { return o - parseFloat(o) >= 0; }
   
+  function is_string(o) { return typeof o === 'string'; }
+  
   function is_function(o) { return typeof o === 'function'; }
   
-  function is_not_function(o) { return !is_function(o); }
+  function defined(o) { return !not_defined(o); }
   
-  function is_defined(o) { return !is_undefined(o); }
-  
-  function is_undefined(o) { return typeof o === 'undefined'; }
+  function not_defined(o) { return typeof o === 'undefined'; }
   
   function escape_re(o) { return o.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); }
   
   function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
   
-  function is_empty(o) { return typeof o === 'undefined' || o === null || (o.length && o.length === 0); }
+  function empty(o) {
+    return typeof o === 'undefined' || o === null ||
+      (is_array(o) && o.length === 0) ||
+      (is_string(o) && o.length === 0) ||
+      (is_number(o) && o === 0);
+  }
   
-  function not_empty(o) { return !is_empty(o); }
+  function not_empty(o) { return !empty(o); }
   
-  function dfault(value, dfault_value) { return is_undefined(value) ? dfault_value : value; }
+  function dfault(value, dfault_value) { return not_defined(value) ? dfault_value : value; }
   
   function trim(s, chars) {
-    chars = escape_re(chars || ' ');
     if (s === undefined || s === null) {
       return '';
+    } else if (chars === undefined || chars === null) {
+      var trim_re = /(^\s+|\s+$)/g;
+      return String(s).replace(trim_re, '');
     } else {
+      chars = escape_re(chars);
       return String(s).replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
     }
   }
   
   function ltrim(s, chars) {
-    chars = escape_re(chars || ' ');
+    chars = chars ? escape_re(chars) : ' ';
     if (s === undefined || s === null) {
       return '';
     } else {
@@ -48,7 +58,7 @@
   }
   
   function rtrim(s, chars) {
-    chars = escape_re(chars || ' ');
+    chars = chars ? escape_re(chars) : ' ';
     if (s === undefined || s === null) {
       return '';
     } else {
@@ -56,12 +66,31 @@
     }
   }
   
+  function clean_whitespace(s) {
+    var newline_re = /\r?\n|\r/g;
+    var trim_re = /(^\s+|\s+$)/g;
+    if (s === undefined || s === null) {
+      return '';
+    } else {
+      return String(s).replace(newline_re, ' ').replace(trim_re, '');
+    }
+  }
+  
   function split(s, chars) {
     return s.split(chars);
   }
   
+  function lines(s) {
+    return String(s).split(/\r\n|\r|\n/g);
+  }
+  
   function build() {
-    return compact(flatten(arguments)).join('');
+    return compact(flatten(array(arguments))).join('');
+  }
+  
+  function plural(o, prefix, single, multi, suffix) {
+    var size = size(o);
+    return size + ' ' + (prefix || '') + (size > 1 ? multi : single) + (suffix || '');
   }
   
   function escape(s) {
@@ -83,22 +112,25 @@
   }
   
   function lpad(s, padding, width) {
-    if (s === undefined || s === null) {
-      return '';
-    } else {
-      while (s.length < width) {
-        s = padding + s;
-      }
-      return s;
-    }
+    return pad(s, padding, width, 'lpad');
   }
   
   function rpad(s, padding, width) {
+    return pad(s, padding, width, 'rpad');
+  }
+  
+  function pad(s, padding, width, fn) {
+    var rpad = fn === 'rpad';
     if (s === undefined || s === null) {
       return '';
     } else {
+      if (arguments.length === 2) {
+        width = padding;
+        padding = ' ';
+      }
+      s = String(s);
       while (s.length < width) {
-        s = s + padding;
+        s = rpad ? s + padding : padding + s;
       }
       return s;
     }
@@ -120,6 +152,12 @@
     } else {
       return s;
     }
+  }
+  
+  function title_case(s) {
+    return s.replace(/\w+/g, function(o) {
+      return o.charAt(0).toUpperCase() + o.substr(1).toLowerCase();
+    });
   }
   
   function to_camel(s, sep) {
@@ -202,27 +240,47 @@
     return len;
   }
   
+  function format(s, o, options) {
+    if (is(o, 'object')) {
+      options = qp_options(options, { leave_unmatched: false });
+      return s.replace(/\{{([A-Za-z0-9_\.]+)\}}/g, function(t, k) {
+        var v = get(o, k);
+        return v === undefined ? options.leave_unmatched ? t : '' : v;
+      });
+    } else {
+      o = flatten(slice.call(arguments, 1));
+      return s.replace(/\{{([0-9]+)\}}/g, function (_, i) {
+        var v = o[i];
+        return v === undefined ? '' : v;
+      });
+    }
+  }
+  
   function stringify(o, simple) {
     if (simple) {
-      return qp.is_empty(o) ? '' : '{ ' + qp.pairs(o).map(function(pair) {
+      return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
         var value = pair[1];
-        if (qp.is(value, 'array')) value = '[ ' + value.length + ' ]';
-        if (qp.is(value, 'object')) value = '{ }';
+        var type = qp_typeof(value);
+        if (type === 'function') value = value.name || 'fn';
+        if (type === 'array') value = '[ ' + value.length + ' ]';
+        if (type === 'object') {
+          if (empty(value)) value = '{ }'; else value = '{ … }';
+        }
         return pair[0] + ': ' + value;
       }).join(', ') + ' }';
     } else {
-      if (qp.is_empty(o)) return '{ }';
-      if (qp.is_not(o, 'object', 'array')) return o;
-      return '{ ' + qp.pairs(o).map(function(pair) {
+      if (empty(o)) return '{ }';
+      if (is_not(o, 'object', 'array')) return o;
+      return '{ ' + pairs(o).map(function(pair) {
         var value = pair[1];
-        if (qp.is(value, 'function')) {
-          return pair[0] + ': fn';
-        } else if (qp.is(value, 'array')) {
-          return pair[0] + ': [ ' + qp.map(value, function(item) {
-            return qp.stringify(item);
+        if (is(value, 'function')) {
+          return pair[0] + ': ' + value.name || 'fn';
+        } else if (is(value, 'array')) {
+          return pair[0] + ': [ ' + map(value, function(item) {
+            return stringify(item);
           }).join(', ') + ' ]';
-        } else if (qp.is(value, 'object')) {
-          return pair[0] + ': ' + qp.stringify(value);
+        } else if (is(value, 'object')) {
+          return pair[0] + ': ' + stringify(value);
         } else {
           return pair[0] + ': ' + value;
         }
@@ -230,19 +288,37 @@
     }
   }
   
-  function map(o, fn, scope) { return o.map(fn, scope); }
+  function map(o, fn, scope) {
+    if (empty(o)) {
+      return [];
+    } else if (is_array(o)) {
+      return o.map(fn, scope);
+    } else if (o.length) {
+      var out = [];
+      for (var i = 0, l = o.length; i < l; i++) {
+        out.push(fn.call(scope, o[i]));
+      }
+      return out;
+    } else {
+      return [];
+    }
+  }
   
-  function reduce(o, fn, init) { return is_empty(o) ? undefined : o.reduce(fn, init); }
+  function reduce(o, fn, init) {
+    return empty(o) ? undefined : o.reduce(fn, init);
+  }
   
-  function arg(o) { return array_slice.call(o); }
+  function arg(o) { return slice.call(o); }
   
   function to_array(o) {
     if (is_array(o)) {
       return o;
-    } else if (o && o.length) {
-      return array_slice.call(o);
+    } else if (o && has_key(o, 'length')) {
+      return slice.call(o);
     } else if (typeof o === 'string') {
       return o.split('');
+    } else if (typeof o === 'number') {
+      return o === 0 ? [] : new Array(o);
     } else if (o) {
       return [o];
     } else {
@@ -252,14 +328,25 @@
   
   function union() {
     return slice.call(arguments).reduce(function(output, input) {
-      return output.concat(input);
+      return to_array(output).concat(to_array(input));
     }, []);
+  }
+  
+  function unique(o) {
+    var unique = [];
+    if (is_array(o)) {
+      for (var i = 0, l = o.length; i < l; i++) {
+        var item = o[i];
+        if (unique.indexOf(item) === -1) unique.push(item);
+      }
+    }
+    return unique;
   }
   
   function flatten() {
     function _flatten(items) {
       return items.reduce(function(output, input) {
-        return any(input, is_array) ? output.concat(flatten(input)) : output.concat(input);
+        return any(input, is_array) ? output.concat(_flatten(input)) : output.concat(input);
       }, []);
     }
     var args = slice.call(arguments);
@@ -279,51 +366,50 @@
     return result;
   }
   
-  function first(o, count) {
-    if (count) {
-      return o && o.length ? array_slice.call(o, 0, count) : undefined;
+  function clear(o) {
+    if (is_array(o)) {
+      for (var i = 0, l = o.length; i < l; i++) { o.pop(); }
     } else {
-      return o && o.length ? o[0] : undefined;
+      for (var key in o) { if (o.hasOwnProperty(key)) { delete o[key]; } }
     }
+    return o;
   }
   
-  function last(o, count) {
-    if (count) {
-      return o && o.length ? array_slice.call(o, -count) : undefined;
+  function push(o, value) {
+    if (is_array(value)) {
+      if (!is_array(o)) {
+        o = value;
+      } else {
+        for (var i = 0, l = value.length; i < l; i++) { o.push(value[i]); }
+      }
+    } else if (value === undefined) {
+      if (!is_array(o)) {
+        o = [];
+      }
     } else {
-      return o && o.length ? o[o.length -1] : undefined;
+      if (!is_array(o)) {
+        o = [ value ];
+      } else {
+        o.push(value);
+      }
     }
+    return o;
   }
   
-  function rest(o, index) {
-    return o && o.length ? array_slice.call(o, index || 1) : undefined;
+  function load(o, value) {
+    clear(o);
+    push(o, value);
   }
   
-  function at(o, i) {
-    if (o && o.length) {
-      return i < 0 ? o[((o.length - 1) + i)] : o[i];
-    }
-    return undefined;
+  function has_key(o, key) {
+    return Object.keys(o).indexOf(key) !== -1;
   }
-  
-  function range(o, from, to) {
-    return o && o.length ? array_slice.call(o, from, to) : undefined;
-  }
-  
-  function _in(item, items) {
-    if (is_array(items)) {
-      return items.indexOf(item) != -1;
-    } else {
-      return rest(arguments).indexOf(item) != -1;
-    }
-  }
-  
-  function not_in() { return !_in.apply(null, arguments); }
   
   var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
   
   function now(format) {
     var _now = new Date();
@@ -333,7 +419,9 @@
       } else if (format === 'iso') {
         return _now.toISOString();
       } else if (format === 'int') {
-        return _now.valueOf();
+        return _now.getTime();
+      } else if (format === 'string') {
+        return String(_now.getTime());
       }
     }
     now.offset = function(offset, unit) {
@@ -408,12 +496,12 @@
   }
   
   function done() {
-    var args = arg(arguments);
+    var args = slice.call(arguments);
     var type = qp_typeof(args[0]);
     if (type === 'object') {
-      qp.invoke_next(args[0].done.bind(args[0].context || args[0].bind), args[1], args[2]);
+      invoke_next(args[0].done.bind(args[0].context || args[0].bind), args[1], args[2]);
     } else if (type === 'function') {
-      qp.invoke_next(args[0].bind(args[1]), args[2], args[3]);
+      invoke_next(args[0].bind(args[1]), args[2], args[3]);
     }
     return null;
   }
@@ -427,10 +515,11 @@
   }
   
   function invoke(fn, ctx) {
-    if (fn && is(fn, 'function')) {
-      return fn.apply(ctx, array_slice.call(arguments, 2));
-    } else if (is(fn, 'array')) {
-      var args = array_slice.call(arguments, 2);
+    var type = qp_typeof(args[0]);
+    if (fn && type === 'function') {
+      return fn.apply(ctx, slice.call(arguments, 2));
+    } else if (type === 'array') {
+      var args = slice.call(arguments, 2);
       return map(fn, function(func) { return func.apply(ctx, args); });
     }
     return undefined;
@@ -469,60 +558,112 @@
   function invoke_when(fn, check, interval) {
     (function timer_event() {
       invoke_delay(interval || 500, function() {
-        if (check()) {
-          fn();
-        } else {
-          timer_event();
-        }
+        if (check()) fn(); else timer_event();
       });
     })();
   }
   
-  function size(o) {
-    if (is_array(o)) {
-      return o.length;
-    } else {
-      return Object.keys(o).length;
-    }
+  function debounce(fn, wait, immediate, scope) {
+    var timeout;
+    return function() {
+      var context = scope || this, args = slice.call(arguments);
+      var later = function() {
+        timeout = clearTimeout(timeout);
+        if (!immediate && fn) fn.apply(context, args);
+      };
+      var call = immediate && !timeout;
+      if (!timeout) timeout = setTimeout(later, wait);
+      if (call && fn) fn.apply(context, args);
+    };
   }
   
-  function each(o, fn, scope) {
-    var no_exit = true;
-    if (is_array(o)) {
-      for (var i = 0, l = o.length; i < l; i++) {
-        if (fn.call(scope, o[i], i, o) === false) {
-          no_exit = false;
-          break;
-        }
+  function throttle(fn, threshhold, scope) {
+    threshhold = threshhold || 250;
+    var last, deferTimer;
+    return function () {
+      var context = scope || this;
+      var now = +(new Date()), args = slice.call(arguments);
+      if (last && now < last + threshhold) {
+        clearTimeout(deferTimer);
+        deferTimer = setTimeout(function () {
+          last = now;
+          fn.apply(context, args);
+        }, threshhold);
+      } else {
+        last = now;
+        fn.apply(context, args);
       }
-    } else {
-      var index = 0;
-      for (var key in o) {
-        if (fn.call(scope, o[key], key, index++, o) === false) {
-          no_exit = false;
-          break;
-        }
-      }
-    }
-    return no_exit;
+    };
   }
   
-  function each_own(o, fn, scope) {
-    var no_exit = true;
-    var index = 0;
-    for (var key in o) {
-      if (o.hasOwnProperty(key)) {
-        if (fn.call(scope, o[key], key, index++, o) === false) {
-          no_exit = false;
-          break;
+  function get(o, key, dfault) {
+    var value = dfault;
+    if (is(o, 'object')) {
+      var item = o;
+      var path = key.split('.');
+      for (var i = 0, l = path.length; i < l; i++) {
+        item = item[path[i]];
+        if (item === undefined) break;
+        if (i == (l - 1)) value = item;
+      }
+    }
+    return value;
+  }
+  
+  function take(o, key, dfault) {
+    var value = dfault;
+    if (is(o, 'object')) {
+      var item = o;
+      var last;
+      var path = key.split('.');
+      for (var i = 0, l = path.length; i < l; i++) {
+        last = item;
+        item = item[path[i]];
+        if (item === undefined) break;
+        if (i == (l - 1)) {
+          delete last[path[i]];
+          value = item;
         }
       }
     }
-    return no_exit;
+    return value;
+  }
+  
+  function has(o, key) {
+    var has = false;
+    if (is(o, 'object')) {
+      var item = o;
+      var path = key.split('.');
+      for (var i = 0, l = path.length; i < l; i++) {
+        var item_key = path[i];
+        if (item.hasOwnProperty(item_key)) {
+          item = item[item_key];
+          if (item === undefined) break;
+          if (i == (l - 1)) has = true;
+        } else { break; }
+      }
+    }
+    return has;
+  }
+  
+  function set(o, key, value) {
+    var item = o;
+    var path = key.split('.');
+    for (var i = 0, l = path.length; i < l; i++) {
+      if (i == (l - 1)) {
+        item[path[i]] = value;
+        break;
+      } else if (item[path[i]] === undefined) {
+        item = item[path[i]] = {};
+      } else {
+        item = item[path[i]];
+      }
+    }
+    return o;
   }
   
   function assign() {
-    var target = first(arguments);
+    var target = first(arguments) || {};
     each(rest(arguments), function(source) {
       each(source, function(value, key) {
         if (typeof value !== 'undefined') {
@@ -534,7 +675,7 @@
   }
   
   function assign_own() {
-    var target = first(arguments);
+    var target = first(arguments) || {};
     each(rest(arguments), function(source) {
       each_own(source, function(value, key) {
         if (typeof value !== 'undefined' && target.hasOwnProperty(key)) {
@@ -559,10 +700,10 @@
   }
   
   function qp_typeof(o, ctor) {
-    var type = object_to_string.call(o).slice(8, -1).toLowerCase();
+    var type = to_string.call(o).slice(8, -1).toLowerCase();
     if (ctor && type === 'object') {
-      if (o.constructor && o.constructor.name) {
-        type = o.constructor.name.toLowerCase();
+      if (o.constructor) {
+        type = get_fn_name(o.constructor).toLowerCase();
         return type === 'object' ? 'pojo' : type;
       } else {
         return 'pojo';
@@ -610,18 +751,21 @@
   }
   
   function copy(o) {
-    if (is(o, 'array')) {
+    var type = qp_typeof(o);
+    if (type === 'array') {
       return o.slice(0);
-    } else if (is(o, 'object')) {
+    } else if (type === 'object') {
       return assign({}, o);
-    } else if (is(o, 'date')) {
+    } else if (type === 'date') {
       return new Date(o.getTime());
     } else {
       return o;
     }
   }
   
-  function equals(o1, o2) {
+  function neq(o1, o2) { return !eq(o1, o2); }
+  
+  function eq(o1, o2) {
     function _equals(a, b) {
       if (a === b) {
         return true;
@@ -661,17 +805,22 @@
   
   function extend(a, b) {
     if (is_function(b)) {
-      b = b.apply(null, array_slice.call(arguments, 2));
+      b = b.apply(null, slice.call(arguments, 2));
     }
     for (var key in b) {
       if (b.hasOwnProperty(key)) {
-        a[key] = b[key];
+        var v = b[key];
+        if (is_function(v)) {
+          a[key] = v.bind(a);
+        } else {
+          a[key] = v;
+        }
       }
     }
     return a;
   }
   
-  function merge() {
+  function merge(target, source, override) {
     function _merge(a, b) {
       var type_a = qp_typeof(a);
       var type_b = qp_typeof(b);
@@ -679,7 +828,9 @@
         for (var i = 0, l = Math.min(a.length, b.length); i < l; i++) {
           var type_ai = qp_typeof(a[i]);
           var type_bi = qp_typeof(b[i]);
-          if (type_ai == 'undefined' && type_bi != 'undefined') {
+          if (override && type_bi != 'undefined') {
+            a[i] = b[i];
+          } else if (type_ai == 'undefined' && type_bi != 'undefined') {
             a[i] = b[i];
           } else if (type_ai == type_bi) {
             a[i] = _merge(a[i], b[i]);
@@ -693,23 +844,23 @@
           if (b.hasOwnProperty(k)) {
             var type_ak = qp_typeof(a[k]);
             var type_bk = qp_typeof(b[k]);
-            if (type_ak == 'undefined' && type_bk != 'undefined') {
+            if (override && type_bk != 'undefined') {
+              a[k] = b[k];
+            } else if (type_ak == 'undefined' && type_bk != 'undefined') {
               a[k] = b[k];
             } else {
               a[k] = _merge(a[k], b[k]);
             }
           }
         }
+      } else if (override && type_b != 'undefined') {
+        return b;
       } else if (type_a == 'undefined') {
-        return type_b == 'undefined' ? {} : b;
+        return b;
       }
       return a;
     }
-    var target = arguments[0];
-    for (var i = 1, l = arguments.length; i < l; i++) {
-      target = _merge(target, arguments[i]);
-    }
-    return target;
+    return _merge(target, source);
   }
   
   function ns(scope, _ns, value) {
@@ -728,7 +879,7 @@
     return scope;
   }
   
-  function options(_options, defaults) {
+  function qp_options(_options, defaults) {
     if (is(_options, 'object') && is(defaults, 'object')) {
       each_own(defaults, function(v, k) {
         if (is(_options[k], 'undefined')) {
@@ -741,30 +892,15 @@
     return _options;
   }
   
-  function override(a, b) {
-    function _override(a, b) {
-      var type_a = qp_typeof(a);
-      var type_b = qp_typeof(b);
-      if (b === undefined || b === 0 || b === null || (b.length && !b.length)) {
-        return a;
-      } else if (type_a == 'object' && type_b == 'object') {
-        for (var k in b) {
-          if (b.hasOwnProperty(k)) {
-            a[k] = _override(a[k], b[k]);
-          }
-        }
-        return a;
-      }
-      return b;
-    }
-    return _override(a, b);
+  function override(target, source) {
+    return merge(target, source, true); 
   }
   
   function pick_predicate() {
-    if (is(arguments[0], 'function')) {
+    if (is_function(arguments[0])) {
       return arguments[1] ? arguments[0].bind(arguments[1]) : arguments[0];
     } else {
-      var picks = flatten(array_slice.call(arguments));
+      var picks = flatten(slice.call(arguments));
       return function(v, k, o) { return picks.indexOf(k) !== -1; };
     }
     return undefined;
@@ -835,8 +971,174 @@
     return output;
   }
   
+  function get_data(original) {
+    var non_transferable = 'NON_TRANSFERABLE';
+    function _get_data(o) {
+      var data = non_transferable;
+      var value;
+      var type_o = qp_typeof(o);
+      if (type_o == 'array') {
+        data = [];
+        for (var i = 0, l = o.length; i < l; i++) {
+          value = _get_data(o[i]);
+          if (value === non_transferable) value = undefined;
+          data[i] = value;
+        }
+      } else if (type_o == 'date' || (o && o.toISOString)) {
+        data = o.toISOString();
+      } else if (type_o == 'object') {
+        data = {};
+        for (var key in o) {
+          if (o.hasOwnProperty(key)) {
+            value = _get_data(o[key]);
+            if (value !== non_transferable) data[key] = value;
+          }
+        }
+      } else if (type_o == 'number' || type_o == 'string' || type_o == 'boolean') {
+        data = o;
+      }
+      return data;
+    }
+    return _get_data(original);
+  }
+  
+  function set_data(original) {
+    function _set_data(o) {
+      var type_o = qp_typeof(o);
+      if (type_o == 'array') {
+        for (var i = 0, l = o.length; i < l; i++) {
+          o[i] = _set_data(o[i]);
+        }
+      } else if (type_o == 'date' || (o && o.toISOString)) {
+         return o.toISOString();
+      } else if (type_o == 'object') {
+        for (var key in o) {
+          if (o.hasOwnProperty(key)) o[key] = _set_data(o[key]);
+        }
+      } else if (type_o == 'string') {
+        if (iso_date_re.test(o)) {
+          if (moment) {
+            return moment(o);
+          } else {
+            return new Date(o);
+          }
+        }
+      }
+      return o;
+    }
+    return _set_data(original);
+  }
+  
+  function first(o, count) {
+    if (count) {
+      return o && o.length ? slice.call(o, 0, count) : undefined;
+    } else {
+      return o && o.length ? o[0] : undefined;
+    }
+  }
+  
+  function last(o, count) {
+    if (count) {
+      return o && o.length ? slice.call(o, -count) : undefined;
+    } else {
+      return o && o.length ? o[o.length -1] : undefined;
+    }
+  }
+  
+  function rest(o, index) {
+    return o && o.length ? slice.call(o, index || 1) : undefined;
+  }
+  
+  function at(o, i) {
+    if (o && o.length) {
+      return i < 0 ? o[((o.length - 1) + i)] : o[i];
+    }
+    return undefined;
+  }
+  
+  function range(o, from, to) {
+    return o && o.length ? slice.call(o, from, to) : undefined;
+  }
+  
+  function _in(item, items) {
+    if (is_array(items)) {
+      return items.indexOf(item) != -1;
+    } else {
+      return rest(arguments).indexOf(item) != -1;
+    }
+  }
+  
+  function not_in() { return !_in.apply(null, arguments); }
+  
+  function contains(o) {
+    var contains = false;
+    var items = rest(arguments);
+    for (var i = 0, l = o.length; i < l; i++) {
+      contains = o.indexOf(items[i]) !== -1;
+      if (contains) break;
+    }
+    return contains;
+  }
+  
+  function inlist(o) {
+    return rest(arguments).indexOf(o) !== -1;
+  }
+  
+  function pick_path(o) {
+    var keys = flatten(rest(arguments));
+    var output = {};
+    for (var i = 0, l = keys.length; i < l; i++) {
+      var key = keys[i];
+      ns(o, key, ns(o, key));
+    }
+    return output;
+  }
+  
+  function size(o) {
+    if (is_array(o)) {
+      return o.length;
+    } else {
+      return Object.keys(o).length;
+    }
+  }
+  
+  function each(o, fn, scope) {
+    var no_exit = true;
+    if (is_array(o)) {
+      for (var i = 0, l = o.length; i < l; i++) {
+        if (fn.call(scope, o[i], i, o) === false) {
+          no_exit = false;
+          break;
+        }
+      }
+    } else {
+      var index = 0;
+      for (var key in o) {
+        if (fn.call(scope, o[key], key, index++, o) === false) {
+          no_exit = false;
+          break;
+        }
+      }
+    }
+    return no_exit;
+  }
+  
+  function each_own(o, fn, scope) {
+    var no_exit = true;
+    var index = 0;
+    for (var key in o) {
+      if (o.hasOwnProperty(key)) {
+        if (fn.call(scope, o[key], key, index++, o) === false) {
+          no_exit = false;
+          break;
+        }
+      }
+    }
+    return no_exit;
+  }
+  
   function series() {
-    var args = arg(arguments);
+    var args = slice.call(arguments);
     var data = args[2] ? args[0] : null;
     var actions = args[2] ? args[1] : args[0];
     var done = args[2] ? args[2] : args[1];
@@ -860,7 +1162,7 @@
   }
   
   function parallel() {
-    var args = arg(arguments);
+    var args = slice.call(arguments);
     var data = args[2] ? args[0] : null;
     var actions = args[2] ? args[1] : args[0];
     var done = args[2] ? args[2] : args[1];
@@ -884,18 +1186,18 @@
   
   function find_predicate(arg1, arg2) {
     var predicate;
-    if (qp.is(arg1, 'function')) {
-      predicate = qp.is_not_empty(arg2) ? arg1.bind(arg2) : arg1;
-    } else if (qp.is(arg1, 'object')) {
-      var keys = qp.keys(arg1);
+    if (is(arg1, 'function')) {
+      predicate = not_empty(arg2) ? arg1.bind(arg2) : arg1;
+    } else if (is(arg1, 'object')) {
+      var keys = keys(arg1);
       predicate = function(item, index, items) {
-        return qp.eq(qp.pick(item, keys), arg1);
+        return eq(pick(item, keys), arg1);
       };
-    } else if (qp.is(arg1, 'string')) {
-      var truthy = qp.is(arg2, 'undefined');
+    } else if (is(arg1, 'string')) {
+      var truthy = is(arg2, 'undefined');
       predicate = function(item, index, items) {
         var value = item[arg1];
-        return truthy ? value : value === arg2;
+        return truthy ? !!value : value === arg2;
       };
     }
     return predicate;
@@ -906,7 +1208,7 @@
     var output_all = options.find_all || options.remove_all;
     var match_index = [];
     var match_value = [];
-    if (is_not_empty(items)) {
+    if (not_empty(items)) {
       var predicate = find_predicate(arg1, arg2);
       if (predicate) {
         for (var i = 0, il = items.length; i < il; i++) {
@@ -923,20 +1225,25 @@
           }
         }
       }
+      return output_all ? match_value : options.index && match_value[0] === undefined ? -1 : match_value[0];
     }
-    return output_all ? match_value : match_value[0];
+    return output_all ? [] : options.index ? -1 : undefined;
+  }
+  
+  function count(items, arg1, arg2) {
+    return find(items, arg1, arg2, { find_all: true }).length;
   }
   
   function any(items, arg1, arg2) {
-    return find(items, arg1, arg2, { find: true }) !== undefined;
+    return find(items, arg1, arg2, { find: true }) !== -1;
   }
   
   function all(items, arg1, arg2) {
-    return qp.find_all(items, arg1, arg2, { find_all: true }).length !== 0;
+    return find(items, arg1, arg2, { find_all: true }).length !== items.length;
   }
   
   function none(items, arg1, arg2) {
-    return qp.find_all(items, arg1, arg2, { find_all: true }).length === 0;
+    return find(items, arg1, arg2, { find_all: true }).length === 0;
   }
   
   function find_all(items, arg1, arg2) {
@@ -947,6 +1254,10 @@
     return find(items, arg1, arg2, { index: true });
   }
   
+  function exists(items, arg1, arg2) {
+    return find(items, arg1, arg2, { index: true }) !== -1;
+  }
+  
   function remove(items, arg1, arg2) {
     return find(items, arg1, arg2, { remove: true });
   }
@@ -955,15 +1266,30 @@
     return find(items, arg1, arg2, { remove_all: true });
   }
   
-  var identity = 101;
-  
-  function id(use_date) {
-    if (use_date) {
-      return String(new Date().getTime() + identity++);
-    } else {
-      return String(identity++);
+  function replace(items, arg1, arg2, item) {
+    var index = find(items, arg1, arg2, { index: true });
+    if (index > -1) {
+      items[index] = item;
     }
+    return index !== -1;
   }
+  
+  function upsert(items, arg1, arg2, item) {
+    if (is(items, 'array') && is(item, 'object')) {
+      var index = find(items, arg1, arg2, { index: true });
+      if (index !== -1) {
+        items[index] = item;
+      } else {
+        items.push(item);
+      }
+      return true;
+    }
+    return false;
+  }
+  
+  var _id = Math.round(+(new Date()) * 0.001);
+  
+  function id() { return _id++; }
   
   function uuid() {
     var d = new Date().getTime();
@@ -1031,87 +1357,229 @@
     return ctor;
   }
   
-  function sort(items, fn) {
-    return items.sort(fn);
-  }
-  
-  function sort_on(items, keys, _options) {
-    var opts = options(_options, { stable: true });
-    keys = is_array(keys) ? keys : keys.split(',');
-    if (opts.stable) {
-      for (var i = 0, l = items.length; i < l; i++) {
-        items[i].sort_index = i;
-      }
+  var sort = (function() {
+    function _sort(items, sorters, options) {
+      items = array(items);
+      each(items, function(item, i) { item.__idx = i; });
+      sorters = array(sorters);
+      var sorters_length = sorters.length;
+      return items.sort(function(a, b) {
+        var result = 0;
+        for (var i = 0; i < sorters_length; i++) {
+          var sorter = sorters[i];
+          result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
+          if (result !== 0) break;
+        }
+        return result === 0 ? (a.__idx > b.__idx ? 1 : -1) : result;
+      });
     }
-    each(keys, function(key) {
-      items.sort(function(o1, o2) {
-        var v1 = o1[key], v2 = o2[key];
-        if (v1 > v2) { return 1; }
-        if (v1 < v2) { return -1; }
-        if (opts.stable) {
-          return o1.sort_index > o2.sort_index ? 1 : -1;
+  
+    function natural_sort(case_insensitive) {
+      /*
+       * Natural Sort algorithm for Javascript - Version 0.8 - Released under MIT license
+       * Author: Jim Palmer (based on chunking idea from Dave Koelle)
+       * https://github.com/overset/javascript-natural-sort
+       */
+      return function(a, b) {
+        var re = /(^([+\-]?(?:\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[\da-fA-F]+$|\d+)/g,
+            sre = /^\s+|\s+$/g,   // trim pre-post whitespace
+            snre = /\s+/g,        // normalize all whitespace to single ' ' character
+            dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
+            hre = /^0x[0-9a-f]+$/i,
+            ore = /^0/,
+            i = function(s) {
+              return (case_insensitive && ('' + s).toLowerCase() || '' + s).replace(sre, '');
+            },
+            // convert all to strings strip whitespace
+            x = i(a) || '',
+            y = i(b) || '',
+            // chunk/tokenize
+            xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+            yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+            // numeric, hex or date detection
+            xD = parseInt(x.match(hre), 16) || (xN.length !== 1 && Date.parse(x)),
+            yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null,
+            normChunk = function(s, l) {
+              // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
+              return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
+            },
+            oFxNcL, oFyNcL;
+        // first try and sort Hex codes or Dates
+        if (yD) {
+          if (xD < yD) { return -1; }
+          else if (xD > yD) { return 1; }
+        }
+        // natural sorting through split numeric strings and default strings
+        for (var cLoc=0, xNl = xN.length, yNl = yN.length, numS=Math.max(xNl, yNl); cLoc < numS; cLoc++) {
+          oFxNcL = normChunk(xN[cLoc], xNl);
+          oFyNcL = normChunk(yN[cLoc], yNl);
+          // handle numeric vs string comparison - number < string - (Kyle Adams)
+          if (isNaN(oFxNcL) !== isNaN(oFyNcL)) { return (isNaN(oFxNcL)) ? 1 : -1; }
+          // rely on string comparison if different types - i.e. '02' < 2 != '02' < '2'
+          else if (typeof oFxNcL !== typeof oFyNcL) {
+            oFxNcL += '';
+            oFyNcL += '';
+          }
+          if (oFxNcL < oFyNcL) { return -1; }
+          if (oFxNcL > oFyNcL) { return 1; }
         }
         return 0;
-      });
-    });
+      };
+    }
+  
+    _sort.asc =  function(a, b) { return (a < b) ? -1 : (a > b) ? 1 : 0; };
+    _sort.desc = function(a, b) { return (a > b) ? -1 : (a < b) ? 1 : 0; };
+    _sort.number = {
+      asc:  function(a, b) { return a - b; },
+      desc: function(a, b) { return b - a; }
+    };
+    _sort.string = {
+      asc:  function(a, b) { return a.localeCompare(b); },
+      desc: function(a, b) { return b.localeCompare(a); }
+    };
+    _sort.moment = {
+      asc: function(a, b) { return (a < b) ? -1 : (a > b) ? 1 : 0; },
+      desc: function(a, b) { return (a > b) ? -1 : (a < b) ? 1 : 0; }
+    };
+    _sort.date = {
+      asc:  function(a, b) { return a.getTime() - b.getTime(); },
+      desc: function(a, b) { return b.getTime() - a.getTime(); }
+    };
+    _sort.empty = {
+      last: function(a, b) { return (!!a) ? -1 : (!!b) ? 1 : 0; },
+      first: function(a, b) { return (!!a) ? 1 : (!!b) ? -1 : 0; }
+    };
+    _sort.natural = natural_sort();
+  
+    return _sort;
+  })();
+  
+  function get_comparer(type, asc, desc, key) {
+    type = type || '';
+    var fn = (sort[type] || sort)[asc ? 'asc' : desc ? 'desc' : 'asc'];
+    return { fn: fn, key: key };
+  }
+  
+  function ungroup(items) {
+    remove_all(items, { group: true });
     return items;
   }
   
-  function group_on(items, key, name, sort_key, options) {
-    options = options || {};
-    name = name || key;
-    var sort = [ key ];
-    if (sort_key) sort.push(sort_key);
-    qp.sort_on(items, sort, { stable: true });
-    var group;
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i];
-      var item_key = qp.ns(item, key);
-      if (!group || item_key !== group.key) {
-        var group_name = typeof name === 'function' ? name(item, item_key, i) : qp.ns(item, name);
-        group = { group: true, key: item_key, name: group_name, count: 1 };
-        if (options.group_items) {
-          group.items = [ item ];
+  function group(items, group_keys, options) {
+    items = array(items);
+    group_keys = array(group_keys);
+    var group_count = group_keys.length;
+    if (group_count === 0) return;
+  
+    var summary = [];
+    var group_id = -99;
+    var item_index = 0;
+  
+    while (item_index < items.length) {
+      if (group_count === 1) {
+        summary.push(create_group(group_id--, get_key(items[item_index], group_keys[0])));
+      } else {
+        var groups = [];
+        var summary_groups = [];
+        while (groups.length < group_count - 1) {
+          var key = get_key(items[item_index], group_keys[groups.length]);
+          var group = create_header(group_id--, key);
+          groups.push(group);
+          items.splice(item_index++, 0, group);
+          summary_groups.push(create_group_summary(group, 'groups'));
         }
-        items.splice(i, 0, group);
-      }
-      group.count++;
-      if (group.items) {
-        group.items.push(item);
+        var outer_group = groups[groups.length - 1];
+        var outer_summary_group = summary_groups[groups.length - 1];
+        while (items[item_index] && items[item_index][outer_group.name] === outer_group.key) {
+          outer_summary_group.groups.push(create_group(group_id--, get_key(items[item_index], group_keys[group_count - 1]), groups));
+        }
+        while (groups.length) {
+          groups.pop();
+          var group_summary = summary_groups.shift();
+          group_summary.footer = create_footer(group_summary.id, {
+            name: group_summary.name,
+            key: group_summary.key,
+            id_name: group_summary.id_name,
+            id_key: group_summary.id_key
+          });
+          items.splice(item_index++, 0, group_summary.footer);
+          summary.push(group_summary);
+        }
       }
     }
-    return items;
-  }
   
-  function group_by(items, group_key, group_name, sort_key) {
-    group_name = group_name || group_key;
-    var sort = [ group_key ];
-    if (sort_key) sort.push(sort_key);
-    var groups = [];
-    var group;
-    sort_on(items, sort, { stable: true }).forEach(function(item) {
-      var item_key = ns(item, group_key);
-      if (!group || item_key !== group.key) {
-        group = {
-          group: true,
-          key: item_key,
-          name: ns(item, group_name),
-          items: [item]
-        };
-        groups.push(group);
+    function get_key(item, o) {
+      if (is(o, 'string')) {
+        var key_name = o;
+        var key_value = get(item, key_name);
+        return { name: key_name, value: key_value, id_name: key_name,  id_value: key_value };
+      } else if (is(o, 'object')) {
+        return { name: o.key, value: get(item, o.key), id_name: o.id_key, id_value: get(item, o.id_key) };
       } else {
-        group.items.push(item);
+        return null;
       }
-    });
-    return groups;
+    }
+  
+    function create_group(id, key, outer_groups) {
+      var header = create_header(id, key);
+      var group_summary = create_group_summary(header, 'items');
+      items.splice(item_index++, 0, header);
+      while (items[item_index] && get_key(items[item_index], key.name).value === key.value) {
+        group_summary.items.push(items[item_index]);
+        if (outer_groups) {
+          each(outer_groups, function(grp) { grp.count++; });
+        }
+        group_summary.count++;
+        item_index++;
+      }
+      group_summary.footer = create_footer(id, key);
+      items.splice(item_index++, 0, group_summary.footer);
+      return group_summary;
+    }
+  
+    function create_group_summary(group, list_key) {
+      var summary = { group_id: group.id, name: group.name, key: group.key, id_name: group.id_name, id_key: group.id_key, header: group, count: 0 };
+      summary[list_key] = [];
+      return summary;
+    }
+  
+    function create_header(id, key) {
+      return {
+        id: id,
+        group: true,
+        group_header: true,
+        name: key.name,
+        key: key.value,
+        id_name: key.id_name,
+        id_key: key.id_value
+      };
+    }
+  
+    function create_footer(id, key) {
+      return {
+        id: id,
+        group: true,
+        group_footer: true,
+        name: key.name,
+        key: key.value,
+        id_name: key.id_name,
+        id_key: key.id_value
+      };
+    }
+  
+    return summary;
   }
   
   function sum(o, key) {
     if (is_array(o)) {
       if (key) {
-        return o.reduce(function(sum, item) { return sum + item[key]; }, 0);
+        return o.reduce(function(sum, item) {
+          return sum + Number(get(item, key));
+        }, 0);
       } else {
-        return o.reduce(function(sum, item) { return sum + item; }, 0);
+        return o.reduce(function(sum, item) {
+          return sum + Number(item); 
+        }, 0);
       }
     }
     return 0;
@@ -1130,6 +1598,51 @@
   function avg(o, k) { return sum(o, k) / (o.length || 1); }
   function max(o, k) { return min_max(o, k, 'max'); }
   function min(o, k) { return min_max(o, k, 'min'); }
+  
+  function build_match(s) {
+    var escape = '/$^+.()=!|[]{},';
+    var re = '';
+    for (var i = 0, l = s.length; i < l; i++) {
+      var c = s[i];
+      if (c === '\\' || escape.indexOf(c) !== -1) {
+        re += '\\' + c;
+      } else if (c == '?') {
+        var j = i;
+        while (c == '?') { c = s[++i]; }
+        re += '(.{' + (i - j) + '})';
+      } else if (c == '*') {
+        re += '(.*)';
+      } else {
+        re += c;
+      }
+    }
+    return '^' + re + '$';
+  }
+  
+  function match(s, expr) {
+    return new RegExp(build_match(expr), 'ig').test(s);
+  }
+  
+  function get_matches(s, expr) {
+    var matches = new RegExp(build_match(expr), 'ig').exec(s);
+    return matches && matches.slice(1) || [];
+  }
+  
+  function select(items, fn, scope) {
+    var out = [];
+    var args = rest(arguments, 2);
+    for (var i = 0, l = items.length; i < l; i++) {
+      args[0] = items[i];
+      var result = fn.apply(scope, args);
+      if (result !== undefined) out.push(result);
+    }
+    return out;
+  }
+  
+  global.debug = function() {
+    var format = ['%cDEBUG:','color:black;background-color:yellow;'];
+    console.log.apply(console, format.concat(slice.call(arguments)));
+  };
   
   function http_request(options) {
     options.done = options.done || noop;
@@ -1190,161 +1703,24 @@
     request.send(options.data);
   }
   
-  var qp = {
-  
-    // core.js
-    noop: noop,
-    noop_callback: noop_callback,
-    escape_re: escape_re,
-    is_number: is_number,
-    is_function: is_function,
-    is_not_function: is_not_function,
-    is_defined: is_defined,
-    is_undefined: is_undefined,
-    random: random,
-    dfault: dfault,
-    is_empty: is_empty,
-    not_empty: not_empty,
-  
-    // string.js
-    trim: trim,
-    ltrim: ltrim,
-    rtrim: rtrim,
-    split: split,
-    build: build,
-    escape: escape,
-    unescape: unescape,
-    lpad: lpad,
-    rpad: rpad,
-    starts: starts,
-    ends: ends,
-    between: between,
-    snake_to_camel: snake_to_camel,
-    camel_to_snake: camel_to_snake,
-    repeat: repeat,
-    replace_all: replace_all,
-    get_utf8_length: get_utf8_length,
-    stringify: stringify,
-  
-    // math.js
-    sum: sum,
-    min: min,
-    max: max,
-    avg: avg,
-  
-    // array.js
-    map: map,
-    reduce: reduce,
-    arg: arg,
-    to_array: to_array,
-    flatten: flatten,
-    compact: compact,
-  
-    // date.js
-    now: now,
-    date: date,
-    file_date: file_date,
-  
-    // function.js
-    get_fn_name: get_fn_name,
-    combine: combine,
-    done: done,
-    bind: bind,
-    invoke: invoke,
-    invoke_after: invoke_after,
-    invoke_delay: invoke_delay,
-    invoke_next: invoke_next,
-  
-    // typeof.js
-    typeof: qp_typeof,
-    is: is,
-    is_not: is_not,
-  
-    // iteration.js
-    size: size,
-    each: each,
-    each_own: each_own,
-  
-    // assign.js
-    assign: assign,
-    assign_own: assign_own,
-    assign_if: assign_if,
-  
-    // equals.js
-    equals: equals,
-    // clone.js
-    clone: clone,
-    // copy.js
-    copy: copy,
-    // merge.js
-    merge: merge,
-    // extend.js
-    extend: extend,
-    // override
-    override: override,
-    // make.js
-    make: make,
-  
-    // collection.js
-    first: first,
-    last: last,
-    rest: rest,
-    at: at,
-    range: range,
-    in: _in,
-    not_in: not_in,
-  
-    // find.js
-    find_predicate: find_predicate,
-    find: find,
-    any: any,
-    exists: any,
-    find_all: find_all,
-    find_index: find_index,
-    remove: remove,
-    remove_all: remove_all,
-  
-    // pick
-    pick_predicate: pick_predicate,
-    pick: pick,
-    pick_own: pick_own,
-    pairs: pairs,
-    keys: keys,
-    values: values,
-    pick_values: pick_values,
-  
-    // sort.js
-    sort: sort,
-    sort_on: sort_on,
-    group_on: group_on,
-    group_by: group_by,
-  
-    // ns.js
-    ns: ns,
-  
-    // options.js
-    options: options,
-  
-    // id.js
-    id: id,
-    uuid: uuid,
-  
-    // async.js
-    series: series,
-    parallel: parallel,
-  
-    http_request: http_request,
-  
-    dom_ready: dom_ready
-  
-  };
-  
-  function show(el) {
-    el.style.display = '';
+  function get_attributes(el) {
+    if (el && el.attributes) {
+      return slice.call(el.attributes);
+    } else {
+      return [];
+    }
   }
   
-  function hide(el) {
-    el.style.display = 'none';
+  function get_attribute(el, name) {
+    if (el && el.attributes) {
+      var attributes = el.attributes;
+      for (var i = 0, l = attributes.length; i < l; i++) {
+        var attribute = el.attributes[i];
+        if (match(attribute.name, name)) {
+          return attribute;
+        }
+      }
+    }
   }
   
   function is_element(el) {
@@ -1356,23 +1732,56 @@
   }
   
   function element(el) {
-    if (qp.typeof(el) === 'string') {
-      return qp.select_first(el);
-    } else if (qp.is_element(el)) {
+    if (qp_typeof(el) === 'string') {
+      return select_first(el);
+    } else if (is_element(el)) {
       return el;
     } else {
       return null;
     }
   }
   
+  function show(el, v) {
+    el.style.display = v || 'block';
+  }
+  
+  function hide(el, v) {
+    el.style.display = v || '';
+  }
+  
   function add_class(el, class_name) {
-    el = qp.element(el);
+    el = element(el);
     if (el) { el.classList.add(class_name); }
   }
   
   function remove_class(el, class_name) {
-    el = qp.element(el);
+    el = element(el);
     if (el) { el.classList.remove(class_name); }
+  }
+  
+  function html() {
+    var tmp = document.implementation.createHTMLDocument();
+    tmp.body.innerHTML = slice.call(arguments).join('');
+    return tmp.body.children;
+  }
+  
+  function attr(el, name, value) {
+    if (arguments.length === 2) {
+      el.getAttribute(name);
+    } else {
+      el.setAttribute(name, value);
+    }
+  }
+  
+  function parents_until(child_el, parent_el, match) {
+    var result = match(child_el);
+    if (result) {
+      return result;
+    } else if (child_el === parent_el) {
+      return null;
+    } else {
+      return parents_until(child_el.parentNode, parent_el, match);
+    }
   }
   
   var dom_ready = (function() {
@@ -1418,8 +1827,6 @@
     tick();
   }
   
-  var class_re = /^\.([\w\-]+)$/;
-  
   function select_all() {
     var one_arg = arguments.length === 1;
     var element = one_arg ? document : arguments[0];
@@ -1436,14 +1843,301 @@
   
   function select_each() {
     var args = arguments.length === 2 ? [arguments[0]] : [arguments[0], arguments[1]];
-    var elements = qp.select_all.apply(null, args);
-    forEach.call(elements, arguments[arguments.length - 1]);
+    var elements = select_all.apply(null, args);
+    for_each.call(elements, arguments[arguments.length - 1]);
   }
   
   function select_first() {
-    return qp.select_all.apply(null, arguments)[0];
+    return select_all.apply(null, arguments)[0];
   }
   
+  global.app = { };
+  
+  function create_view(config) { return new View(config); }
+  
+  function View(config) {
+    this.bind.bind(this);
+    this.parse.bind(this);
+    this.parse_node.bind(this);
+    this.update_view.bind(this);
+    this.update_model.bind(this);
+  
+    this.element = config.el;
+    this.model = config.model;
+    this.bindings = [];
+    this.bind();
+  }
+  
+  View.prototype.bind = function() {
+    this.parse(this.element, this.bindings);
+  };
+  
+  View.prototype.update_view = function() {
+    qp.each(this.bindings, function(binding) {
+      binding.update_view(this.model);
+    }.bind(this));
+  };
+  
+  View.prototype.update_model = function() {
+    qp.each(this.bindings, function(binding) {
+      binding.update_model(this.model);
+    }.bind(this));
+  };
+  
+  View.prototype.parse = function(element, bindings) {
+    bindings = bindings || [];
+    this.parse_node(element, bindings);
+    if (element.parentNode) {
+      qp.each(element.children, function(child_element) {
+        this.parse(child_element, bindings);
+      }.bind(this));
+    }
+    return bindings;
+  };
+  
+  View.prototype.parse_node = function(element, bindings) {
+    qp.each(qp.get_attributes(element), function(attribute) {
+      if (attribute.name.slice(0, 2) === 'v-') {
+        var binding = {
+          key: attribute.name,
+          path: attribute.value,
+          element: element
+        };
+        if (attribute.name === 'v-text') {
+          binding.type = 'text';
+        } else if (attribute.name === 'v-html') {
+          binding.type = 'html';
+        } else if (attribute.name === 'v-data-id') {
+          binding.type = 'id';
+        } else if (qp.match(attribute.name, 'v-on-*')) {
+          binding.type = 'on';
+          binding.item_name = attribute.name.slice(5);
+        } else if (qp.match(attribute.name, 'v-each-*')) {
+          binding.type = 'each';
+          binding.item_name = attribute.name.slice(7);
+        }
+        this[binding.type](binding);
+        bindings.push(binding);
+        element.removeAttribute(binding.key);
+      }
+    }.bind(this));
+  };
+  
+  View.prototype.text = function(binding) {
+    binding.update_view = function(model) { binding.element.textContent = qp.get(model, binding.path); };
+    binding.update_model = function(model) { qp.set(model, binding.path, binding.element.textContent); };
+  };
+  
+  View.prototype.html = function(binding) {
+    binding.update_view = function(model) { binding.element.innerHTML = qp.get(model, binding.path); };
+    binding.update_model = function(model) { qp.set(model, binding.path, binding.element.innerHTML); };
+  };
+  
+  View.prototype.id = function(binding) {
+    binding.update_view = function(model) { binding.element.setAttribute('data-id', qp.get(model, binding.path)); };
+    binding.update_model = function(model) { qp.set(model, binding.path, binding.element.getAttribute('data-id')); };
+  };
+  
+  View.prototype.on = function(binding) {
+    binding.update_view = function(model) {
+      binding.event_listener = function(e) {
+        e.stopPropagation();
+        var id = binding.element.getAttribute('data-id');
+        if (!id) {
+          id = qp.parents_until(e.target, binding.element, function(el) {
+            return el.getAttribute('data-id');
+          });
+        }
+        qp.get(model, binding.path).call(model, Number(id));
+      };
+      binding.element.addEventListener(binding.item_name, binding.event_listener, false);
+    };
+    binding.update_model = function(model) { };
+  };
+  
+  View.prototype.each = function(binding) {
+    binding.container = binding.element.parentNode;
+    binding.template = binding.container.removeChild(binding.element);
+    binding.container.innerHTML = '';
+    binding.update_view = function(model) {
+      binding.container.innerHTML = '';
+      qp.each(qp.get(model, binding.path), function(item) {
+        model[binding.item_name] = item;
+        var child_element = binding.container.appendChild(binding.template.cloneNode(true));
+        child_element.setAttribute('data-id', item.id);
+        qp.each(this.parse(child_element), function(binding) {
+          binding.update_view(model);
+        });
+      }.bind(this));
+    }.bind(this);
+    binding.update_model = function(model) { };
+  };
+  
+
+  var qp = {
+    noop: noop,
+    noop_callback: noop_callback,
+    escape_re: escape_re,
+    is_number: is_number,
+    is_function: is_function,
+    is_string: is_string,
+    defined: defined,
+    undefined: not_defined,
+    random: random,
+    dfault: dfault,
+    empty: empty,
+    not_empty: not_empty,
+    trim: trim,
+    ltrim: ltrim,
+    rtrim: rtrim,
+    split: split,
+    build: build,
+    escape: escape,
+    unescape: unescape,
+    pad: pad,
+    lpad: lpad,
+    rpad: rpad,
+    starts: starts,
+    clean_whitespace: clean_whitespace,
+    lines: lines,
+    plural: plural,
+    ends: ends,
+    between: between,
+    title_case: title_case,
+    repeat: repeat,
+    replace_all: replace_all,
+    format: format,
+    camel_to: camel_to,
+    to_camel: to_camel,
+    snake_to_camel: snake_to_camel,
+    camel_to_snake: camel_to_snake,
+    snake_to_kebab: snake_to_kebab,
+    kebab_to_snake: kebab_to_snake,
+    camel_to_kebab: camel_to_kebab,
+    kebab_to_camel: kebab_to_camel,
+    get_utf8_length: get_utf8_length,
+    stringify: stringify,
+    sum: sum,
+    min: min,
+    max: max,
+    avg: avg,
+    map: map,
+    reduce: reduce,
+    arg: arg,
+    to_array: to_array,
+    flatten: flatten,
+    compact: compact,
+    now: now,
+    date: date,
+    date_time: date_time,
+    file_date: file_date,
+    get_fn_name: get_fn_name,
+    timer: timer,
+    combine: combine,
+    done: done,
+    bind: bind,
+    invoke: invoke,
+    invoke_after: invoke_after,
+    invoke_delay: invoke_delay,
+    invoke_next: invoke_next,
+    invoke_when: invoke_when,
+    debounce: debounce,
+    throttle: throttle,
+    typeof: qp_typeof,
+    is: is,
+    is_not: is_not,
+    size: size,
+    each: each,
+    each_own: each_own,
+    assign: assign,
+    assign_own: assign_own,
+    assign_if: assign_if,
+    equals: equals,
+    clone: clone,
+    copy: copy,
+    merge: merge,
+    extend: extend,
+    override: override,
+    make: make,
+    first: first,
+    last: last,
+    rest: rest,
+    at: at,
+    range: range,
+    in: _in,
+    not_in: not_in,
+    find_predicate: find_predicate,
+    find: find,
+    any: any,
+    find_all: find_all,
+    find_index: find_index,
+    remove: remove,
+    remove_all: remove_all,
+    pick_predicate: pick_predicate,
+    pick: pick,
+    pick_own: pick_own,
+    pairs: pairs,
+    keys: keys,
+    values: values,
+    pick_values: pick_values,
+    sort: sort,
+    get_comparer: get_comparer,
+    group: group,
+    ungroup: ungroup,
+    ns: ns,
+    options: qp_options,
+    id: id,
+    uuid: uuid,
+    series: series,
+    parallel: parallel,
+    get: get,
+    take: take,
+    has: has,
+    set: set,
+    union: union,
+    unique: unique,
+    clear: clear,
+    push: push,
+    load: load,
+    contains: contains,
+    inlist: inlist,
+    pick_path: pick_path,
+    get_data: get_data,
+    set_data: set_data,
+    eq: eq,
+    neq: neq,
+    count: count,
+    all: all,
+    none: none,
+    exists: exists,
+    replace: replace,
+    upsert: upsert,
+    build_match: build_match,
+    match: match,
+    get_matches: get_matches,
+    has_key: has_key,
+    select: select,
+    fade_in: fade_in,
+    fade_out: fade_out,
+    debug: debug,
+    get_attributes: get_attributes,
+    get_attribute: get_attribute,
+    is_element: is_element,
+    element: element,
+    show: show,
+    hide: hide,
+    add_class: add_class,
+    remove_class: remove_class,
+    html: html,
+    attr: attr,
+    parents_until: parents_until,
+    dom_ready: dom_ready,
+    http_request: http_request,
+    select_all: select_all,
+    select_each: select_each,
+    select_first: select_first,
+    create_view: create_view
+  };
 
   if (global.define) global.define.make = qp.make;
   if (module && module.exports) {

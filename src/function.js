@@ -18,12 +18,12 @@ function combine() {
 }
 
 function done() {
-  var args = arg(arguments);
+  var args = slice.call(arguments);
   var type = qp_typeof(args[0]);
   if (type === 'object') {
-    qp.invoke_next(args[0].done.bind(args[0].context || args[0].bind), args[1], args[2]);
+    invoke_next(args[0].done.bind(args[0].context || args[0].bind), args[1], args[2]);
   } else if (type === 'function') {
-    qp.invoke_next(args[0].bind(args[1]), args[2], args[3]);
+    invoke_next(args[0].bind(args[1]), args[2], args[3]);
   }
   return null;
 }
@@ -37,10 +37,11 @@ function bind(o, scope) {
 }
 
 function invoke(fn, ctx) {
-  if (fn && is(fn, 'function')) {
-    return fn.apply(ctx, array_slice.call(arguments, 2));
-  } else if (is(fn, 'array')) {
-    var args = array_slice.call(arguments, 2);
+  var type = qp_typeof(args[0]);
+  if (fn && type === 'function') {
+    return fn.apply(ctx, slice.call(arguments, 2));
+  } else if (type === 'array') {
+    var args = slice.call(arguments, 2);
     return map(fn, function(func) { return func.apply(ctx, args); });
   }
   return undefined;
@@ -79,11 +80,40 @@ function invoke_next(fn) {
 function invoke_when(fn, check, interval) {
   (function timer_event() {
     invoke_delay(interval || 500, function() {
-      if (check()) {
-        fn();
-      } else {
-        timer_event();
-      }
+      if (check()) fn(); else timer_event();
     });
   })();
+}
+
+function debounce(fn, wait, immediate, scope) {
+  var timeout;
+  return function() {
+    var context = scope || this, args = slice.call(arguments);
+    var later = function() {
+      timeout = clearTimeout(timeout);
+      if (!immediate && fn) fn.apply(context, args);
+    };
+    var call = immediate && !timeout;
+    if (!timeout) timeout = setTimeout(later, wait);
+    if (call && fn) fn.apply(context, args);
+  };
+}
+
+function throttle(fn, threshhold, scope) {
+  threshhold = threshhold || 250;
+  var last, deferTimer;
+  return function () {
+    var context = scope || this;
+    var now = +(new Date()), args = slice.call(arguments);
+    if (last && now < last + threshhold) {
+      clearTimeout(deferTimer);
+      deferTimer = setTimeout(function () {
+        last = now;
+        fn.apply(context, args);
+      }, threshhold);
+    } else {
+      last = now;
+      fn.apply(context, args);
+    }
+  };
 }

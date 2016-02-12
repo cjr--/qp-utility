@@ -1,74 +1,102 @@
-function sort(items, fn) {
-  return items.sort(fn);
-}
-
-function sort_on(items, keys, _options) {
-  var opts = options(_options, { stable: true });
-  keys = is_array(keys) ? keys : keys.split(',');
-  if (opts.stable) {
-    for (var i = 0, l = items.length; i < l; i++) {
-      items[i].sort_index = i;
-    }
+var sort = (function() {
+  function _sort(items, sorters, options) {
+    items = array(items);
+    each(items, function(item, i) { item.__idx = i; });
+    sorters = array(sorters);
+    var sorters_length = sorters.length;
+    return items.sort(function(a, b) {
+      var result = 0;
+      for (var i = 0; i < sorters_length; i++) {
+        var sorter = sorters[i];
+        result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
+        if (result !== 0) break;
+      }
+      return result === 0 ? (a.__idx > b.__idx ? 1 : -1) : result;
+    });
   }
-  each(keys, function(key) {
-    items.sort(function(o1, o2) {
-      var v1 = o1[key], v2 = o2[key];
-      if (v1 > v2) { return 1; }
-      if (v1 < v2) { return -1; }
-      if (opts.stable) {
-        return o1.sort_index > o2.sort_index ? 1 : -1;
+
+  function natural_sort(case_insensitive) {
+    /*
+     * Natural Sort algorithm for Javascript - Version 0.8 - Released under MIT license
+     * Author: Jim Palmer (based on chunking idea from Dave Koelle)
+     * https://github.com/overset/javascript-natural-sort
+     */
+    return function(a, b) {
+      var re = /(^([+\-]?(?:\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[\da-fA-F]+$|\d+)/g,
+          sre = /^\s+|\s+$/g,   // trim pre-post whitespace
+          snre = /\s+/g,        // normalize all whitespace to single ' ' character
+          dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
+          hre = /^0x[0-9a-f]+$/i,
+          ore = /^0/,
+          i = function(s) {
+            return (case_insensitive && ('' + s).toLowerCase() || '' + s).replace(sre, '');
+          },
+          // convert all to strings strip whitespace
+          x = i(a) || '',
+          y = i(b) || '',
+          // chunk/tokenize
+          xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+          yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
+          // numeric, hex or date detection
+          xD = parseInt(x.match(hre), 16) || (xN.length !== 1 && Date.parse(x)),
+          yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null,
+          normChunk = function(s, l) {
+            // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
+            return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
+          },
+          oFxNcL, oFyNcL;
+      // first try and sort Hex codes or Dates
+      if (yD) {
+        if (xD < yD) { return -1; }
+        else if (xD > yD) { return 1; }
+      }
+      // natural sorting through split numeric strings and default strings
+      for (var cLoc=0, xNl = xN.length, yNl = yN.length, numS=Math.max(xNl, yNl); cLoc < numS; cLoc++) {
+        oFxNcL = normChunk(xN[cLoc], xNl);
+        oFyNcL = normChunk(yN[cLoc], yNl);
+        // handle numeric vs string comparison - number < string - (Kyle Adams)
+        if (isNaN(oFxNcL) !== isNaN(oFyNcL)) { return (isNaN(oFxNcL)) ? 1 : -1; }
+        // rely on string comparison if different types - i.e. '02' < 2 != '02' < '2'
+        else if (typeof oFxNcL !== typeof oFyNcL) {
+          oFxNcL += '';
+          oFyNcL += '';
+        }
+        if (oFxNcL < oFyNcL) { return -1; }
+        if (oFxNcL > oFyNcL) { return 1; }
       }
       return 0;
-    });
-  });
-  return items;
-}
-
-function group_on(items, key, name, sort_key, options) {
-  options = options || {};
-  name = name || key;
-  var sort = [ key ];
-  if (sort_key) sort.push(sort_key);
-  qp.sort_on(items, sort, { stable: true });
-  var group;
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    var item_key = qp.ns(item, key);
-    if (!group || item_key !== group.key) {
-      var group_name = typeof name === 'function' ? name(item, item_key, i) : qp.ns(item, name);
-      group = { group: true, key: item_key, name: group_name, count: 1 };
-      if (options.group_items) {
-        group.items = [ item ];
-      }
-      items.splice(i, 0, group);
-    }
-    group.count++;
-    if (group.items) {
-      group.items.push(item);
-    }
+    };
   }
-  return items;
-}
 
-function group_by(items, group_key, group_name, sort_key) {
-  group_name = group_name || group_key;
-  var sort = [ group_key ];
-  if (sort_key) sort.push(sort_key);
-  var groups = [];
-  var group;
-  sort_on(items, sort, { stable: true }).forEach(function(item) {
-    var item_key = ns(item, group_key);
-    if (!group || item_key !== group.key) {
-      group = {
-        group: true,
-        key: item_key,
-        name: ns(item, group_name),
-        items: [item]
-      };
-      groups.push(group);
-    } else {
-      group.items.push(item);
-    }
-  });
-  return groups;
+  _sort.asc =  function(a, b) { return (a < b) ? -1 : (a > b) ? 1 : 0; };
+  _sort.desc = function(a, b) { return (a > b) ? -1 : (a < b) ? 1 : 0; };
+  _sort.number = {
+    asc:  function(a, b) { return a - b; },
+    desc: function(a, b) { return b - a; }
+  };
+  _sort.string = {
+    asc:  function(a, b) { return a.localeCompare(b); },
+    desc: function(a, b) { return b.localeCompare(a); }
+  };
+  _sort.moment = {
+    asc: function(a, b) { return (a < b) ? -1 : (a > b) ? 1 : 0; },
+    desc: function(a, b) { return (a > b) ? -1 : (a < b) ? 1 : 0; }
+  };
+  _sort.date = {
+    asc:  function(a, b) { return a.getTime() - b.getTime(); },
+    desc: function(a, b) { return b.getTime() - a.getTime(); }
+  };
+  _sort.empty = {
+    last: function(a, b) { return (!!a) ? -1 : (!!b) ? 1 : 0; },
+    first: function(a, b) { return (!!a) ? 1 : (!!b) ? -1 : 0; }
+  };
+  _sort.natural = natural_sort();
+
+  return _sort;
+})();
+
+function get_comparer(type, asc, desc, key) {
+  type = type || '';
+  var fn = (sort[type] || sort)[asc ? 'asc' : desc ? 'desc' : 'asc'];
+  return { fn: fn, key: key };
 }

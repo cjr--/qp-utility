@@ -1,5 +1,5 @@
 function series() {
-  var args = arg(arguments);
+  var args = slice.call(arguments);
   var data = args[2] ? args[0] : null;
   var actions = args[2] ? args[1] : args[0];
   var done = args[2] ? args[2] : args[1];
@@ -23,7 +23,7 @@ function series() {
 }
 
 function parallel() {
-  var args = arg(arguments);
+  var args = slice.call(arguments);
   var data = args[2] ? args[0] : null;
   var actions = args[2] ? args[1] : args[0];
   var done = args[2] ? args[2] : args[1];

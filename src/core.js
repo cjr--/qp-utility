@@ -1,28 +1,35 @@
 var is_array = Array.isArray;
-var array_slice = Array.prototype.slice;
-var array_concat = Array.prototype.concat;
-var object_to_string = Object.prototype.toString;
+var slice = Array.prototype.slice;
+var concat = Array.prototype.concat;
+var to_string = Object.prototype.toString;
+var for_each = Array.prototype.forEach;
+var class_re = /^\.([\w\-]+)$/;
 
-function noop() { }
+function noop(o) { return o; }
 
-function noop_callback(data, done) { qp.invoke_next(done, null, data); }
+function noop_callback(data, done) { invoke_next(done, null, data); }
 
 function is_number(o) { return o - parseFloat(o) >= 0; }
 
+function is_string(o) { return typeof o === 'string'; }
+
 function is_function(o) { return typeof o === 'function'; }
 
-function is_not_function(o) { return !is_function(o); }
+function defined(o) { return !not_defined(o); }
 
-function is_defined(o) { return !is_undefined(o); }
-
-function is_undefined(o) { return typeof o === 'undefined'; }
+function not_defined(o) { return typeof o === 'undefined'; }
 
 function escape_re(o) { return o.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); }
 
 function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
 
-function is_empty(o) { return typeof o === 'undefined' || o === null || (o.length && o.length === 0); }
+function empty(o) {
+  return typeof o === 'undefined' || o === null ||
+    (is_array(o) && o.length === 0) ||
+    (is_string(o) && o.length === 0) ||
+    (is_number(o) && o === 0);
+}
 
-function not_empty(o) { return !is_empty(o); }
+function not_empty(o) { return !empty(o); }
 
-function dfault(value, dfault_value) { return is_undefined(value) ? dfault_value : value; }
+function dfault(value, dfault_value) { return not_defined(value) ? dfault_value : value; }
