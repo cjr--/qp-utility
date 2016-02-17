@@ -1,5 +1,15 @@
 module.exports = function(target) {
 
+  var js_files = [
+    'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
+    'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
+    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select',
+  ];
+
+  var css_files = [
+    'normalize', 'base', 'code', 'form', 'misc', 'text', 'media', 'grid', 'grid-xs', 'grid-sm', 'grid-md', 'grid-lg'
+  ];
+
   var fns = [
     'noop','noop_callback','escape_re','is_number','is_function','is_string','defined',
     'undefined:not_defined','random','dfault','empty','not_empty','trim',
@@ -23,6 +33,9 @@ module.exports = function(target) {
   if (target === 'node') {
     //
   } else if (target === 'browser') {
+    js_files = js_files.concat([
+      'debug', 'request', 'dom', 'animate', 'selector', 'app', 'view'
+    ]);
     fns = fns.concat([
       'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element',
       'show','hide','add_class','remove_class','html','attr','parents_until','dom_ready','http_request',
@@ -30,8 +43,20 @@ module.exports = function(target) {
     ]);
   }
 
-  return 'var qp = {\n' + fns.map(function(fn) {
-    fn = fn.split(':');
-    return '  ' + fn[0] + ': ' + (fn[1] || fn[0]);
-  }).join(',\n') + '\n};';
+  return {
+
+    platform: target,
+
+    files: {
+      js: js_files,
+      css: css_files
+    },
+
+    fns: 'var qp = {\n' + fns.map(function(fn) {
+      fn = fn.split(':');
+      return '  ' + fn[0] + ': ' + (fn[1] || fn[0]);
+    }).join(',\n') + '\n};'
+
+  };
+
 };

@@ -1,36 +1,25 @@
 var fs = require('fs');
 var uglify = require('uglify-js');
 var path = require('path');
-var fns = require('./function_map');
+var definition = require('./definition');
 
-var common_files = [
-  'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
-  'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
-  'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select',
-];
-
-var node_files = [ ];
-var browser_files = [
-  'debug', 'request', 'dom', 'animate', 'selector', 'app', 'view'
-];
+var browser_def = definition('browser');
 
 console.log('');
-write_file('index.js', make_file(common_files.concat(node_files), 'node'));
-write_file('qp-utility.js', make_file(common_files.concat(browser_files), 'browser'));
+write_file('index.js', make_file(definition('node')));
+write_file('qp-utility.js', make_file(browser_def));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
+write_file('qp-utility.css', join_files(browser_def.files.css, 'css'));
 console.log('');
 
-function make_file(files, platform) {
-  var file = files.map(function(_file) {
-    return read_file(_file + '.js');
-  }).join('\n');
+function make_file(def) {
 
   return [
     '(function(global, undefined) {',
       '',
-      indent(file),
+      indent(join_files(def.files.js, 'js')),
       '',
-      indent(fns(platform)),
+      indent(def.fns),
       '',
       '  if (global.define) global.define.make = qp.make;',
       '  if (module && module.exports) {',
@@ -49,8 +38,14 @@ function make_min_file(filename) {
   return min.code;
 }
 
-function read_file(file) {
-  return fs.readFileSync(path.join(__dirname, 'src', file), 'utf8');
+function join_files(files, ext) {
+  return files.map(function(file) {
+    return read_file(file + '.' + ext, ext);
+  }).join('\n');
+}
+
+function read_file(file, type) {
+  return fs.readFileSync(path.join(__dirname, 'src', type, file), 'utf8');
 }
 
 function write_file(file, data) {
