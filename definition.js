@@ -3,11 +3,13 @@ module.exports = function(target) {
   var js_files = [
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
-    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select',
+    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select'
   ];
 
   var css_files = [
-    'normalize', 'base', 'code', 'form', 'misc', 'text', 'media', 'grid', 'grid-xs', 'grid-sm', 'grid-md', 'grid-lg'
+    'normalize', 'base', 'code', 'form', 'misc', 'text', 'media',
+    'grid', 'grid-xs', 'grid-sm', 'grid-md', 'grid-lg',
+    'flex-grid'
   ];
 
   var fns = [
