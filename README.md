@@ -8,6 +8,7 @@
 `npm install qp-utility --save`
 
 `<script src="qp-utility.min.js"></script>`
+`<link href="qp-utility.min.css" rel="stylesheet">`
 
 ### build
 
