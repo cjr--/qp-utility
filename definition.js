@@ -22,7 +22,7 @@ module.exports = function(target) {
     'arg','to_array','flatten','compact','now','date','date_time','file_date','get_fn_name','timer',
     'combine','done','bind','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle',
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',
-    'assign_own','assign_if','equals','clone','copy','merge','extend','override',
+    'assign_own','assign_if','eq','neq','clone','copy','merge','extend','override',
     'make','first','last','rest','at','range','in:_in','not_in','find_predicate',
     'find','any','find_all','find_index','remove','remove_all','pick_predicate',
     'pick','pick_own','pairs','keys','values','pick_values','sort','get_comparer','group','ungroup','ns',

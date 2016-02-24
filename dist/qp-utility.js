@@ -515,7 +515,7 @@
   }
   
   function invoke(fn, ctx) {
-    var type = qp_typeof(args[0]);
+    var type = qp_typeof(arguments[0]);
     if (fn && type === 'function') {
       return fn.apply(ctx, slice.call(arguments, 2));
     } else if (type === 'array') {
@@ -2052,7 +2052,8 @@
     assign: assign,
     assign_own: assign_own,
     assign_if: assign_if,
-    equals: equals,
+    eq: eq,
+    neq: neq,
     clone: clone,
     copy: copy,
     merge: merge,

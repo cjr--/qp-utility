@@ -37,7 +37,7 @@ function bind(o, scope) {
 }
 
 function invoke(fn, ctx) {
-  var type = qp_typeof(args[0]);
+  var type = qp_typeof(arguments[0]);
   if (fn && type === 'function') {
     return fn.apply(ctx, slice.call(arguments, 2));
   } else if (type === 'array') {
