@@ -1,5 +1,6 @@
 var fs = require('fs');
 var uglify = require('uglify-js');
+var CleanCSS = require('clean-css');
 var path = require('path');
 var definition = require('./definition');
 
@@ -10,6 +11,7 @@ write_file('index.js', make_file(definition('node')));
 write_file('qp-utility.js', make_file(browser_def));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
 write_file('qp-utility.css', join_files(browser_def.files.css, 'css'));
+write_file('qp-utility.min.css', make_min_file('qp-utility.css'));
 console.log('');
 
 function make_file(def) {
@@ -34,8 +36,15 @@ function make_file(def) {
 }
 
 function make_min_file(filename) {
-  var min = uglify.minify(path.join('dist', filename), { compress: { dead_code: false, unused: false } });
-  return min.code;
+  var ext = path.extname(filename);
+  if (ext === '.js') {
+    var min = uglify.minify(path.join('dist', filename), { compress: { dead_code: false, unused: false } });
+    return min.code;
+  } else if (ext === '.css') {
+    var css = fs.readFileSync(path.join(__dirname, 'dist', filename), 'utf8');
+    return new CleanCSS().minify(css).styles;
+  }
+  return '';
 }
 
 function join_files(files, ext) {
