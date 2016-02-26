@@ -28,7 +28,7 @@ module.exports = function(target) {
     'pick','pick_own','pairs','keys','values','pick_values','sort','get_comparer','group','ungroup','ns',
     'options:qp_options','id','uuid','series','parallel','get','take','has','set',
     'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
-    'set_data','eq','neq','count','all','none','exists','replace','upsert',
+    'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','select'
   ];
 
@@ -39,8 +39,8 @@ module.exports = function(target) {
       'debug', 'request', 'dom', 'animate', 'selector', 'app', 'view'
     ]);
     fns = fns.concat([
-      'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element',
-      'show','hide','add_class','remove_class','html','attr','parents_until','dom_ready','http_request',
+      'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off',
+      'show','hide','add_class','remove_class','html','attr','parents_until','ready','request:http_request',
       'select_all','select_each','select_first','create_view'
     ]);
   }

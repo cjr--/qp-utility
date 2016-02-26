@@ -1741,6 +1741,14 @@
     }
   }
   
+  function on(el, event_name, handler) {
+    el.addEventListener(event_name, handler, false);
+  }
+  
+  function off(el, event_name, handler) {
+    el.removeEventListener(event_name, handler);
+  }
+  
   function show(el, v) {
     el.style.display = v || 'block';
   }
@@ -1784,22 +1792,13 @@
     }
   }
   
-  var dom_ready = (function() {
-    var ready = false;
-    return function(fn) {
-      if (fn && ready) {
-        fn.call(app);
-      } else if (fn) {
-        ready = fn;
-      } else if (ready) {
-        ready.call(app);
-      } else {
-        ready = true;
-      }
-    };
-  })();
-  
-  document.addEventListener('DOMContentLoaded', dom_ready);
+  function ready(fn) {
+    if (document.readyState !== 'loading') {
+      fn(window);
+    } else {
+      document.addEventListener('DOMContentLoaded', function() { fn(window); });
+    }
+  }
   
   function fade_in(el) {
     el.style.opacity = 0;
@@ -2105,8 +2104,6 @@
     pick_path: pick_path,
     get_data: get_data,
     set_data: set_data,
-    eq: eq,
-    neq: neq,
     count: count,
     all: all,
     none: none,
@@ -2125,6 +2122,8 @@
     get_attribute: get_attribute,
     is_element: is_element,
     element: element,
+    on: on,
+    off: off,
     show: show,
     hide: hide,
     add_class: add_class,
@@ -2132,7 +2131,7 @@
     html: html,
     attr: attr,
     parents_until: parents_until,
-    dom_ready: dom_ready,
+    ready: ready,
     http_request: http_request,
     select_all: select_all,
     select_each: select_each,
@@ -2140,12 +2139,12 @@
     create_view: create_view
   };
 
-  if (global.define) global.define.make = qp.make;
+  if (global.define) global.define.make = make;
   if (module && module.exports) {
     module.exports = qp;
   } else {
     global.qp = qp;
-    console.clear();
+    // console.clear();
   }
 
-})(global || window);
+})(this || window);

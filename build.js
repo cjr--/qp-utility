@@ -23,15 +23,15 @@ function make_file(def) {
       '',
       indent(def.fns),
       '',
-      '  if (global.define) global.define.make = qp.make;',
+      '  if (global.define) global.define.make = make;',
       '  if (module && module.exports) {',
       '    module.exports = qp;',
       '  } else {',
       '    global.qp = qp;',
-      '    console.clear();',
+      '    // console.clear();',
       '  }',
       '',
-    '})(global || window);'
+    '})(this || window);'
   ].join('\n');
 }
 

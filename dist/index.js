@@ -1771,8 +1771,6 @@
     pick_path: pick_path,
     get_data: get_data,
     set_data: set_data,
-    eq: eq,
-    neq: neq,
     count: count,
     all: all,
     none: none,
@@ -1786,12 +1784,12 @@
     select: select
   };
 
-  if (global.define) global.define.make = qp.make;
+  if (global.define) global.define.make = make;
   if (module && module.exports) {
     module.exports = qp;
   } else {
     global.qp = qp;
-    console.clear();
+    // console.clear();
   }
 
-})(global || window);
+})(this || window);

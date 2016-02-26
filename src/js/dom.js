@@ -36,6 +36,14 @@ function element(el) {
   }
 }
 
+function on(el, event_name, handler) {
+  el.addEventListener(event_name, handler, false);
+}
+
+function off(el, event_name, handler) {
+  el.removeEventListener(event_name, handler);
+}
+
 function show(el, v) {
   el.style.display = v || 'block';
 }
@@ -79,19 +87,10 @@ function parents_until(child_el, parent_el, match) {
   }
 }
 
-var dom_ready = (function() {
-  var ready = false;
-  return function(fn) {
-    if (fn && ready) {
-      fn.call(app);
-    } else if (fn) {
-      ready = fn;
-    } else if (ready) {
-      ready.call(app);
-    } else {
-      ready = true;
-    }
-  };
-})();
-
-document.addEventListener('DOMContentLoaded', dom_ready);
+function ready(fn) {
+  if (document.readyState !== 'loading') {
+    fn(window);
+  } else {
+    document.addEventListener('DOMContentLoaded', function() { fn(window); });
+  }
+}
