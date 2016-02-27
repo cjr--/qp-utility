@@ -7,9 +7,8 @@ function http_request(options) {
   var response = { ok: false };
   var construct_response = function(req, res) {
     res.status = req.status;
-    if (options.json) { res.data = JSON.parse(req.responseText); }
-    else if (options.html) { res.data = req.responseText; }
-    else { res.data = req.responseText; }
+    res.data = res.text = req.responseText;
+    if (options.json) { res.data = JSON.parse(res.text); }
   };
   var request = new XMLHttpRequest();
   if (options.json) {
@@ -23,10 +22,10 @@ function http_request(options) {
     options.method = 'GET';
     options.headers['content-type'] = 'text/html';
   }
+  request.open(options.method.toUpperCase(), options.url, true);
   for (var name in options.headers) {
     request.setRequestHeader(name.toLowerCase(), options.headers[name]);
   }
-  request.open(options.method.toUpperCase(), options.url, true);
   request.onload = function() {
     if (options.timeout_id) { clearTimeout(options.timeout_id); }
     construct_response(request, response);

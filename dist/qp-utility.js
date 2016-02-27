@@ -1653,9 +1653,8 @@
     var response = { ok: false };
     var construct_response = function(req, res) {
       res.status = req.status;
-      if (options.json) { res.data = JSON.parse(req.responseText); }
-      else if (options.html) { res.data = req.responseText; }
-      else { res.data = req.responseText; }
+      res.data = res.text = req.responseText;
+      if (options.json) { res.data = JSON.parse(res.text); }
     };
     var request = new XMLHttpRequest();
     if (options.json) {
@@ -1669,10 +1668,10 @@
       options.method = 'GET';
       options.headers['content-type'] = 'text/html';
     }
+    request.open(options.method.toUpperCase(), options.url, true);
     for (var name in options.headers) {
       request.setRequestHeader(name.toLowerCase(), options.headers[name]);
     }
-    request.open(options.method.toUpperCase(), options.url, true);
     request.onload = function() {
       if (options.timeout_id) { clearTimeout(options.timeout_id); }
       construct_response(request, response);
@@ -2132,7 +2131,7 @@
     attr: attr,
     parents_until: parents_until,
     ready: ready,
-    http_request: http_request,
+    request: http_request,
     select_all: select_all,
     select_each: select_each,
     select_first: select_first,
