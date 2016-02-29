@@ -2146,4 +2146,4 @@
     // console.clear();
   }
 
-})(this || window);
+})(typeof global === "object" ? global : window);
