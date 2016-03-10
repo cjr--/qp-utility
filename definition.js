@@ -36,12 +36,12 @@ module.exports = function(target) {
     //
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'debug', 'request', 'dom', 'animate', 'selector', 'app', 'view'
+      'debug', 'request', 'dom', 'animate', 'selector', 'app'
     ]);
     fns = fns.concat([
-      'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off',
+      'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off','nodefault',
       'show','hide','add_class','remove_class','html','attr','parents_until','ready','request:http_request',
-      'select_all','select_each','select_first','create_view'
+      'select_all','select_each','select_first'
     ]);
   }
 

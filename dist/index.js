@@ -1789,7 +1789,6 @@
     module.exports = qp;
   } else {
     global.qp = qp;
-    // console.clear();
   }
 
 })(typeof global === "object" ? global : window);

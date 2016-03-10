@@ -44,6 +44,11 @@ function off(el, event_name, handler) {
   el.removeEventListener(event_name, handler);
 }
 
+function nodefault(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
 function show(el, v) {
   el.style.display = v || 'block';
 }
@@ -60,6 +65,21 @@ function add_class(el, class_name) {
 function remove_class(el, class_name) {
   el = element(el);
   if (el) { el.classList.remove(class_name); }
+}
+
+function has_class(el, class_name) {
+  el = element(el);
+  if (el) { el.classList.contains(class_name); }
+}
+
+function set_style(el, k, v) {
+  el = element(el);
+  if (el) { el.style.setProperty(k, v); }
+}
+
+function get_style(el, k) {
+  el = element(el);
+  if (el) { el.style.getPropertyValue(k); }
 }
 
 function html() {

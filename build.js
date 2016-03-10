@@ -15,7 +15,6 @@ write_file('qp-utility.min.css', make_min_file('qp-utility.css'));
 console.log('');
 
 function make_file(def) {
-
   return [
     '(function(global, undefined) {',
       '',
@@ -28,7 +27,6 @@ function make_file(def) {
       '    module.exports = qp;',
       '  } else {',
       '    global.qp = qp;',
-      '    // console.clear();',
       '  }',
       '',
     '})(typeof global === "object" ? global : window);'
