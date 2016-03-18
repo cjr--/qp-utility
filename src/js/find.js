@@ -3,9 +3,9 @@ function find_predicate(arg1, arg2) {
   if (is(arg1, 'function')) {
     predicate = not_empty(arg2) ? arg1.bind(arg2) : arg1;
   } else if (is(arg1, 'object')) {
-    var keys = keys(arg1);
+    var object_keys = keys(arg1);
     predicate = function(item, index, items) {
-      return eq(pick(item, keys), arg1);
+      return eq(pick(item, object_keys), arg1);
     };
   } else if (is(arg1, 'string')) {
     var truthy = is(arg2, 'undefined');

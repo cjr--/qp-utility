@@ -15,7 +15,7 @@ function map(o, fn, scope) {
 }
 
 function reduce(o, fn, init) {
-  return empty(o) ? undefined : o.reduce(fn, init);
+  return is(o, 'array') ? o.reduce(fn, init) : undefined;
 }
 
 function arg(o) { return slice.call(o); }
@@ -55,7 +55,7 @@ function unique(o) {
 
 function flatten() {
   function _flatten(items) {
-    return items.reduce(function(output, input) {
+    return reduce(items, function(output, input) {
       return any(input, is_array) ? output.concat(_flatten(input)) : output.concat(input);
     }, []);
   }
