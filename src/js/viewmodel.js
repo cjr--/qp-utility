@@ -22,9 +22,9 @@
       - v-on-click in outer scope receives 2 args; handler and id, default calls handler with id arg
 */
 
-define(module, function(exports, require, make) {
+define(module, function(exports, require, ViewModel) {
 
-  make({
+  ViewModel({
 
     ns: 'ViewModel',
 
@@ -47,26 +47,41 @@ define(module, function(exports, require, make) {
     },
 
     update_view: function() {
-      qp.each(this.bindings, function(binding) {
-        binding.update_view(this.model);
-      }.bind(this));
+      this.sync('view', this.bindings, this.model);
     },
 
     update_model: function() {
-      qp.each(this.bindings, function(binding) {
-        binding.update_model(this.model);
-      }.bind(this));
+      this.sync('model', this.bindings, this.model);
+    },
+
+    sync: function(target, node, model) {
+      qp.each(node.bindings, function(binding) {
+        binding['update_' + target].call(this, model);
+      }, this);
+      qp.each(node.children, function(child_node, index) {
+        if (node.each) {
+          var binder = node.bindings[0];
+          model[binder.item_name] = model[binder.path][index];
+        }
+        this.sync(target, child_node, model);
+      }, this);
     },
 
     parse: function(node) {
       this.parse_node(node);
       if (node.element.parentNode) {
-        node.children = qp.map(node.element.children, function(child_element) {
-          return this.parse({
-            element: child_element,
-            bindings: []
-          });
-        }.bind(this));
+        node.children = qp.select(node.element.children, function(child_element) {
+          if (qp.is_element(child_element)) {
+            if (child_element.hasAttribute('v-each')) {
+              node.parent = node.element;
+              node.element = child_element;
+              node.each = true;
+              this.parse_node(node);
+            } else {
+              return this.parse({ element: child_element, bindings: [] });
+            }
+          }
+        }, this);
       }
       return node;
     },
@@ -75,6 +90,7 @@ define(module, function(exports, require, make) {
       qp.each(qp.get_attributes(node.element), function(attribute) {
         if (attribute.name.slice(0, 2) === 'v-') {
           var binding = this.create_binding(node, attribute);
+          node.element.removeAttribute(binding.key);
           if (binding.name === 'if') {
             binding.type = 'if';
           } else if (qp.inlist(binding.name, 'show', 'hide')) {
@@ -96,6 +112,9 @@ define(module, function(exports, require, make) {
             var items = binding.path.split(' in ');
             binding.item_name = items[0];
             binding.path = items[1];
+            binding.template = node.parent.removeChild(node.element);
+            node.element = node.parent;
+            delete node.parent;
           } else if (binding.name === 'add-class') {
             binding.type = 'add_class';
           } else if (qp.match(binding.name, 'on-*')) {
@@ -115,6 +134,8 @@ define(module, function(exports, require, make) {
             this.property(binding, node.element);
           } else if (binding.attribute) {
             this.attribute(binding, node.element);
+          } else if (binding.name === 'each') {
+            this.each(binding, node);
           } else {
             this[binding.type](binding, node.element);
           }
@@ -125,6 +146,7 @@ define(module, function(exports, require, make) {
     create_binding: function(node, attribute) {
       var attribute_name = attribute.name.slice(2);
       var binding = {
+        key: attribute.name,
         name: attribute_name,
         type: attribute_name,
         path: attribute.value,
@@ -135,7 +157,6 @@ define(module, function(exports, require, make) {
         binding.path = attribute.value.slice(4);
         binding.negate = true;
       }
-      node.element.removeAttribute(binding.name);
       node.bindings.push(binding);
       return binding;
     },
@@ -235,24 +256,17 @@ define(module, function(exports, require, make) {
       binding.update_model = function(model) { };
     },
 
-    each: function(binding, element) {
-      binding.container = element.parentNode;
-      binding.template = binding.container.removeChild(element);
-      binding.container.innerHTML = '';
+    each: function(binding, node) {
+      var list_element = node.element;
       binding.update_view = function(model) {
-        binding.container.innerHTML = '';
+        list_element.innerHTML = '';
         qp.each(qp.get(model, binding.path), function(item) {
-          model[binding.item_name] = item;
-          var node = {
-            element: binding.container.appendChild(binding.template.cloneNode(true)),
-            bindings: []
-          };
-          node.element.setAttribute('data-id', item.id);
-          qp.each(this.parse(node), function(binding) {
-            binding.update_view(model);
-          });
-        }.bind(this));
-      }.bind(this);
+          var item_element = binding.template.cloneNode(true);
+          item_element.setAttribute('data-id', item.id);
+          list_element.appendChild(item_element);
+        }, this);
+        node.children = this.parse({ element: list_element, bindings: [] }).children;
+      };
       binding.update_model = function(model) { };
     }
 
