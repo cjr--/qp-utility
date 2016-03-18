@@ -305,7 +305,7 @@
   }
   
   function reduce(o, fn, init) {
-    return empty(o) ? undefined : o.reduce(fn, init);
+    return is(o, 'array') ? o.reduce(fn, init) : undefined;
   }
   
   function arg(o) { return slice.call(o); }
@@ -345,7 +345,7 @@
   
   function flatten() {
     function _flatten(items) {
-      return items.reduce(function(output, input) {
+      return reduce(items, function(output, input) {
         return any(input, is_array) ? output.concat(_flatten(input)) : output.concat(input);
       }, []);
     }
@@ -1189,9 +1189,9 @@
     if (is(arg1, 'function')) {
       predicate = not_empty(arg2) ? arg1.bind(arg2) : arg1;
     } else if (is(arg1, 'object')) {
-      var keys = keys(arg1);
+      var object_keys = keys(arg1);
       predicate = function(item, index, items) {
-        return eq(pick(item, keys), arg1);
+        return eq(pick(item, object_keys), arg1);
       };
     } else if (is(arg1, 'string')) {
       var truthy = is(arg2, 'undefined');
@@ -1401,6 +1401,7 @@
             yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null,
             normChunk = function(s, l) {
               // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
+              if (typeof s === 'undefined') return 0;
               return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
             },
             oFxNcL, oFyNcL;
@@ -1813,7 +1814,7 @@
   
   function ready(fn) {
     if (document.readyState !== 'loading') {
-      fn(module.require, window);
+      fn(window);
     } else {
       document.addEventListener('DOMContentLoaded', function() { fn(window); });
     }
