@@ -1,27 +1,3 @@
-/*
-  - create syntax which allows user to pick parts of the binding tree and keep local ref
-    - the bindings and the element type probably allow this tree to be built automatically
-      - perhaps classes like .input-group act as sign posts?
-      - v-node="user_name", would declare a node in the view tree
-        - walk dom tree creating bindings
-          - create some binding automatically; eg input > enabled, visible
-        - walk bindings looking for nodes and create view tree
-    - 1-way binding for control state / meta-data
-    - form: {
-        refresh: function() { ... },
-        control1: {
-          refresh: function() { ... },
-          enabled: true,
-          visible: true
-        }
-      }
-    - this handles the meta data aspect, the actual control <-> data binding is going to be on the model
-    - each binding
-      - data-id attr automatically set to model.id
-      - v-click="fn_name" -> data-click-handler="fn_name"
-      - v-on-click in outer scope receives 2 args; handler and id, default calls handler with id arg
-*/
-
 define(module, function(exports, require, ViewModel) {
 
   ViewModel({
