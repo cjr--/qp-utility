@@ -112,19 +112,18 @@
   }
   
   function lpad(s, padding, width) {
-    return pad(s, padding, width, 'lpad');
+    return pad(s, padding, width, false);
   }
   
   function rpad(s, padding, width) {
-    return pad(s, padding, width, 'rpad');
+    return pad(s, padding, width, true);
   }
   
-  function pad(s, padding, width, fn) {
-    var rpad = fn === 'rpad';
+  function pad(s, padding, width, rpad) {
     if (s === undefined || s === null) {
       return '';
     } else {
-      if (arguments.length === 2) {
+      if (not_defined(width)) {
         width = padding;
         padding = ' ';
       }
@@ -332,12 +331,13 @@
     }, []);
   }
   
-  function unique(o) {
+  function unique(o, fn) {
     var unique = [];
     if (is_array(o)) {
+      fn = fn || function(items, item) { return items.indexOf(item) === -1; };
       for (var i = 0, l = o.length; i < l; i++) {
         var item = o[i];
-        if (unique.indexOf(item) === -1) unique.push(item);
+        if (fn(unique, item)) unique.push(item);
       }
     }
     return unique;
@@ -1664,14 +1664,14 @@
       if (json.length) {
         options.data = json;
       }
-      options.headers['content-type'] = 'application/json';
+      options.headers['Content-Type'] = 'application/json';
     } else if (options.html) {
       options.method = 'GET';
-      options.headers['content-type'] = 'text/html';
+      options.headers['Content-Type'] = 'text/html';
     }
     request.open(options.method.toUpperCase(), options.url, true);
     for (var name in options.headers) {
-      request.setRequestHeader(name.toLowerCase(), options.headers[name]);
+      request.setRequestHeader(name, options.headers[name]);
     }
     request.onload = function() {
       if (options.timeout_id) { clearTimeout(options.timeout_id); }
