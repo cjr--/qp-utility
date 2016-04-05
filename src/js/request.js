@@ -17,14 +17,14 @@ function http_request(options) {
     if (json.length) {
       options.data = json;
     }
-    options.headers['content-type'] = 'application/json';
+    options.headers['Content-Type'] = 'application/json';
   } else if (options.html) {
     options.method = 'GET';
-    options.headers['content-type'] = 'text/html';
+    options.headers['Content-Type'] = 'text/html';
   }
   request.open(options.method.toUpperCase(), options.url, true);
   for (var name in options.headers) {
-    request.setRequestHeader(name.toLowerCase(), options.headers[name]);
+    request.setRequestHeader(name, options.headers[name]);
   }
   request.onload = function() {
     if (options.timeout_id) { clearTimeout(options.timeout_id); }
