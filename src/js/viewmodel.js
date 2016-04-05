@@ -7,6 +7,7 @@ define(module, function(exports, require, ViewModel) {
     properties: {
       model: null,
       element: null,
+      view: {},
       bindings: []
     },
 
@@ -16,10 +17,7 @@ define(module, function(exports, require, ViewModel) {
     },
 
     bind: function() {
-      this.bindings = this.parse({
-        element: this.element,
-        bindings: []
-      });
+      this.bindings = this.parse({ element: this.element, bindings: [] });
     },
 
     update_view: function() {
@@ -67,7 +65,9 @@ define(module, function(exports, require, ViewModel) {
         if (attribute.name.slice(0, 2) === 'v-') {
           var binding = this.create_binding(node, attribute);
           node.element.removeAttribute(binding.key);
-          if (binding.name === 'if') {
+          if (binding.name === 'node') {
+            node.name = binding.path;
+          } else if (binding.name === 'if') {
             binding.type = 'if';
           } else if (qp.inlist(binding.name, 'show', 'hide')) {
             binding.type = 'visible';
@@ -106,7 +106,9 @@ define(module, function(exports, require, ViewModel) {
             binding.attribute = binding.type;
           }
 
-          if (binding.property) {
+          if (binding.type === 'node') {
+            //
+          } else if (binding.property) {
             this.property(binding, node.element);
           } else if (binding.attribute) {
             this.attribute(binding, node.element);
@@ -133,7 +135,9 @@ define(module, function(exports, require, ViewModel) {
         binding.path = attribute.value.slice(4);
         binding.negate = true;
       }
-      node.bindings.push(binding);
+      if (binding.type !== 'node') {
+        node.bindings.push(binding);
+      }
       return binding;
     },
 
