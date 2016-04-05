@@ -74,19 +74,18 @@ function unescape(s) {
 }
 
 function lpad(s, padding, width) {
-  return pad(s, padding, width, 'lpad');
+  return pad(s, padding, width, false);
 }
 
 function rpad(s, padding, width) {
-  return pad(s, padding, width, 'rpad');
+  return pad(s, padding, width, true);
 }
 
-function pad(s, padding, width, fn) {
-  var rpad = fn === 'rpad';
+function pad(s, padding, width, rpad) {
   if (s === undefined || s === null) {
     return '';
   } else {
-    if (arguments.length === 2) {
+    if (not_defined(width)) {
       width = padding;
       padding = ' ';
     }
