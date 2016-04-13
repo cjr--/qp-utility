@@ -1317,6 +1317,7 @@
     ctor.create = function(o) { return new ctor(o); };
     ctor.ns = ns;
     ctor.properties = {};
+    ctor.mixins = [];
     ctor.inits = [];
   
     if (def.mixin) {
@@ -1326,7 +1327,7 @@
         override(ctor.properties, mixin.properties);
         override(ctor.prototype, mixin.prototype);
       });
-      mixin.inits = flatten(mixin.inits);
+      ctor.inits = compact(flatten(ctor.inits));
     }
   
     each(def, function(value, name) {
