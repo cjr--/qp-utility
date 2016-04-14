@@ -36,6 +36,14 @@
   
   function dfault(value, dfault_value) { return not_defined(value) ? dfault_value : value; }
   
+  function lower(s) {
+    return String(s).toLocaleLowerCase();
+  }
+  
+  function upper(s) {
+    return String(s).toLocaleUpperCase();
+  }
+  
   function trim(s, chars) {
     if (s === undefined || s === null) {
       return '';
@@ -1323,11 +1331,10 @@
     if (def.mixin) {
       each(def.mixin.reverse(), function(mixin) {
         ctor.mixins.push(mixin.ns);
-        ctor.inits.unshift(mixin.inits);
+        ctor.inits = mixin.inits.concat(ctor.inits);
         override(ctor.properties, mixin.properties);
         override(ctor.prototype, mixin.prototype);
       });
-      ctor.inits = compact(flatten(ctor.inits));
     }
   
     each(def, function(value, name) {
@@ -1336,7 +1343,7 @@
         assign(ctor, def.self);
       } else if (qp.is(value, 'function')) {
         if (name === 'init') {
-          ctor.inits.unshift(value);
+          ctor.inits.push(value);
         } else {
           ctor.prototype[name] = value;
         }
@@ -1887,6 +1894,8 @@
     dfault: dfault,
     empty: empty,
     not_empty: not_empty,
+    upper: upper,
+    lower: lower,
     trim: trim,
     ltrim: ltrim,
     rtrim: rtrim,
