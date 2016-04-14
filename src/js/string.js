@@ -1,3 +1,11 @@
+function lower(s) {
+  return String(s).toLocaleLowerCase();
+}
+
+function upper(s) {
+  return String(s).toLocaleUpperCase();
+}
+
 function trim(s, chars) {
   if (s === undefined || s === null) {
     return '';

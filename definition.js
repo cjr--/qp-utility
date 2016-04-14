@@ -14,7 +14,7 @@ module.exports = function(target) {
 
   var fns = [
     'noop','noop_callback','escape_re','is_number','is_function','is_string','defined',
-    'undefined:not_defined','random','dfault','empty','not_empty','trim',
+    'undefined:not_defined','random','dfault','empty','not_empty','upper','lower','trim',
     'ltrim','rtrim','split','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
     'ends','between','title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',
