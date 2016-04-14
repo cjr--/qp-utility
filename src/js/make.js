@@ -20,11 +20,10 @@ function make() {
   if (def.mixin) {
     each(def.mixin.reverse(), function(mixin) {
       ctor.mixins.push(mixin.ns);
-      ctor.inits.unshift(mixin.inits);
+      ctor.inits = mixin.inits.concat(ctor.inits);
       override(ctor.properties, mixin.properties);
       override(ctor.prototype, mixin.prototype);
     });
-    ctor.inits = compact(flatten(ctor.inits));
   }
 
   each(def, function(value, name) {
@@ -33,7 +32,7 @@ function make() {
       assign(ctor, def.self);
     } else if (qp.is(value, 'function')) {
       if (name === 'init') {
-        ctor.inits.unshift(value);
+        ctor.inits.push(value);
       } else {
         ctor.prototype[name] = value;
       }
