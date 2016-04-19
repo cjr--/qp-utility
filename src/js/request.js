@@ -1,5 +1,5 @@
-function http_request(options) {
-  options.done = options.done || noop;
+function http_request(options, done) {
+  options.done = options.done || done || noop;
   options.headers = options.headers || {};
   options.method = options.method || 'GET';
   options.data = options.data || null;
@@ -18,6 +18,10 @@ function http_request(options) {
       options.data = json;
     }
     options.headers['Content-Type'] = 'application/json';
+  } else if (options.text) {
+    options.method = 'POST';
+    options.data = options.text;
+    options.headers['Content-Type'] = 'text/plain';
   } else if (options.html) {
     options.method = 'GET';
     options.headers['Content-Type'] = 'text/html';
