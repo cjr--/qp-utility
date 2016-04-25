@@ -109,8 +109,8 @@ function parents_until(child_el, parent_el, match) {
 
 function ready(fn) {
   if (document.readyState !== 'loading') {
-    fn(window);
+    fn(window, module.require);
   } else {
-    document.addEventListener('DOMContentLoaded', function() { fn(window); });
+    document.addEventListener('DOMContentLoaded', function() { fn(window, module.require); });
   }
 }
