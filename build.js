@@ -4,32 +4,48 @@ var CleanCSS = require('clean-css');
 var path = require('path');
 var definition = require('./definition');
 
-var browser_def = definition('browser');
+var browser = definition('browser');
+var node = definition('node');
 
 console.log('');
-write_file('index.js', make_file(definition('node')));
-write_file('qp-utility.js', make_file(browser_def));
+write_file('index.js', make_node_file(node));
+write_file('qp-utility.js', make_browser_file(browser));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
-write_file('qp-utility.css', join_files(browser_def.files.css, 'css'));
+write_file('qp-utility.css', join_files(browser.files.css, 'css'));
 write_file('qp-utility.min.css', make_min_file('qp-utility.css'));
 console.log('');
 
-function make_file(def) {
+function make_node_file(node) {
   return [
     '(function(global, undefined) {',
       '',
-      indent(join_files(def.files.js, 'js')),
+      indent(join_files(node.files.js, 'js')),
       '',
-      indent(def.fns),
+      indent(node.fns),
       '',
       '  if (global.define) global.define.make = make;',
-      '  if (module && module.exports) {',
-      '    module.exports = qp;',
+      '  module.exports = qp;',
+      '',
+    '})(global);'
+  ].join('\n');
+}
+
+function make_browser_file(browser) {
+  return [
+    '(function(global, undefined) {',
+      '',
+      indent(join_files(browser.files.js, 'js')),
+      '',
+      indent(browser.fns),
+      '',
+      '  if (global.define) {',
+      '    global.define.make = make;',
+      '    global.module.require.cache["qp-utility"] = qp;',
       '  } else {',
       '    global.qp = qp;',
       '  }',
       '',
-    '})(typeof global === "object" ? global : window);'
+    '})(window);'
   ].join('\n');
 }
 
