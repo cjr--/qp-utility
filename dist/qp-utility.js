@@ -1826,9 +1826,9 @@
   
   function ready(fn) {
     if (document.readyState !== 'loading') {
-      fn(window);
+      fn(window, module.require);
     } else {
-      document.addEventListener('DOMContentLoaded', function() { fn(window); });
+      document.addEventListener('DOMContentLoaded', function() { fn(window, module.require); });
     }
   }
   
@@ -2053,11 +2053,11 @@
     select_first: select_first
   };
 
-  if (global.define) global.define.make = make;
-  if (module && module.exports) {
-    module.exports = qp;
+  if (global.define) {
+    global.define.make = make;
+    global.module.require.cache["qp-utility"] = qp;
   } else {
     global.qp = qp;
   }
 
-})(typeof global === "object" ? global : window);
+})(window);

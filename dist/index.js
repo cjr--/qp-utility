@@ -1796,10 +1796,6 @@
   };
 
   if (global.define) global.define.make = make;
-  if (module && module.exports) {
-    module.exports = qp;
-  } else {
-    global.qp = qp;
-  }
+  module.exports = qp;
 
-})(typeof global === "object" ? global : window);
+})(global);
