@@ -1,8 +1,8 @@
 var sort = (function() {
   function _sort(items, sorters, options) {
-    items = array(items);
+    items = to_array(items);
     each(items, function(item, i) { item.__idx = i; });
-    sorters = array(sorters);
+    sorters = to_array(sorters);
     var sorters_length = sorters.length;
     return items.sort(function(a, b) {
       var result = 0;

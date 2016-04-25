@@ -4,8 +4,8 @@ function ungroup(items) {
 }
 
 function group(items, group_keys, options) {
-  items = array(items);
-  group_keys = array(group_keys);
+  items = to_array(items);
+  group_keys = to_array(group_keys);
   var group_count = group_keys.length;
   if (group_count === 0) return;
 

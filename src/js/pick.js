@@ -11,7 +11,7 @@ function pick_predicate() {
 function _pick(o, predicate, options) {
   options = options || {};
   if (predicate) {
-    output = {};
+    var output = {};
     for (var key in o) {
       if (!options.own || o.hasOwnProperty(key)) {
         if (predicate(o[key], key, o)) {

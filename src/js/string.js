@@ -55,7 +55,7 @@ function lines(s) {
 }
 
 function build() {
-  return compact(flatten(array(arguments))).join('');
+  return compact(flatten(to_array(arguments))).join('');
 }
 
 function plural(o, prefix, single, multi, suffix) {
