@@ -8,7 +8,15 @@ function http_request(options, done) {
   var construct_response = function(req, res) {
     res.status = req.status;
     res.data = res.text = req.responseText;
-    if (options.json) { res.data = JSON.parse(res.text); }
+    req.getAllResponseHeaders().split('\r\n').forEach(function(header) {
+      var h = header.split(':');
+      if (h.length > 1) {
+        res.headers = res.headers || {};
+        res.headers[h[0].toLowerCase()] = h.slice(1).join(':').trim();
+      }
+    });
+    res.json = res.headers['content-type'] === 'application/json';
+    if (res.json) { res.data = JSON.parse(res.text); }
   };
   var request = new XMLHttpRequest();
   if (options.json) {
@@ -35,13 +43,6 @@ function http_request(options, done) {
     construct_response(request, response);
     if (request.status >= 200 && request.status < 400) {
       response.ok = true;
-      request.getAllResponseHeaders().split('\r\n').forEach(function(header) {
-        var h = header.split(':');
-        if (h.length > 1) {
-          response.headers = response.headers || {};
-          response.headers[h[0].toLowerCase()] = h.slice(1).join(':').trim();
-        }
-      });
       options.done.call(options.bind, null, response);
     } else {
       options.done.call(options.bind, response, null);

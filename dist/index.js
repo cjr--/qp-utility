@@ -93,7 +93,7 @@
   }
   
   function build() {
-    return compact(flatten(array(arguments))).join('');
+    return compact(flatten(to_array(arguments))).join('');
   }
   
   function plural(o, prefix, single, multi, suffix) {
@@ -917,7 +917,7 @@
   function _pick(o, predicate, options) {
     options = options || {};
     if (predicate) {
-      output = {};
+      var output = {};
       for (var key in o) {
         if (!options.own || o.hasOwnProperty(key)) {
           if (predicate(o[key], key, o)) {
@@ -1367,9 +1367,9 @@
   
   var sort = (function() {
     function _sort(items, sorters, options) {
-      items = array(items);
+      items = to_array(items);
       each(items, function(item, i) { item.__idx = i; });
-      sorters = array(sorters);
+      sorters = to_array(sorters);
       var sorters_length = sorters.length;
       return items.sort(function(a, b) {
         var result = 0;
@@ -1475,8 +1475,8 @@
   }
   
   function group(items, group_keys, options) {
-    items = array(items);
-    group_keys = array(group_keys);
+    items = to_array(items);
+    group_keys = to_array(group_keys);
     var group_count = group_keys.length;
     if (group_count === 0) return;
   
