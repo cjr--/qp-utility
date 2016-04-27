@@ -21,7 +21,7 @@ function http_request(options, done) {
   var request = new XMLHttpRequest();
   if (options.json) {
     options.method = 'POST';
-    var json = JSON.stringify(options.json);
+    var json = JSON.stringify(options.json, null, '  ');
     if (json.length) {
       options.data = json;
     }
