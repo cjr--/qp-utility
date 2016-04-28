@@ -1657,7 +1657,7 @@
     options.done = options.done || noop;
     if (options.bind) options.done.bind(options.bind);
     options.headers = options.headers || {};
-    options.method = options.method.toUpperCase() || 'GET';
+    options.method = options.method || 'GET';
     options.data = options.data || null;
   
     var response = { ok: false };
@@ -1676,6 +1676,8 @@
       options.method = 'GET';
       options.headers['Content-Type'] = 'text/html';
       options.data = options.html;
+    } else {
+      options.method = options.method.toUpperCase();
     }
     request.open(options.method, options.url, true);
     set_request_headers(request, options.headers);
@@ -1684,7 +1686,7 @@
       response.status = request.status;
       response.data = response.text = request.responseText;
       response.headers = get_response_headers(request);
-      if (response.headers['content-type'] === 'application/json') { 
+      if (response.headers['content-type'] === 'application/json') {
         response.data = JSON.parse(response.text);
       }
       if (request.status >= 200 && request.status < 400) {
