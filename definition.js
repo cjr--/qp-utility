@@ -1,18 +1,31 @@
 module.exports = function(target) {
 
-  var js_files = [
+  var js_files = [];
+  var css_files = [];
+
+  if (target === 'node') {
+    js_files = js_files.concat([
+      'node_core'
+    ]);
+    fns = fns.concat([]);
+  } else if (target === 'browser') {
+    js_files = js_files.concat([]);
+    fns = fns.concat([]);
+  }
+
+  js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
     'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select'
-  ];
+  ]);
 
-  var css_files = [
+  css_files.concat([
     'normalize', 'base', 'code', 'form', 'misc', 'text', 'media',
     'grid', 'grid-xs', 'grid-sm', 'grid-md', 'grid-lg',
     'flex-grid'
-  ];
+  ]);
 
-  var fns = [
+  fns.concat([
     'noop','noop_callback','escape_re','is_number','is_function','is_string','defined',
     'undefined:not_defined','random','dfault','empty','not_empty','upper','lower','trim',
     'ltrim','rtrim','split','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
@@ -30,13 +43,18 @@ module.exports = function(target) {
     'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','select'
-  ];
+  ]);
 
   if (target === 'node') {
-    //
+    js_files = js_files.concat([
+      'node_request'
+    ]);
+    fns = fns.concat([
+      'request:http_request'
+    ]);
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'debug', 'request', 'dom', 'animate', 'selector', 'app'
+      'debug', 'browser_request', 'dom', 'animate', 'selector', 'app'
     ]);
     fns = fns.concat([
       'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off','nodefault',
