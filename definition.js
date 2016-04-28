@@ -2,6 +2,7 @@ module.exports = function(target) {
 
   var js_files = [];
   var css_files = [];
+  var fns = [];
 
   if (target === 'node') {
     js_files = js_files.concat([
@@ -13,19 +14,19 @@ module.exports = function(target) {
     fns = fns.concat([]);
   }
 
-  js_files.concat([
+  js_files = js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
     'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select'
   ]);
 
-  css_files.concat([
+  css_files = css_files.concat([
     'normalize', 'base', 'code', 'form', 'misc', 'text', 'media',
     'grid', 'grid-xs', 'grid-sm', 'grid-md', 'grid-lg',
     'flex-grid'
   ]);
 
-  fns.concat([
+  fns = fns.concat([
     'noop','noop_callback','escape_re','is_number','is_function','is_string','defined',
     'undefined:not_defined','random','dfault','empty','not_empty','upper','lower','trim',
     'ltrim','rtrim','split','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
