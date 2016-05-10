@@ -38,7 +38,7 @@ module.exports = function(target) {
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',
     'assign_own','assign_if','eq','neq','clone','copy','merge','extend','override',
     'make','first','last','rest','at','range','in:_in','not_in','find_predicate',
-    'find','any','find_all','find_index','remove','remove_all','pick_predicate',
+    'find','any','find_all','find_last','find_index','remove','remove_all','pick_predicate',
     'pick','pick_own','pairs','keys','values','pick_values','sort','get_comparer','group','ungroup','ns',
     'options:qp_options','id','uuid','series','parallel','get','take','has','set',
     'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
