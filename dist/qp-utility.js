@@ -1258,6 +1258,11 @@
     return find(items, arg1, arg2, { find_all: true });
   }
   
+  function find_last(items, arg1, arg2) {
+    var all = find(items, arg1, arg2, { find_all: true });
+    return all[all.length - 1];
+  } 
+  
   function find_index(items, arg1, arg2) {
     return find(items, arg1, arg2, { index: true });
   }
@@ -1330,25 +1335,33 @@
   
     if (def.mixin) {
       each(def.mixin.reverse(), function(mixin) {
-        ctor.mixins.push(mixin.ns);
-        ctor.inits = mixin.inits.concat(ctor.inits);
-        override(ctor.properties, mixin.properties);
-        override(ctor.prototype, mixin.prototype);
+        each_own(mixin, function(v, k) {
+          if (k === 'ns') {
+            ctor.mixins.push(mixin.ns);
+          } else if (k === 'inits') {
+            ctor.inits = mixin.inits.concat(ctor.inits);
+          } else if (k === 'properties') {
+            ctro.properties = override(ctor.properties, mixin.properties);
+          } else {
+            ctor[k] = v;
+          }
+        });
+        ctor.prototype = override(ctor.prototype, mixin.prototype);
       });
     }
   
-    each(def, function(value, name) {
-      if (name === 'mixin') {
-      } else if (name === 'self') {
-        assign(ctor, def.self);
-      } else if (qp.is(value, 'function')) {
-        if (name === 'init') {
-          ctor.inits.push(value);
+    each_own(def, function(v, k) {
+      if (inlist(k, 'mixin', 'ns')) {
+      } else if (k === 'self') {
+        each_own(def.self, function(v, k) { ctor[k] = v; });
+      } else if (qp.is(v, 'function')) {
+        if (k === 'init') {
+          ctor.inits.push(v);
         } else {
-          ctor.prototype[name] = value;
+          ctor.prototype[k] = v;
         }
       } else {
-        ctor.properties[name] = override(ctor.properties[name], value);
+        ctor.properties[k] = override(ctor.properties[k], v);
       }
     });
   
@@ -1815,7 +1828,7 @@
   
   function attr(el, name, value) {
     if (arguments.length === 2) {
-      el.getAttribute(name);
+       return el.getAttribute(name);
     } else {
       el.setAttribute(name, value);
     }
@@ -1992,6 +2005,7 @@
     find: find,
     any: any,
     find_all: find_all,
+    find_last: find_last,
     find_index: find_index,
     remove: remove,
     remove_all: remove_all,
