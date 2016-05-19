@@ -90,7 +90,7 @@ function html() {
 
 function attr(el, name, value) {
   if (arguments.length === 2) {
-    el.getAttribute(name);
+     return el.getAttribute(name);
   } else {
     el.setAttribute(name, value);
   }
