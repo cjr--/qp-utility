@@ -263,8 +263,8 @@
     }
   }
   
-  function stringify(o, simple) {
-    if (simple) {
+  function stringify(o, options) {
+    if (options === true) {
       return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
         var value = pair[1];
         var type = qp_typeof(value);
@@ -1333,27 +1333,23 @@
     ctor.mixins = [];
     ctor.inits = [];
   
-    if (def.mixin) {
+    if (is_array(def.mixin)) {
       each(def.mixin.reverse(), function(mixin) {
-        each_own(mixin, function(v, k) {
-          if (k === 'ns') {
-            ctor.mixins.push(mixin.ns);
-          } else if (k === 'inits') {
-            ctor.inits = mixin.inits.concat(ctor.inits);
-          } else if (k === 'properties') {
-            ctro.properties = override(ctor.properties, mixin.properties);
-          } else {
+        push(ctor.mixins, mixin.ns);
+        push(ctor.inits, mixin.inits);
+        ctor.properties = override(ctor.properties, mixin.properties);
+        each(mixin.prototype, function(v, k) { ctor.prototype[k] = v; });
+        each(mixin, function(v, k) {
+          if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits')) {
             ctor[k] = v;
           }
         });
-        ctor.prototype = override(ctor.prototype, mixin.prototype);
       });
     }
   
-    each_own(def, function(v, k) {
-      if (inlist(k, 'mixin', 'ns')) {
-      } else if (k === 'self') {
-        each_own(def.self, function(v, k) { ctor[k] = v; });
+    each(def, function(v, k) {
+      each(def.self, function(v, k) { ctor[k] = v; });
+      if (inlist(k, 'ns', 'mixin', 'self')) {
       } else if (qp.is(v, 'function')) {
         if (k === 'init') {
           ctor.inits.push(v);

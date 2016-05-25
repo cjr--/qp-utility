@@ -225,8 +225,8 @@ function format(s, o, options) {
   }
 }
 
-function stringify(o, simple) {
-  if (simple) {
+function stringify(o, options) {
+  if (options === true) {
     return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
       var value = pair[1];
       var type = qp_typeof(value);
