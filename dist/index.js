@@ -434,13 +434,13 @@
         return String(_now.getTime());
       }
     }
-    now.offset = function(offset, unit) {
+    _now.offset = function(offset, unit) {
       if (unit === 'day' || unit === 'days') {
         offset = offset * 24 * 60 * 60 * 1000;
       } else if (unit === 'hour' || unit === 'hours') {
         offset = offset * 60 * 60 * 1000;
       }
-      return new Date(now.getTime() + offset);
+      return new Date(_now.getTime() + offset);
     };
     return _now;
   }
