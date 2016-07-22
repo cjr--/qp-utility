@@ -151,6 +151,14 @@
     return s.indexOf(str, s.length - str.length) !== -1;
   }
   
+  function before(s, str) {
+    return s.slice(0, s.indexOf(str));
+  }
+  
+  function after(s, str) {
+    return s.slice(s.indexOf(str) + str.length);
+  }
+  
   function between(s, left, right) {
     if (!right) right = left;
     if (s && left && right) {
@@ -1327,6 +1335,7 @@
     var name = ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
     var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
+    ctor.name = name;
     ctor.create = function(o) { return new ctor(o); };
     ctor.ns = ns;
     ctor.properties = {};
@@ -1348,9 +1357,9 @@
     }
   
     each(def, function(v, k) {
-      each(def.self, function(v, k) { ctor[k] = v; });
+      each(def.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
       if (inlist(k, 'ns', 'mixin', 'self')) {
-      } else if (qp.is(v, 'function')) {
+      } else if (is(v, 'function')) {
         if (k === 'init') {
           ctor.inits.push(v);
         } else {
@@ -1937,6 +1946,8 @@
     plural: plural,
     ends: ends,
     between: between,
+    before: before,
+    after: after,
     title_case: title_case,
     repeat: repeat,
     replace_all: replace_all,
