@@ -113,6 +113,14 @@ function ends(s, str) {
   return s.indexOf(str, s.length - str.length) !== -1;
 }
 
+function before(s, str) {
+  return s.slice(0, s.indexOf(str));
+}
+
+function after(s, str) {
+  return s.slice(s.indexOf(str) + str.length);
+}
+
 function between(s, left, right) {
   if (!right) right = left;
   if (s && left && right) {
