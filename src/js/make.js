@@ -11,6 +11,7 @@ function make() {
   var name = ns.split('/').pop().toLowerCase();
   /*jslint evil: true*/
   var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
+  ctor.name = name;
   ctor.create = function(o) { return new ctor(o); };
   ctor.ns = ns;
   ctor.properties = {};
@@ -32,9 +33,9 @@ function make() {
   }
 
   each(def, function(v, k) {
-    each(def.self, function(v, k) { ctor[k] = v; });
+    each(def.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
     if (inlist(k, 'ns', 'mixin', 'self')) {
-    } else if (qp.is(v, 'function')) {
+    } else if (is(v, 'function')) {
       if (k === 'init') {
         ctor.inits.push(v);
       } else {
