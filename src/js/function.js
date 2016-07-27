@@ -117,3 +117,8 @@ function throttle(fn, threshhold, scope) {
     }
   };
 }
+
+function patch(scope, fn_name, patch) {
+  var base = scope[fn_name];
+  scope[fn_name] = patch.bind(scope, base.bind(scope));
+}
