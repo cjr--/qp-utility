@@ -612,6 +612,11 @@
     };
   }
   
+  function patch(scope, fn_name, patch) {
+    var base = scope[fn_name];
+    scope[fn_name] = patch.bind(scope, base.bind(scope));
+  }
+  
   function get(o, key, dfault) {
     var value = dfault;
     if (is(o, 'object')) {
@@ -1988,6 +1993,7 @@
     invoke_when: invoke_when,
     debounce: debounce,
     throttle: throttle,
+    patch: patch,
     typeof: qp_typeof,
     is: is,
     is_not: is_not,
