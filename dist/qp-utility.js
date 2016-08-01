@@ -1327,28 +1327,19 @@
     return _uuid;
   }
   
-  function make() {
-    var ns, def;
-    if (arguments.length === 1) {
-      ns = arguments[0].ns;
-      def = arguments[0];
-    } else {
-      ns = arguments[0];
-      def = arguments[1];
-    }
-  
-    var name = ns.split('/').pop().toLowerCase();
+  function make(definition) {
+    var name = definition.ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
     var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
     ctor.name = name;
     ctor.create = function(o) { return new ctor(o); };
-    ctor.ns = ns;
+    ctor.ns = definition.ns;
     ctor.properties = {};
     ctor.mixins = [];
     ctor.inits = [];
   
-    if (is_array(def.mixin)) {
-      each(def.mixin.reverse(), function(mixin) {
+    if (is_array(definition.mixin)) {
+      each(definition.mixin.reverse(), function(mixin) {
         push(ctor.mixins, mixin.ns);
         push(ctor.inits, mixin.inits);
         ctor.properties = override(ctor.properties, mixin.properties);
@@ -1361,8 +1352,8 @@
       });
     }
   
-    each(def, function(v, k) {
-      each(def.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+    each(definition, function(v, k) {
+      each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
       if (inlist(k, 'ns', 'mixin', 'self')) {
       } else if (is(v, 'function')) {
         if (k === 'init') {
