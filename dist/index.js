@@ -274,6 +274,7 @@
   }
   
   function stringify(o, options) {
+    if (o.toJSON) o = o.toJSON();
     if (options === true) {
       return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
         var value = pair[1];

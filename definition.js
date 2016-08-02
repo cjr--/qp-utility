@@ -55,7 +55,7 @@ module.exports = function(target) {
     ]);
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app'
+      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app', 'browser_socket'
     ]);
     fns = fns.concat([
       'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off','nodefault',
