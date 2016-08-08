@@ -8,15 +8,17 @@ function make(definition) {
   ctor.properties = {};
   ctor.mixins = [];
   ctor.inits = [];
+  ctor.setups = [];
 
   if (is_array(definition.mixin)) {
     each(definition.mixin.reverse(), function(mixin) {
       push(ctor.mixins, mixin.ns);
       push(ctor.inits, mixin.inits);
+      push(ctor.setups, mixin.setups);
       ctor.properties = override(ctor.properties, mixin.properties);
       each(mixin.prototype, function(v, k) { ctor.prototype[k] = v; });
       each(mixin, function(v, k) {
-        if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits')) {
+        if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits', 'setups')) {
           ctor[k] = v;
         }
       });
@@ -29,6 +31,8 @@ function make(definition) {
     } else if (is(v, 'function')) {
       if (k === 'init') {
         ctor.inits.push(v);
+      } else if (k === 'setup') {
+        ctor.setups.push(v);
       } else {
         ctor.prototype[k] = v;
       }
@@ -45,6 +49,7 @@ function make(definition) {
     this.self = ctor;
     assign_own(this, options);
     invoke(ctor.inits, this, options);
+    invoke(ctor.setups, this);
   };
 
   return ctor;
