@@ -17,7 +17,7 @@ module.exports = function(target) {
   js_files = js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
-    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select'
+    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'match', 'select', 'validate'
   ]);
 
   css_files = css_files.concat([
@@ -30,7 +30,7 @@ module.exports = function(target) {
     'noop','noop_callback','escape_re','is_number','is_function','is_string','defined',
     'undefined:not_defined','random','dfault','empty','not_empty','upper','lower','trim',
     'ltrim','rtrim','split','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
-    'ends','between','before','after','title_case','repeat','replace_all','format',
+    'ends','between','before','before_last','after','after_last','title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',
     'get_utf8_length','stringify','sum','min','max','avg','map','reduce',
     'arg','to_array','flatten','compact','now','date','date_time','file_date','get_fn_name','timer',
@@ -43,7 +43,8 @@ module.exports = function(target) {
     'options:qp_options','id','uuid','series','parallel','get','take','has','set',
     'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
     'set_data','count','all','none','exists','replace','upsert',
-    'build_match','match','get_matches','has_key','select'
+    'build_match','match','get_matches','has_key','select',
+    'is_alpha_numeric','is_length'
   ]);
 
   if (target === 'node') {

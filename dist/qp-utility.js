@@ -155,8 +155,16 @@
     return s.slice(0, s.indexOf(str));
   }
   
+  function before_last(s, str) {
+    return s.slice(0, s.lastIndexOf(str));
+  }
+  
   function after(s, str) {
     return s.slice(s.indexOf(str) + str.length);
+  }
+  
+  function after_last(s, str) {
+    return s.slice(s.lastIndexOf(str) + str.length);
   }
   
   function between(s, left, right) {
@@ -1338,15 +1346,17 @@
     ctor.properties = {};
     ctor.mixins = [];
     ctor.inits = [];
+    ctor.setups = [];
   
     if (is_array(definition.mixin)) {
       each(definition.mixin.reverse(), function(mixin) {
         push(ctor.mixins, mixin.ns);
         push(ctor.inits, mixin.inits);
+        push(ctor.setups, mixin.setups);
         ctor.properties = override(ctor.properties, mixin.properties);
         each(mixin.prototype, function(v, k) { ctor.prototype[k] = v; });
         each(mixin, function(v, k) {
-          if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits')) {
+          if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits', 'setups')) {
             ctor[k] = v;
           }
         });
@@ -1359,6 +1369,8 @@
       } else if (is(v, 'function')) {
         if (k === 'init') {
           ctor.inits.push(v);
+        } else if (k === 'setup') {
+          ctor.setups.push(v);
         } else {
           ctor.prototype[k] = v;
         }
@@ -1375,6 +1387,7 @@
       this.self = ctor;
       assign_own(this, options);
       invoke(ctor.inits, this, options);
+      invoke(ctor.setups, this);
     };
   
     return ctor;
@@ -1661,6 +1674,23 @@
       if (result !== undefined) out.push(result);
     }
     return out;
+  }
+  
+  var alpha_numeric_re = /^[a-z0-9]+$/i;
+  
+  function is_alpha_numeric(s) {
+    return alpha_numeric_re.test(s);
+  }
+  
+  function is_length(s, l0, l1) {
+    if (is(s, 'string')) {
+      if (arguments.length === 2) {
+        return s.length === l0;
+      } else if (arguments.length === 3) {
+        return s.length >= l0 && s.length <= l1;
+      }
+    }
+    return false;
   }
   
   global.debug = function() {
@@ -2013,7 +2043,9 @@
     ends: ends,
     between: between,
     before: before,
+    before_last: before_last,
     after: after,
+    after_last: after_last,
     title_case: title_case,
     repeat: repeat,
     replace_all: replace_all,
@@ -2129,6 +2161,8 @@
     get_matches: get_matches,
     has_key: has_key,
     select: select,
+    is_alpha_numeric: is_alpha_numeric,
+    is_length: is_length,
     fade_in: fade_in,
     fade_out: fade_out,
     debug: debug,
