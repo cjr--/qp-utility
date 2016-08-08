@@ -117,8 +117,16 @@ function before(s, str) {
   return s.slice(0, s.indexOf(str));
 }
 
+function before_last(s, str) {
+  return s.slice(0, s.lastIndexOf(str));
+}
+
 function after(s, str) {
   return s.slice(s.indexOf(str) + str.length);
+}
+
+function after_last(s, str) {
+  return s.slice(s.lastIndexOf(str) + str.length);
 }
 
 function between(s, left, right) {
