@@ -13,6 +13,8 @@
   
   function noop_callback(data, done) { invoke_next(done, null, data); }
   
+  function is_value(o) { return typeof o !== 'undefined' && o !== null; }
+  
   function is_number(o) { return o - parseFloat(o) >= 0; }
   
   function is_string(o) { return typeof o === 'string'; }
@@ -241,6 +243,47 @@
     } else {
       return String(s0).replace(new RegExp(s1, 'g'), s2 || '');
     }
+  }
+  
+  function increase_indent(o, indent, times, options) {
+    options = options || {};
+    if (is_value(indent)) {
+      if (is_number(indent)) {
+        times = indent;
+        indent = '  ';
+      } else {
+        if (is_value(times) && times > 1) {
+          indent = repeat(indent, times);
+        }
+      }
+    } else {
+      indent = '  ';
+    }
+    return o.split('\n').map(function(line, index) {
+      if (index === 0 && options.ignore_first_line) {
+        return line;
+      } else {
+        return indent + line;
+      }
+    }).join('\n');
+  }
+  
+  /* To Title Case 2.1 – http://individed.com/code/to-title-case */
+  /* Copyright © 2008–2013 David Gouch. Licensed under the MIT License. */
+  function title_case(s) {
+    var smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i;
+    return s.replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-]*/g, function(match, index, title) {
+      if (index > 0 && index + match.length !== title.length &&
+        match.search(smallWords) > -1 && title.charAt(index - 2) !== ":" &&
+        (title.charAt(index + match.length) !== '-' || title.charAt(index - 1) === '-') &&
+        title.charAt(index - 1).search(/[^\s-]/) < 0) {
+        return match.toLowerCase();
+      }
+      if (match.substr(1).search(/[A-Z]|\../) > -1) {
+        return match;
+      }
+      return match.charAt(0).toUpperCase() + match.substr(1);
+    });
   }
   
   // http://stackoverflow.com/a/12206089
@@ -1760,6 +1803,7 @@
     noop: noop,
     noop_callback: noop_callback,
     escape_re: escape_re,
+    is_value: is_value,
     is_number: is_number,
     is_function: is_function,
     is_string: is_string,
@@ -1803,6 +1847,8 @@
     kebab_to_snake: kebab_to_snake,
     camel_to_kebab: camel_to_kebab,
     kebab_to_camel: kebab_to_camel,
+    increase_indent: increase_indent,
+    title_case: title_case,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
     sum: sum,

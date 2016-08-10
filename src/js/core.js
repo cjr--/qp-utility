@@ -9,6 +9,8 @@ function noop(o) { return o; }
 
 function noop_callback(data, done) { invoke_next(done, null, data); }
 
+function is_value(o) { return typeof o !== 'undefined' && o !== null; }
+
 function is_number(o) { return o - parseFloat(o) >= 0; }
 
 function is_string(o) { return typeof o === 'string'; }

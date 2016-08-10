@@ -203,6 +203,47 @@ function replace_all(s0, s1, s2) {
   }
 }
 
+function increase_indent(o, indent, times, options) {
+  options = options || {};
+  if (is_value(indent)) {
+    if (is_number(indent)) {
+      times = indent;
+      indent = '  ';
+    } else {
+      if (is_value(times) && times > 1) {
+        indent = repeat(indent, times);
+      }
+    }
+  } else {
+    indent = '  ';
+  }
+  return o.split('\n').map(function(line, index) {
+    if (index === 0 && options.ignore_first_line) {
+      return line;
+    } else {
+      return indent + line;
+    }
+  }).join('\n');
+}
+
+/* To Title Case 2.1 – http://individed.com/code/to-title-case */
+/* Copyright © 2008–2013 David Gouch. Licensed under the MIT License. */
+function title_case(s) {
+  var smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|nor|of|on|or|per|the|to|vs?\.?|via)$/i;
+  return s.replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-]*/g, function(match, index, title) {
+    if (index > 0 && index + match.length !== title.length &&
+      match.search(smallWords) > -1 && title.charAt(index - 2) !== ":" &&
+      (title.charAt(index + match.length) !== '-' || title.charAt(index - 1) === '-') &&
+      title.charAt(index - 1).search(/[^\s-]/) < 0) {
+      return match.toLowerCase();
+    }
+    if (match.substr(1).search(/[A-Z]|\../) > -1) {
+      return match;
+    }
+    return match.charAt(0).toUpperCase() + match.substr(1);
+  });
+}
+
 // http://stackoverflow.com/a/12206089
 function get_utf8_length(s) {
   var len = 0;
