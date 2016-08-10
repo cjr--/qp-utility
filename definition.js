@@ -3,6 +3,7 @@ module.exports = function(target) {
   var js_files = [];
   var css_files = [];
   var fns = [];
+  var type_definitions = [];
 
   if (target === 'node') {
     js_files = js_files.concat([
@@ -56,12 +57,15 @@ module.exports = function(target) {
     ]);
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app', 'browser_socket'
+      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app'
     ]);
     fns = fns.concat([
       'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off','nodefault',
       'show','hide','add_class','remove_class','html','attr','parents_until','ready','request:http_request',
       'select_all','select_each','select_first'
+    ]);
+    type_definitions = type_definitions.concat([
+      'browser_socket'
     ]);
   }
 
@@ -71,7 +75,8 @@ module.exports = function(target) {
 
     files: {
       js: js_files,
-      css: css_files
+      css: css_files,
+      type_definitions: type_definitions
     },
 
     fns: 'var qp = {\n' + fns.map(function(fn) {

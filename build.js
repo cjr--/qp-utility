@@ -45,6 +45,8 @@ function make_browser_file(browser) {
       '    global.qp = qp;',
       '  }',
       '',
+      indent(join_files(browser.files.type_definitions, 'js')),
+      '',
     '})(window);'
   ].join('\n');
 }
