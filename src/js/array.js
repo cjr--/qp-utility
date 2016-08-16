@@ -1,19 +1,3 @@
-function map(o, fn, scope) {
-  if (empty(o)) {
-    return [];
-  } else if (is_array(o)) {
-    return o.map(fn, scope);
-  } else if (o.length) {
-    var out = [];
-    for (var i = 0, l = o.length; i < l; i++) {
-      out.push(fn.call(scope, o[i]));
-    }
-    return out;
-  } else {
-    return [];
-  }
-}
-
 function reduce(o, fn, init) {
   return is(o, 'array') ? o.reduce(fn, init) : undefined;
 }

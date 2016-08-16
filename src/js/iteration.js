@@ -27,6 +27,26 @@ function each(o, fn, scope) {
   return no_exit;
 }
 
+function map(o, fn, scope) {
+  if (empty(o)) {
+    return [];
+  } else if (is_array(o)) {
+    return o.map(fn, scope);
+  } else if (o.length) {
+    var out = [];
+    for (var i = 0, l = o.length; i < l; i++) {
+      out.push(fn.call(scope, o[i]));
+    }
+    return out;
+  } else if (is(o, 'object')) {
+    var out = [];
+    each_own(o, function(item) { out.push(fn.call(scope, item)); });
+    return out;
+  } else {
+    return [];
+  }
+}
+
 function each_own(o, fn, scope) {
   var no_exit = true;
   var index = 0;
