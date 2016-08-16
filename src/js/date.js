@@ -15,6 +15,11 @@ function now(format) {
       return _now.getTime();
     } else if (format === 'string') {
       return String(_now.getTime());
+    } else if (format === 'time') {
+      var hours = lpad(_now.getUTCHours().toString(), '0', 2);
+      var minutes = lpad(_now.getUTCMinutes().toString(), '0', 2);
+      var seconds = lpad(_now.getUTCSeconds().toString(), '0', 2);
+      return [hours, minutes, seconds].join(':');
     }
   }
   _now.offset = function(offset, unit) {
