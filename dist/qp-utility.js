@@ -1995,6 +1995,7 @@
   
 
   var qp = {
+    browser_core: browser_core,
     noop: noop,
     noop_callback: noop_callback,
     escape_re: escape_re,
@@ -2046,6 +2047,7 @@
     title_case: title_case,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
+    eol: eol,
     sum: sum,
     min: min,
     max: max,

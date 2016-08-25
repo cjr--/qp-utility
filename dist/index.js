@@ -1,6 +1,11 @@
 (function(global, undefined) {
 
   var http = require('http');
+  var os = require('os');
+  
+  function eol() {
+    return os.EOL;
+  }
   
   var is_array = Array.isArray;
   var slice = Array.prototype.slice;
@@ -1860,6 +1865,7 @@
     title_case: title_case,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
+    eol: eol,
     sum: sum,
     min: min,
     max: max,

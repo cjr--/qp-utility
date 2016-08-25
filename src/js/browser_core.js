@@ -1,0 +1,3 @@
+function eol() {
+  return '\n';
+}
