@@ -11,10 +11,10 @@ module.exports = function(target) {
     ]);
     fns = fns.concat([]);
   } else if (target === 'browser') {
-    js_files = js_files.concat([]);
-    fns = fns.concat([
+    js_files = js_files.concat([
       'browser_core'
     ]);
+    fns = fns.concat([]);
   }
 
   js_files = js_files.concat([

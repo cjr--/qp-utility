@@ -1,5 +1,9 @@
 (function(global, undefined) {
 
+  function eol() {
+    return '\n';
+  }
+  
   var is_array = Array.isArray;
   var slice = Array.prototype.slice;
   var concat = Array.prototype.concat;
@@ -1995,7 +1999,6 @@
   
 
   var qp = {
-    browser_core: browser_core,
     noop: noop,
     noop_callback: noop_callback,
     escape_re: escape_re,
