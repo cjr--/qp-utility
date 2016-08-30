@@ -68,7 +68,7 @@ module.exports = function(target) {
       'select_all','select_each','select_first'
     ]);
     type_definitions = type_definitions.concat([
-      'browser_socket'
+      'browser_socket','browser_store'
     ]);
   }
 
