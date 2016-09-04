@@ -35,7 +35,7 @@ module.exports = function(target) {
     'ltrim','rtrim','split','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
     'ends','between','before','before_last','after','after_last','title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',
-    'increase_indent','title_case','get_utf8_length','stringify','eol',
+    'increase_indent','hashcode','title_case','get_utf8_length','stringify','eol',
     'sum','min','max','avg','map','reduce','arg','to_array','flatten','compact',
     'now','date','date_time','file_date','get_fn_name','timer',
     'combine','done','bind','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle','patch',

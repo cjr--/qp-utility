@@ -226,6 +226,17 @@ function increase_indent(o, indent, times, options) {
   }).join('\n');
 }
 
+function hashcode(s) {
+  var h = 0;
+  if (s.length === 0) return h;
+  for (var i = 0, l = s.length; i < l; i++) {
+    var c = s.charCodeAt(i);
+    h = ((h << 5) - h) + c;
+    h = h & h;
+  }
+  return h;
+}
+
 /* To Title Case 2.1 – http://individed.com/code/to-title-case */
 /* Copyright © 2008–2013 David Gouch. Licensed under the MIT License. */
 function title_case(s) {
