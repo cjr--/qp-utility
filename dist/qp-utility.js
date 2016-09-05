@@ -2293,13 +2293,14 @@
         return kb;
       },
   
-      data: function() {
+      data: function(include_meta) {
         var data = {};
         var store_key = this.store_key;
         var store_key_len = store_key.length
         qp.each_own(this.store, function(value, key) {
           if (qp.starts(key, store_key)) {
-            qp.set(data, key.slice(store_key_len), JSON.parse(value));
+            var item = JSON.parse(value);
+            qp.set(data, key.slice(store_key_len), include_meta ? item : item.data);
           }
         });
         return data;
