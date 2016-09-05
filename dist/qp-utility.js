@@ -270,6 +270,17 @@
     }).join('\n');
   }
   
+  function hashcode(s) {
+    var h = 0;
+    if (s.length === 0) return h;
+    for (var i = 0, l = s.length; i < l; i++) {
+      var c = s.charCodeAt(i);
+      h = ((h << 5) - h) + c;
+      h = h & h;
+    }
+    return h;
+  }
+  
   /* To Title Case 2.1 – http://individed.com/code/to-title-case */
   /* Copyright © 2008–2013 David Gouch. Licensed under the MIT License. */
   function title_case(s) {
@@ -2047,6 +2058,7 @@
     camel_to_kebab: camel_to_kebab,
     kebab_to_camel: kebab_to_camel,
     increase_indent: increase_indent,
+    hashcode: hashcode,
     title_case: title_case,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
