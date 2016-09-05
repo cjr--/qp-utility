@@ -1335,7 +1335,7 @@
   }
   
   function any(items, arg1, arg2) {
-    return find(items, arg1, arg2, { find: true }) !== -1;
+    return find(items, arg1, arg2, { index: true }) !== -1;
   }
   
   function all(items, arg1, arg2) {
@@ -1353,7 +1353,7 @@
   function find_last(items, arg1, arg2) {
     var all = find(items, arg1, arg2, { find_all: true });
     return all[all.length - 1];
-  } 
+  }
   
   function find_index(items, arg1, arg2) {
     return find(items, arg1, arg2, { index: true });
