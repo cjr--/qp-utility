@@ -30,12 +30,21 @@ define(module, function(exports, require, make) {
 
     data: function(include_meta) {
       var data = {};
+<<<<<<< HEAD
       var key = this.get_key();
       var key_len = key.length
       qp.each_own(this.store, function(v, k) {
         if (qp.starts(k, key)) {
           var item = JSON.parse(v);
           qp.set(data, key.slice(key_len), include_meta ? item : item.data);
+=======
+      var store_key = this.store_key;
+      var store_key_len = store_key.length;
+      qp.each_own(this.store, function(value, key) {
+        if (qp.starts(key, store_key)) {
+          var item = JSON.parse(value);
+          qp.set(data, key.slice(store_key_len), include_meta ? item : item.data);
+>>>>>>> origin/master
         }
       });
       return data;
