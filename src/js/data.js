@@ -36,8 +36,6 @@ function set_data(original) {
       for (var i = 0, l = o.length; i < l; i++) {
         o[i] = _set_data(o[i]);
       }
-    } else if (type_o == 'date' || (o && o.toISOString)) {
-       return o.toISOString();
     } else if (type_o == 'object') {
       for (var key in o) {
         if (o.hasOwnProperty(key)) o[key] = _set_data(o[key]);
