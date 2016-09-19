@@ -1086,8 +1086,6 @@
         for (var i = 0, l = o.length; i < l; i++) {
           o[i] = _set_data(o[i]);
         }
-      } else if (type_o == 'date' || (o && o.toISOString)) {
-         return o.toISOString();
       } else if (type_o == 'object') {
         for (var key in o) {
           if (o.hasOwnProperty(key)) o[key] = _set_data(o[key]);
@@ -2275,19 +2273,22 @@
       ns: 'qp-utility/store',
   
       store: null,
-      store_key: 'qp.cache.',
+      key: 'qp',
+      ctx: '',
   
       init: function(options) {
         this.store = window.localStorage;
-        this.store_key = qp.rtrim(options.key, '.') + '.';
       },
+  
+      get_key: function(key) { return this.key + (this.ctx ? '.' + this.ctx : '') + (key ? '.' + key : ''); },
+      set_context: function(ctx) { this.ctx = ctx; },
   
       size: function() {
         var kb = 0;
-        var store_key = this.store_key;
-        qp.each_own(this.store, function(value, key) {
-          if (qp.starts(key, store_key)) {
-            kb += (qp.get_utf8_length(value) / 1000);
+        var key = this.get_key();
+        qp.each_own(this.store, function(v, k) {
+          if (qp.starts(k, key)) {
+            kb += (qp.get_utf8_length(v) / 1000);
           }
         });
         return kb;
@@ -2295,18 +2296,16 @@
   
       data: function(include_meta) {
         var data = {};
-        var store_key = this.store_key;
-        var store_key_len = store_key.length
-        qp.each_own(this.store, function(value, key) {
-          if (qp.starts(key, store_key)) {
-            var item = JSON.parse(value);
-            qp.set(data, key.slice(store_key_len), include_meta ? item : item.data);
+        var key = this.get_key();
+        var key_len = key.length
+        qp.each_own(this.store, function(v, k) {
+          if (qp.starts(k, key)) {
+            var item = JSON.parse(v);
+            qp.set(data, key.slice(key_len), include_meta ? item : item.data);
           }
         });
         return data;
       },
-  
-      get_key: function(key) { return this.store_key + key; },
   
       get_item: function(key) {
         var item = this.store.getItem(this.get_key(key));
