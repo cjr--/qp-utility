@@ -468,8 +468,30 @@
     push(o, value);
   }
   
-  function has_key(o, key) {
-    return Object.keys(o).indexOf(key) !== -1;
+  function has_key(o, k) {
+    return Object.keys(o).indexOf(k) !== -1;
+  }
+  
+  function delete_key(o, k, d) {
+    if (not_defined(o)) {
+      return d;
+    } else if (not_defined(k) || not_defined(o[k])) {
+      return d;
+    } else {
+      var v = o[k];
+      delete o[k];
+      return v;
+    }
+  }
+  
+  function qp_delete(o, k) {
+    if (not_defined(o)) {
+      o = { };
+    } else if (not_defined(k) || not_defined(o[k])) {
+    } else {
+      delete o[k];
+    }
+    return o;
   }
   
   var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1170,7 +1192,9 @@
   }
   
   function size(o) {
-    if (is_array(o)) {
+    if (empty(o)) {
+      return 0;
+    } else if (is_array(o)) {
       return o.length;
     } else {
       return Object.keys(o).length;
@@ -1347,6 +1371,11 @@
   
   function find_last(items, arg1, arg2) {
     var all = find(items, arg1, arg2, { find_all: true });
+    return all[all.length - 1];
+  }
+  
+  function find_last_index(items, arg1, arg2) {
+    var all = find(items, arg1, arg2, { find_all: true, index: true });
     return all[all.length - 1];
   }
   
@@ -2117,6 +2146,7 @@
     any: any,
     find_all: find_all,
     find_last: find_last,
+    find_last_index: find_last_index,
     find_index: find_index,
     remove: remove,
     remove_all: remove_all,
@@ -2161,6 +2191,8 @@
     match: match,
     get_matches: get_matches,
     has_key: has_key,
+    delete_key: delete_key,
+    delete: qp_delete,
     select: select,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
