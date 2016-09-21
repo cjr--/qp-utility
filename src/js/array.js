@@ -7,7 +7,7 @@ function arg(o) { return slice.call(o); }
 function to_array(o) {
   if (is_array(o)) {
     return o;
-  } else if (o && has_key(o, 'length')) {
+  } else if (o && o['length']) {
     return slice.call(o);
   } else if (typeof o === 'string') {
     return o.split('');
