@@ -1,5 +1,7 @@
 function size(o) {
-  if (is_array(o)) {
+  if (empty(o)) {
+    return 0;
+  } else if (is_array(o)) {
     return o.length;
   } else {
     return Object.keys(o).length;
