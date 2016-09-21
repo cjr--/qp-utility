@@ -69,6 +69,11 @@ function find_last(items, arg1, arg2) {
   return all[all.length - 1];
 }
 
+function find_last_index(items, arg1, arg2) {
+  var all = find(items, arg1, arg2, { find_all: true, index: true });
+  return all[all.length - 1];
+}
+
 function find_index(items, arg1, arg2) {
   return find(items, arg1, arg2, { index: true });
 }
