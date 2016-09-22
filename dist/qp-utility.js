@@ -338,35 +338,39 @@
   }
   
   function stringify(o, options) {
-    if (o.toJSON) o = o.toJSON();
-    if (options === true) {
-      return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
-        var value = pair[1];
-        var type = qp_typeof(value);
-        if (type === 'function') value = value.name || 'fn';
-        if (type === 'array') value = '[ ' + value.length + ' ]';
-        if (type === 'object') {
-          if (empty(value)) value = '{ }'; else value = '{ … }';
-        }
-        return pair[0] + ': ' + value;
-      }).join(', ') + ' }';
+    if (qp.is(format, 'string') && format === 'json') {
+      return JSON.stringify(o, null, '  ');
     } else {
-      if (empty(o)) return '{ }';
-      if (is_not(o, 'object', 'array')) return o;
-      return '{ ' + pairs(o).map(function(pair) {
-        var value = pair[1];
-        if (is(value, 'function')) {
-          return pair[0] + ': ' + value.name || 'fn';
-        } else if (is(value, 'array')) {
-          return pair[0] + ': [ ' + map(value, function(item) {
-            return stringify(item);
-          }).join(', ') + ' ]';
-        } else if (is(value, 'object')) {
-          return pair[0] + ': ' + stringify(value);
-        } else {
+      if (o && o.toJSON) o = o.toJSON();
+      if (options === true) {
+        return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
+          var value = pair[1];
+          var type = qp_typeof(value);
+          if (type === 'function') value = value.name || 'fn';
+          if (type === 'array') value = '[ ' + value.length + ' ]';
+          if (type === 'object') {
+            if (empty(value)) value = '{ }'; else value = '{ … }';
+          }
           return pair[0] + ': ' + value;
-        }
-      }).join(', ') + ' }';
+        }).join(', ') + ' }';
+      } else {
+        if (empty(o)) return '{ }';
+        if (is_not(o, 'object', 'array')) return o;
+        return '{ ' + pairs(o).map(function(pair) {
+          var value = pair[1];
+          if (is(value, 'function')) {
+            return pair[0] + ': ' + value.name || 'fn';
+          } else if (is(value, 'array')) {
+            return pair[0] + ': [ ' + map(value, function(item) {
+              return stringify(item);
+            }).join(', ') + ' ]';
+          } else if (is(value, 'object')) {
+            return pair[0] + ': ' + stringify(value);
+          } else {
+            return pair[0] + ': ' + value;
+          }
+        }).join(', ') + ' }';
+      }
     }
   }
   
@@ -600,11 +604,17 @@
     return null;
   }
   
-  function bind(o, scope) {
-    scope = scope || o;
-    each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
-      o[k] = v.bind(scope);
-    });
+  function bind(o) {
+    if (arguments.length === 1 || (arguments.length === 2 && is(arguments[1], 'object'))) {
+      var scope = arguments[1] || o;
+      each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
+        o[k] = v.bind(scope);
+      });
+    } else {
+      each(rest(arguments), function(v, k) {
+        o[k] = v.bind(o);
+      });
+    }
     return o;
   }
   
@@ -1894,14 +1904,17 @@
     return false;
   }
   
-  function element(el) {
-    if (qp_typeof(el) === 'string') {
-      return select_first(el);
-    } else if (is_element(el)) {
-      return el;
-    } else {
-      return null;
+  function element(arg0, arg1) {
+    if (arguments.length === 1 && qp_typeof(arg0) === 'string') {
+      return select_first(arg0);
+    } else if (is_element(arg0)) {
+      if (arguments.length === 1) {
+        return el;
+      } else if (arguments.length === 2 && qp_typeof(arg1) === 'string') {
+        return select_first(arg0, arg1);
+      }
     }
+    return null;
   }
   
   function on(el, event_name, handler) {
@@ -1924,6 +1937,14 @@
   function hide(el, v) {
     el.style.display = v || '';
   }
+  
+  function visible(el) {
+    el = element(el);
+    if (el) return el.style.display !== 'hidden' && el.style.display !== '';
+    return false;
+  }
+  
+  function hidden(el) { return !visible(el); }
   
   function add_class(el, class_name) {
     el = element(el);
@@ -2021,6 +2042,14 @@
       elements = element.querySelectorAll(selector);
     }
     return slice.call(elements);
+  }
+  
+  function matches(el, selector) {
+    el = element(el);
+    if (el) {
+      return (el.matches || el.matchesSelector).call(el, selector);
+    }
+    return false;
   }
   
   function select_each() {
@@ -2208,16 +2237,19 @@
     nodefault: nodefault,
     show: show,
     hide: hide,
+    visible: visible,
+    hidden: hidden,
     add_class: add_class,
     remove_class: remove_class,
     html: html,
     attr: attr,
     parents_until: parents_until,
     ready: ready,
-    request: http_request,
     select_all: select_all,
+    matches: matches,
     select_each: select_each,
-    select_first: select_first
+    select_first: select_first,
+    request: http_request
   };
 
   if (global.define) {
