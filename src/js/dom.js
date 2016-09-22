@@ -26,14 +26,17 @@ function is_element(el) {
   return false;
 }
 
-function element(el) {
-  if (qp_typeof(el) === 'string') {
-    return select_first(el);
-  } else if (is_element(el)) {
-    return el;
-  } else {
-    return null;
+function element(arg0, arg1) {
+  if (arguments.length === 1 && qp_typeof(arg0) === 'string') {
+    return select_first(arg0);
+  } else if (is_element(arg0)) {
+    if (arguments.length === 1) {
+      return el;
+    } else if (arguments.length === 2 && qp_typeof(arg1) === 'string') {
+      return select_first(arg0, arg1);
+    }
   }
+  return null;
 }
 
 function on(el, event_name, handler) {
@@ -56,6 +59,14 @@ function show(el, v) {
 function hide(el, v) {
   el.style.display = v || '';
 }
+
+function visible(el) {
+  el = element(el);
+  if (el) return el.style.display !== 'hidden' && el.style.display !== '';
+  return false;
+}
+
+function hidden(el) { return !visible(el); }
 
 function add_class(el, class_name) {
   el = element(el);

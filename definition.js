@@ -64,8 +64,8 @@ module.exports = function(target) {
     ]);
     fns = fns.concat([
       'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off','nodefault',
-      'show','hide','add_class','remove_class','html','attr','parents_until','ready','request:http_request',
-      'select_all','select_each','select_first'
+      'show','hide','visible','hidden','add_class','remove_class','html','attr','parents_until','ready',
+      'select_all','matches','select_each','select_first','request:http_request'
     ]);
     type_definitions = type_definitions.concat([
       'browser_socket','browser_store'

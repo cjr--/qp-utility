@@ -28,11 +28,17 @@ function done() {
   return null;
 }
 
-function bind(o, scope) {
-  scope = scope || o;
-  each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
-    o[k] = v.bind(scope);
-  });
+function bind(o) {
+  if (arguments.length === 1 || (arguments.length === 2 && is(arguments[1], 'object'))) {
+    var scope = arguments[1] || o;
+    each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
+      o[k] = v.bind(scope);
+    });
+  } else {
+    each(rest(arguments), function(v, k) {
+      o[k] = v.bind(o);
+    });
+  }
   return o;
 }
 

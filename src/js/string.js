@@ -294,34 +294,38 @@ function format(s, o, options) {
 }
 
 function stringify(o, options) {
-  if (o.toJSON) o = o.toJSON();
-  if (options === true) {
-    return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
-      var value = pair[1];
-      var type = qp_typeof(value);
-      if (type === 'function') value = value.name || 'fn';
-      if (type === 'array') value = '[ ' + value.length + ' ]';
-      if (type === 'object') {
-        if (empty(value)) value = '{ }'; else value = '{ … }';
-      }
-      return pair[0] + ': ' + value;
-    }).join(', ') + ' }';
+  if (qp.is(format, 'string') && format === 'json') {
+    return JSON.stringify(o, null, '  ');
   } else {
-    if (empty(o)) return '{ }';
-    if (is_not(o, 'object', 'array')) return o;
-    return '{ ' + pairs(o).map(function(pair) {
-      var value = pair[1];
-      if (is(value, 'function')) {
-        return pair[0] + ': ' + value.name || 'fn';
-      } else if (is(value, 'array')) {
-        return pair[0] + ': [ ' + map(value, function(item) {
-          return stringify(item);
-        }).join(', ') + ' ]';
-      } else if (is(value, 'object')) {
-        return pair[0] + ': ' + stringify(value);
-      } else {
+    if (o && o.toJSON) o = o.toJSON();
+    if (options === true) {
+      return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
+        var value = pair[1];
+        var type = qp_typeof(value);
+        if (type === 'function') value = value.name || 'fn';
+        if (type === 'array') value = '[ ' + value.length + ' ]';
+        if (type === 'object') {
+          if (empty(value)) value = '{ }'; else value = '{ … }';
+        }
         return pair[0] + ': ' + value;
-      }
-    }).join(', ') + ' }';
+      }).join(', ') + ' }';
+    } else {
+      if (empty(o)) return '{ }';
+      if (is_not(o, 'object', 'array')) return o;
+      return '{ ' + pairs(o).map(function(pair) {
+        var value = pair[1];
+        if (is(value, 'function')) {
+          return pair[0] + ': ' + value.name || 'fn';
+        } else if (is(value, 'array')) {
+          return pair[0] + ': [ ' + map(value, function(item) {
+            return stringify(item);
+          }).join(', ') + ' ]';
+        } else if (is(value, 'object')) {
+          return pair[0] + ': ' + stringify(value);
+        } else {
+          return pair[0] + ': ' + value;
+        }
+      }).join(', ') + ' }';
+    }
   }
 }

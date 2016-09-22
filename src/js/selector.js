@@ -12,6 +12,14 @@ function select_all() {
   return slice.call(elements);
 }
 
+function matches(el, selector) {
+  el = element(el);
+  if (el) {
+    return (el.matches || el.matchesSelector).call(el, selector);
+  }
+  return false;
+}
+
 function select_each() {
   var args = arguments.length === 2 ? [arguments[0]] : [arguments[0], arguments[1]];
   var elements = select_all.apply(null, args);
