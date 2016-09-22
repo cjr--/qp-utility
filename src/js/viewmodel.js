@@ -1,8 +1,8 @@
-define(module, function(exports, require, ViewModel) {
+define(module, function(exports, require, make) {
 
-  ViewModel({
+  make({
 
-    ns: 'ViewModel',
+    ns: 'qp-utility/viewmodel',
 
     properties: {
       model: null,
@@ -95,13 +95,13 @@ define(module, function(exports, require, ViewModel) {
             binding.type = 'add_class';
           } else if (qp.match(binding.name, 'on-*')) {
             binding.type = 'on';
-            binding.event = binding.name.slice(4);
+            binding.event = binding.name.slice(3);
           } else if (qp.match(binding.name, 'class-*')) {
             binding.type = 'class';
-            binding.class = binding.name.slice(7);
+            binding.class = binding.name.slice(6);
           } else if (qp.match(binding.name, 'style-*')) {
             binding.type = 'style';
-            binding.style = binding.name.slice(7);
+            binding.style = binding.name.slice(6);
           } else {
             binding.attribute = binding.type;
           }
