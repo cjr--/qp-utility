@@ -1,5 +1,7 @@
 define(module, function(exports, require, make) {
 
+  var qp = require('qp-utility');
+
   make({
 
     ns: 'qp-utility/viewmodel',
@@ -13,31 +15,35 @@ define(module, function(exports, require, make) {
 
     init: function(config) {
       this.model = config.model;
-      this.element = config.el || config.element;
+      this.element = config.el || config.element || config.view;
     },
 
     bind: function() {
       this.bindings = this.parse({ element: this.element, bindings: [] });
     },
 
-    update_view: function() {
-      this.sync('view', this.bindings, this.model);
+    update_view: function(node_name) {
+      this.sync('view', this.bindings, this.model, node_name);
     },
 
-    update_model: function() {
-      this.sync('model', this.bindings, this.model);
+    update_model: function(node_name) {
+      this.sync('model', this.bindings, this.model, node_name);
     },
 
-    sync: function(target, node, model) {
-      qp.each(node.bindings, function(binding) {
-        binding['update_' + target].call(this, model);
-      }, this);
+    sync: function(target, node, model, node_name) {
+      if (!node_name || node.name === node_name) {
+        node_name = null;
+        qp.each(node.bindings, function(binding) {
+          binding['update_' + target].call(this, model);
+        }, this);
+      }
       qp.each(node.children, function(child_node, index) {
         if (node.each) {
-          var binder = node.bindings[0];
+          var binder = qp.find(node.bindings, { name: 'each' });
           model[binder.item_name] = model[binder.path][index];
         }
-        this.sync(target, child_node, model);
+        this.sync(target, child_node, model, node_name);
+        if (node.each) qp.delete(model, binder.item_name);
       }, this);
     },
 
@@ -240,12 +246,12 @@ define(module, function(exports, require, make) {
       var list_element = node.element;
       binding.update_view = function(model) {
         list_element.innerHTML = '';
-        qp.each(qp.get(model, binding.path), function(item) {
+        node.children = qp.map(qp.get(model, binding.path), function(item) {
           var item_element = binding.template.cloneNode(true);
           item_element.setAttribute('data-id', item.id);
           list_element.appendChild(item_element);
+          return this.parse({ element: item_element, bindings: [] });
         }, this);
-        node.children = this.parse({ element: list_element, bindings: [] }).children;
       };
       binding.update_model = function(model) { };
     }
