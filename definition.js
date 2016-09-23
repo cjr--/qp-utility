@@ -68,7 +68,7 @@ module.exports = function(target) {
       'select_all','matches','select_each','select_first','request:http_request'
     ]);
     type_definitions = type_definitions.concat([
-      'browser_socket','browser_store'
+      'browser_socket','browser_store','viewmodel'
     ]);
   }
 
