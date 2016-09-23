@@ -31,6 +31,8 @@
   
   function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
   
+  function is_array_like(o) { return !is_array(o) && is_value(o) && !is_string(o) && !is_function(o) && o.length; }
+  
   function empty(o) {
     return typeof o === 'undefined' || o === null ||
       (is_array(o) && o.length === 0) ||
@@ -1899,20 +1901,26 @@
   function is_element(el) {
     if (el) {
       var node_type = el.nodeType;
-      return node_type && (node_type === 1 || node_type === 9);
+      return defined(node_type) && (node_type === 1 || node_type === 9);
     }
     return false;
   }
   
   function element(arg0, arg1) {
-    if (arguments.length === 1 && qp_typeof(arg0) === 'string') {
+    var arg_count = arguments.length;
+    var arg0_type = qp_typeof(arg0);
+    if (arg0_type === 'array') {
+      return arg_count === 1 ? element(arg0[0]) : element(arg0[0], arg1);
+    } else if (arg0_type === 'string' && arg_count === 1) {
       return select_first(arg0);
     } else if (is_element(arg0)) {
-      if (arguments.length === 1) {
-        return el;
-      } else if (arguments.length === 2 && qp_typeof(arg1) === 'string') {
+      if (arg_count === 1) {
+        return arg0;
+      } else if (arg_count === 2) {
         return select_first(arg0, arg1);
       }
+    } else if (defined(arg0.length)) {
+      return arg_count === 1 ? element(arg0[0]) : element(arg0[0], arg1);
     }
     return null;
   }
@@ -2073,6 +2081,8 @@
     is_number: is_number,
     is_function: is_function,
     is_string: is_string,
+    is_array: is_array,
+    is_array_like: is_array_like,
     defined: defined,
     undefined: not_defined,
     random: random,

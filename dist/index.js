@@ -34,6 +34,8 @@
   
   function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
   
+  function is_array_like(o) { return !is_array(o) && is_value(o) && !is_string(o) && !is_function(o) && o.length; }
+  
   function empty(o) {
     return typeof o === 'undefined' || o === null ||
       (is_array(o) && o.length === 0) ||
@@ -1869,6 +1871,8 @@
     is_number: is_number,
     is_function: is_function,
     is_string: is_string,
+    is_array: is_array,
+    is_array_like: is_array_like,
     defined: defined,
     undefined: not_defined,
     random: random,
