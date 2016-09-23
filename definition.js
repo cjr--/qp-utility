@@ -30,7 +30,7 @@ module.exports = function(target) {
   ]);
 
   fns = fns.concat([
-    'noop','noop_callback','escape_re','is_value','is_number','is_function','is_string','defined',
+    'noop','noop_callback','escape_re','is_value','is_number','is_function','is_string','is_array','is_array_like','defined',
     'undefined:not_defined','random','dfault','empty','not_empty','upper','lower','trim',
     'ltrim','rtrim','split','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
     'ends','between','before','before_last','after','after_last','title_case','repeat','replace_all','format',

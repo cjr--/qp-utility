@@ -25,6 +25,8 @@ function escape_re(o) { return o.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); }
 
 function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
 
+function is_array_like(o) { return !is_array(o) && is_value(o) && !is_string(o) && !is_function(o) && o.length; }
+
 function empty(o) {
   return typeof o === 'undefined' || o === null ||
     (is_array(o) && o.length === 0) ||
