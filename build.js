@@ -4,6 +4,8 @@ var CleanCSS = require('clean-css');
 var path = require('path');
 var definition = require('./definition');
 
+process.stdout.write(String.fromCharCode(27) + ']0;' + 'qp-utility' + String.fromCharCode(7));
+
 var browser = definition('browser');
 var node = definition('node');
 
