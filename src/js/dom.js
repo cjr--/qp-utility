@@ -45,7 +45,8 @@ function element(arg0, arg1) {
   return null;
 }
 
-function on(el, event_name, handler) {
+function on(el, event_name, handler, scope) {
+  if (scope) handler.bind(scope);
   el.addEventListener(event_name, handler, false);
 }
 
@@ -99,19 +100,26 @@ function get_style(el, k) {
   if (el) { el.style.getPropertyValue(k); }
 }
 
+function attr(el, name, value) {
+  if (arguments.length === 2) {
+    return el.getAttribute(name);
+  } else {
+    el.setAttribute(name, value);
+  }
+}
+
 function html() {
   var tmp = document.implementation.createHTMLDocument();
   tmp.body.innerHTML = slice.call(arguments).join('');
   return tmp.body.children;
 }
 
-function attr(el, name, value) {
-  if (arguments.length === 2) {
-     return el.getAttribute(name);
-  } else {
-    el.setAttribute(name, value);
-  }
-}
+function swap(a, b) {
+  if (is(b, 'string')) b = html(b);
+  a = element(a);
+  a.parentNode.replaceChild(b, a);
+  return b;
+};
 
 function parents_until(child_el, parent_el, match) {
   var result = match(child_el);
