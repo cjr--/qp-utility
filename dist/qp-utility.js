@@ -1430,7 +1430,7 @@
   
   var _id = Math.round(+(new Date()) * 0.001);
   
-  function id() { return _id++; }
+  function qp_id() { return _id++; }
   
   function uuid() {
     var d = new Date().getTime();
@@ -1925,7 +1925,8 @@
     return null;
   }
   
-  function on(el, event_name, handler) {
+  function on(el, event_name, handler, scope) {
+    if (scope) handler.bind(scope);
     el.addEventListener(event_name, handler, false);
   }
   
@@ -1979,19 +1980,26 @@
     if (el) { el.style.getPropertyValue(k); }
   }
   
+  function attr(el, name, value) {
+    if (arguments.length === 2) {
+      return el.getAttribute(name);
+    } else {
+      el.setAttribute(name, value);
+    }
+  }
+  
   function html() {
     var tmp = document.implementation.createHTMLDocument();
     tmp.body.innerHTML = slice.call(arguments).join('');
     return tmp.body.children;
   }
   
-  function attr(el, name, value) {
-    if (arguments.length === 2) {
-       return el.getAttribute(name);
-    } else {
-      el.setAttribute(name, value);
-    }
-  }
+  function swap(a, b) {
+    if (is(b, 'string')) b = html(b);
+    a = element(a);
+    a.parentNode.replaceChild(b, a);
+    return b;
+  };
   
   function parents_until(child_el, parent_el, match) {
     var result = match(child_el);
@@ -2012,7 +2020,7 @@
     }
   }
   
-  function fade_in(el) {
+  function fade_in_old(el, cb) {
     el.style.opacity = 0;
     var last = Number(new Date());
     var tick = function() {
@@ -2020,12 +2028,29 @@
       last = Number(new Date());
       if (Number(el.style.opacity) < 1) {
         requestAnimationFrame(tick);
+      } else {
+        cb();
       }
     };
     tick();
   }
   
-  function fade_out(el) {
+  function fade_in(el, cb) {
+    el.style.opacity = 0;
+    el.style.display = "block";
+  
+    (function fade() {
+      var val = parseFloat(el.style.opacity);
+      if (!((val += .1) > 1)) {
+        el.style.opacity = val;
+        requestAnimationFrame(fade);
+      } else {
+        if (cb) cb();
+      }
+    })();
+  }
+  
+  function fade_out_old(el, cb) {
     el.style.opacity = 1;
     var last = Number(new Date());
     var tick = function() {
@@ -2033,23 +2058,43 @@
       last = Number(new Date());
       if (Number(el.style.opacity) > 0) {
         requestAnimationFrame(tick);
+      } else {
+        cb();
       }
     };
     tick();
   }
   
+  function fade_out(el, cb) {
+    el.style.opacity = 1;
+  
+    (function fade() {
+      if ((el.style.opacity -= .1) < 0) {
+        el.style.display = "none";
+        if (cb) cb();
+      } else {
+        requestAnimationFrame(fade);
+      }
+    })();
+  }
+  
   function select_all() {
     var one_arg = arguments.length === 1;
+    if (!one_arg && !is_element(arguments[1])) return [];
     var element = one_arg ? document : arguments[0];
     var selector = one_arg ? arguments[0] : arguments[1];
-    var elements;
-    var class_name = selector.match(class_re);
-    if (class_name) {
-      elements = element.getElementsByClassName(class_name[1]);
-    } else {
-      elements = element.querySelectorAll(selector);
-    }
-    return slice.call(elements);
+    return slice.call(element.querySelectorAll(selector));
+  }
+  
+  function select_children(element, selector) {
+    if (!is_element(element)) return [];
+    var id = element.id;
+    var guid = element.id = (id || 'qp' + qp_id());
+    var scope = '#' + guid + ' > ';
+    selector = scope + (selector + '').replace(',', ',' + scope, 'g');
+    var result = slice.call(element.parentNode.querySelectorAll(selector));
+    if (!id) element.removeAttribute('id');
+    return result;
   }
   
   function matches(el, selector) {
@@ -2202,7 +2247,7 @@
     ungroup: ungroup,
     ns: ns,
     options: qp_options,
-    id: id,
+    id: qp_id,
     uuid: uuid,
     series: series,
     parallel: parallel,
@@ -2252,10 +2297,12 @@
     add_class: add_class,
     remove_class: remove_class,
     html: html,
+    swap: swap,
     attr: attr,
     parents_until: parents_until,
     ready: ready,
     select_all: select_all,
+    select_children: select_children,
     matches: matches,
     select_each: select_each,
     select_first: select_first,

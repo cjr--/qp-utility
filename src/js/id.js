@@ -1,6 +1,6 @@
 var _id = Math.round(+(new Date()) * 0.001);
 
-function id() { return _id++; }
+function qp_id() { return _id++; }
 
 function uuid() {
   var d = new Date().getTime();
