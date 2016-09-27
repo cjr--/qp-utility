@@ -1,6 +1,6 @@
 function select_all() {
   var one_arg = arguments.length === 1;
-  if (!one_arg && !is_element(arguments[1])) return [];
+  if (!one_arg && !is_element(arguments[0])) return [];
   var element = one_arg ? document : arguments[0];
   var selector = one_arg ? arguments[0] : arguments[1];
   return slice.call(element.querySelectorAll(selector));
