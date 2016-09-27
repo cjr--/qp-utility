@@ -14,24 +14,30 @@ function http_request(options) {
     if (json.length) options.data = json;
     options.headers['Content-Type'] = 'application/json';
   } else if (options.text) {
-    options.method = 'POST';
     options.data = options.text;
     options.headers['Content-Type'] = 'text/plain';
   } else if (options.html) {
-    options.method = 'GET';
     options.headers['Content-Type'] = 'text/html';
     options.data = options.html;
-  } else {
-    options.method = options.method.toUpperCase();
   }
+  options.method = upper(options.method);
   request.open(options.method, options.url, true);
   set_request_headers(request, options.headers);
   request.onload = function() {
     if (options.timeout_id) { clearTimeout(options.timeout_id); }
     response.status = request.status;
+    response.state = request.readyState;
     response.data = response.text = request.responseText;
     response.headers = get_response_headers(request);
-    if (response.headers['content-type'] === 'application/json') {
+    response.header = function(key, value) {
+      var header = response.headers[key];
+      if (arguments.length === 1) {
+        return header[0];
+      } else {
+        return header && contains(header, value);
+      }
+    };
+    if (response.header('content-type', 'application/json')) {
       response.data = JSON.parse(response.text);
     }
     if (request.status >= 200 && request.status < 400) {
@@ -51,6 +57,7 @@ function http_request(options) {
     }, options.timeout);
   }
   request.send(options.data);
+  return request;
 }
 
 function set_request_headers(http_request, headers) {
@@ -62,8 +69,15 @@ function set_request_headers(http_request, headers) {
 function get_response_headers(http_request) {
   var headers = { };
   http_request.getAllResponseHeaders().split('\r\n').forEach(function(header) {
-    var h = header.split(':');
-    if (h.length > 1) headers[h[0].toLowerCase()] = h.slice(1).join(':').trim();
+    if (not_empty(header)) {
+      var h = lower(header).split(': ');
+      var v = h[1].split('; ');
+      if (v.length === 1) {
+        headers[h[0]] = [h[1]];
+      } else {
+        headers[h[0]] = v;
+      }
+    }
   });
   return headers;
 }
