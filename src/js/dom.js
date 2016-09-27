@@ -29,7 +29,9 @@ function is_element(el) {
 function element(arg0, arg1) {
   var arg_count = arguments.length;
   var arg0_type = qp_typeof(arg0);
-  if (arg0_type === 'array') {
+  if (empty(arg0)) {
+    return null;
+  } else if (arg0_type === 'array') {
     return arg_count === 1 ? element(arg0[0]) : element(arg0[0], arg1);
   } else if (arg0_type === 'string' && arg_count === 1) {
     return select_first(arg0);
@@ -75,14 +77,41 @@ function visible(el) {
 
 function hidden(el) { return !visible(el); }
 
+function text(el, s) {
+  el = element(el);
+  if (el) {
+    if (arguments.length === 2) {
+      el.textContent = s;
+    } else {
+      return el.textContent;
+    }
+  }
+}
+
 function add_class(el, class_name) {
   el = element(el);
-  if (el) { el.classList.add(class_name); }
+  if (el) {
+    if (is_array(class_name)) {
+      qp.each(class_name, function(name) {
+        el.classList.add(name);
+      });
+    } else {
+      el.classList.add(class_name);
+    }
+  }
 }
 
 function remove_class(el, class_name) {
   el = element(el);
-  if (el) { el.classList.remove(class_name); }
+  if (el) {
+    if (is_array(class_name)) {
+      qp.each(class_name, function(name) {
+        el.classList.remove(name);
+      });
+    } else {
+      el.classList.remove(class_name);
+    }
+  }
 }
 
 function has_class(el, class_name) {
@@ -101,17 +130,27 @@ function get_style(el, k) {
 }
 
 function attr(el, name, value) {
-  if (arguments.length === 2) {
-    return el.getAttribute(name);
-  } else {
-    el.setAttribute(name, value);
+  el = element(el);
+  if (el) {
+    if (arguments.length === 2) {
+      return el.getAttribute(name);
+    } else {
+      el.setAttribute(name, value);
+    }
+  }
+}
+
+function has_attr(el, name) {
+  el = element(el);
+  if (el) {
+    return !!attr(el, name);
   }
 }
 
 function html() {
   var tmp = document.implementation.createHTMLDocument();
   tmp.body.innerHTML = slice.call(arguments).join('');
-  return tmp.body.children;
+  return tmp.body.children[0];
 }
 
 function swap(a, b) {
