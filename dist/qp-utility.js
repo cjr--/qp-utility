@@ -1909,7 +1909,9 @@
   function element(arg0, arg1) {
     var arg_count = arguments.length;
     var arg0_type = qp_typeof(arg0);
-    if (arg0_type === 'array') {
+    if (empty(arg0)) {
+      return null;
+    } else if (arg0_type === 'array') {
       return arg_count === 1 ? element(arg0[0]) : element(arg0[0], arg1);
     } else if (arg0_type === 'string' && arg_count === 1) {
       return select_first(arg0);
@@ -1955,14 +1957,41 @@
   
   function hidden(el) { return !visible(el); }
   
+  function text(el, s) {
+    el = element(el);
+    if (el) {
+      if (arguments.length === 2) {
+        el.textContent = s;
+      } else {
+        return el.textContent;
+      }
+    }
+  }
+  
   function add_class(el, class_name) {
     el = element(el);
-    if (el) { el.classList.add(class_name); }
+    if (el) {
+      if (is_array(class_name)) {
+        qp.each(class_name, function(name) {
+          el.classList.add(name);
+        });
+      } else {
+        el.classList.add(class_name);
+      }
+    }
   }
   
   function remove_class(el, class_name) {
     el = element(el);
-    if (el) { el.classList.remove(class_name); }
+    if (el) {
+      if (is_array(class_name)) {
+        qp.each(class_name, function(name) {
+          el.classList.remove(name);
+        });
+      } else {
+        el.classList.remove(class_name);
+      }
+    }
   }
   
   function has_class(el, class_name) {
@@ -1981,17 +2010,27 @@
   }
   
   function attr(el, name, value) {
-    if (arguments.length === 2) {
-      return el.getAttribute(name);
-    } else {
-      el.setAttribute(name, value);
+    el = element(el);
+    if (el) {
+      if (arguments.length === 2) {
+        return el.getAttribute(name);
+      } else {
+        el.setAttribute(name, value);
+      }
+    }
+  }
+  
+  function has_attr(el, name) {
+    el = element(el);
+    if (el) {
+      return !!attr(el, name);
     }
   }
   
   function html() {
     var tmp = document.implementation.createHTMLDocument();
     tmp.body.innerHTML = slice.call(arguments).join('');
-    return tmp.body.children;
+    return tmp.body.children[0];
   }
   
   function swap(a, b) {
@@ -2020,58 +2059,30 @@
     }
   }
   
-  function fade_in_old(el, cb) {
+  function fade_in(el, done){
     el.style.opacity = 0;
-    var last = Number(new Date());
-    var tick = function() {
-      el.style.opacity = Number(el.style.opacity) + (new Date() - last) / 400;
-      last = Number(new Date());
-      if (Number(el.style.opacity) < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        cb();
-      }
-    };
-    tick();
-  }
-  
-  function fade_in(el, cb) {
-    el.style.opacity = 0;
-    el.style.display = "block";
-  
+    el.style.display = 'block';
     (function fade() {
-      var val = parseFloat(el.style.opacity);
-      if (!((val += .1) > 1)) {
-        el.style.opacity = val;
-        requestAnimationFrame(fade);
+      var opacity = parseFloat(el.style.opacity);
+      opacity += 0.1;
+      el.style.opacity = opacity;
+      if (opacity === 1) {
+        qp.done(done);
       } else {
-        if (cb) cb();
+        requestAnimationFrame(fade);
       }
     })();
   }
   
-  function fade_out_old(el, cb) {
+  function fade_out(el, done) {
     el.style.opacity = 1;
-    var last = Number(new Date());
-    var tick = function() {
-      el.style.opacity = Number(el.style.opacity) + (new Date() + last) / 400;
-      last = Number(new Date());
-      if (Number(el.style.opacity) > 0) {
-        requestAnimationFrame(tick);
-      } else {
-        cb();
-      }
-    };
-    tick();
-  }
-  
-  function fade_out(el, cb) {
-    el.style.opacity = 1;
-  
     (function fade() {
-      if ((el.style.opacity -= .1) < 0) {
-        el.style.display = "none";
-        if (cb) cb();
+      var opacity = parseFloat(el.style.opacity);
+      opacity -= 0.1;
+      el.style.opacity = opacity;
+      if (opacity === 0) {
+        el.style.display = 'none';
+        qp.done(done);
       } else {
         requestAnimationFrame(fade);
       }
@@ -2080,7 +2091,7 @@
   
   function select_all() {
     var one_arg = arguments.length === 1;
-    if (!one_arg && !is_element(arguments[1])) return [];
+    if (!one_arg && !is_element(arguments[0])) return [];
     var element = one_arg ? document : arguments[0];
     var selector = one_arg ? arguments[0] : arguments[1];
     return slice.call(element.querySelectorAll(selector));
@@ -2294,11 +2305,15 @@
     hide: hide,
     visible: visible,
     hidden: hidden,
+    text: text,
     add_class: add_class,
     remove_class: remove_class,
     html: html,
     swap: swap,
+    set_style: set_style,
+    get_style: get_style,
     attr: attr,
+    has_attr: has_attr,
     parents_until: parents_until,
     ready: ready,
     select_all: select_all,
