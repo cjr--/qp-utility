@@ -26,6 +26,8 @@ function is_element(el) {
   return false;
 }
 
+function not_element(el) { return !is_element(el); }
+
 function element(arg0, arg1) {
   var arg_count = arguments.length;
   var arg0_type = qp_typeof(arg0);
