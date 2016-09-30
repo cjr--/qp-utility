@@ -7,6 +7,7 @@ function http_request(options) {
 
   var response = { ok: false };
   var request = new XMLHttpRequest();
+  if (options.with_credentials) request.withCredentials = true;
 
   if (options.json) {
     options.method = 'POST';
@@ -44,7 +45,7 @@ function http_request(options) {
       response.ok = true;
       options.done(null, response);
     } else {
-      options.done(response, null);
+      options.done(new Error(response.status), response);
     }
   };
   request.onerror = function(e) {
