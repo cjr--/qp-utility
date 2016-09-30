@@ -1817,6 +1817,7 @@
   
     var response = { ok: false };
     var request = new XMLHttpRequest();
+    if (options.with_credentials) request.withCredentials = true;
   
     if (options.json) {
       options.method = 'POST';
@@ -1854,7 +1855,7 @@
         response.ok = true;
         options.done(null, response);
       } else {
-        options.done(response, null);
+        options.done(new Error(response.status), response);
       }
     };
     request.onerror = function(e) {
@@ -1919,6 +1920,8 @@
     }
     return false;
   }
+  
+  function not_element(el) { return !is_element(el); }
   
   function element(arg0, arg1) {
     var arg_count = arguments.length;
@@ -2073,34 +2076,48 @@
     }
   }
   
-  function fade_in(el, done){
-    el.style.opacity = 0;
-    el.style.display = 'block';
-    (function fade() {
-      var opacity = parseFloat(el.style.opacity);
-      opacity += 0.1;
-      el.style.opacity = opacity;
-      if (opacity === 1) {
-        qp.done(done);
-      } else {
-        requestAnimationFrame(fade);
-      }
-    })();
-  }
+  function animate(o) {
+    var effect = o.effect || 'none';
+    var done = o.done || noop;
+    var el = o.el;
+    var interval = o.interval;
   
-  function fade_out(el, done) {
-    el.style.opacity = 1;
-    (function fade() {
+    if (effect === 'none' || not_element(el)) {
+      invoke_next(done);
+    } else if (effect === 'fade_in') {
+      el.style.opacity = 0;
+      el.style.display = 'block';
+      interval = interval || 0.25;
+      fade_in();
+    } else if (effect === 'fade_out') {
+      el.style.opacity = 1;
+      interval = interval || 0.25;
+      fade_out();
+    }
+  
+    function fade_in() {
       var opacity = parseFloat(el.style.opacity);
-      opacity -= 0.1;
+      opacity += interval;
       el.style.opacity = opacity;
-      if (opacity === 0) {
-        el.style.display = 'none';
+      if (opacity >= 1) {
         qp.done(done);
       } else {
-        requestAnimationFrame(fade);
+        requestAnimationFrame(fade_in);
       }
-    })();
+    }
+  
+    function fade_out() {
+      var opacity = parseFloat(el.style.opacity);
+      opacity -= interval;
+      el.style.opacity = opacity;
+      if (opacity <= 0) {
+        el.style.display = 'none';
+        done();
+      } else {
+        requestAnimationFrame(fade_out);
+      }
+    }
+  
   }
   
   function select_all() {
@@ -2305,12 +2322,12 @@
     select: select,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
-    fade_in: fade_in,
-    fade_out: fade_out,
+    animate: animate,
     debug: debug,
     get_attributes: get_attributes,
     get_attribute: get_attribute,
     is_element: is_element,
+    not_element: not_element,
     element: element,
     on: on,
     off: off,

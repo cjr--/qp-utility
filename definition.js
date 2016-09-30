@@ -63,7 +63,7 @@ module.exports = function(target) {
       'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app'
     ]);
     fns = fns.concat([
-      'fade_in','fade_out','debug','get_attributes','get_attribute','is_element','element','on','off','nodefault',
+      'animate','debug','get_attributes','get_attribute','is_element','not_element','element','on','off','nodefault',
       'show','hide','visible','hidden','text','add_class','remove_class','html','swap',
       'set_style','get_style','attr','has_attr',
       'parents_until','ready', 'select_all','select_children','matches','select_each','select_first',
