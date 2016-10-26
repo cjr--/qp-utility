@@ -102,7 +102,12 @@ function upsert(items, arg1, arg2, item) {
   if (is(items, 'array') && is(item, 'object')) {
     var index = find(items, arg1, arg2, { index: true });
     if (index !== -1) {
-      items[index] = item;
+      var target = items[index];
+      each_own(item, function(v, k) {
+        if (target.hasOwnProperty(k) && target[k] !== v) {
+          target[k] = v;
+        }
+      });
     } else {
       items.push(item);
     }
