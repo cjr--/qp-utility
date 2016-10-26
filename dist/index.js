@@ -99,6 +99,10 @@
     return s.split(chars);
   }
   
+  function join(o, s) {
+    return to_array(o).join(s || ', ');
+  }
+  
   function lines(s) {
     return String(s).split(/\r\n|\r|\n/g);
   }
@@ -343,7 +347,7 @@
   }
   
   function stringify(o, options) {
-    if (qp.is(format, 'string') && format === 'json') {
+    if (qp.is(options, 'string') && options === 'json') {
       return JSON.stringify(o, null, '  ');
     } else {
       if (o && o.toJSON) o = o.toJSON();
@@ -377,6 +381,16 @@
         }).join(', ') + ' }';
       }
     }
+  }
+  
+  function json(o, options) {
+    var type = qp_typeof(o);
+    if (type === 'string') {
+      return JSON.parse(o || '{}');
+    } else if (type === 'object') {
+      return JSON.stringify(o || {}, null, '  ');
+    }
+    return o;
   }
   
   function reduce(o, fn, init) {
@@ -472,9 +486,9 @@
     return o;
   }
   
-  function load(o, value) {
+  function load(o) {
     clear(o);
-    push(o, value);
+    each(rest(arguments), function(value) { push(o, value); });
   }
   
   function has_key(o, k) {
@@ -1422,7 +1436,12 @@
     if (is(items, 'array') && is(item, 'object')) {
       var index = find(items, arg1, arg2, { index: true });
       if (index !== -1) {
-        items[index] = item;
+        var target = items[index];
+        each_own(item, function(v, k) {
+          if (target.hasOwnProperty(k) && target[k] !== v) {
+            target[k] = v;
+          }
+        });
       } else {
         items.push(item);
       }
@@ -1885,6 +1904,7 @@
     ltrim: ltrim,
     rtrim: rtrim,
     split: split,
+    join: join,
     build: build,
     escape: escape,
     unescape: unescape,
@@ -1918,6 +1938,7 @@
     title_case: title_case,
     get_utf8_length: get_utf8_length,
     stringify: stringify,
+    json: json,
     eol: eol,
     sum: sum,
     min: min,
