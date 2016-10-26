@@ -50,6 +50,10 @@ function split(s, chars) {
   return s.split(chars);
 }
 
+function join(o, s) {
+  return to_array(o).join(s || ', ');
+}
+
 function lines(s) {
   return String(s).split(/\r\n|\r|\n/g);
 }
@@ -294,7 +298,7 @@ function format(s, o, options) {
 }
 
 function stringify(o, options) {
-  if (qp.is(format, 'string') && format === 'json') {
+  if (qp.is(options, 'string') && options === 'json') {
     return JSON.stringify(o, null, '  ');
   } else {
     if (o && o.toJSON) o = o.toJSON();
@@ -328,4 +332,14 @@ function stringify(o, options) {
       }).join(', ') + ' }';
     }
   }
+}
+
+function json(o, options) {
+  var type = qp_typeof(o);
+  if (type === 'string') {
+    return JSON.parse(o || '{}');
+  } else if (type === 'object') {
+    return JSON.stringify(o || {}, null, '  ');
+  }
+  return o;
 }
