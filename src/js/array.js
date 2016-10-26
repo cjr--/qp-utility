@@ -91,7 +91,7 @@ function push(o, value) {
   return o;
 }
 
-function load(o, value) {
+function load(o) {
   clear(o);
-  push(o, value);
+  each(rest(arguments), function(value) { push(o, value); });
 }
