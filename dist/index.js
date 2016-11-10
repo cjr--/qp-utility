@@ -262,10 +262,9 @@
       if (is_number(indent)) {
         times = indent;
         indent = '  ';
-      } else {
-        if (is_value(times) && times > 1) {
-          indent = repeat(indent, times);
-        }
+      }
+      if (is_number(times) && times > 1) {
+        indent = repeat(indent, times);
       }
     } else {
       indent = '  ';
@@ -387,7 +386,7 @@
     var type = qp_typeof(o);
     if (type === 'string') {
       return JSON.parse(o || '{}');
-    } else if (type === 'object') {
+    } else if (type === 'object' || type === 'array') {
       return JSON.stringify(o || {}, null, '  ');
     }
     return o;
@@ -1199,7 +1198,7 @@
   function contains(o) {
     var contains = false;
     var items = rest(arguments);
-    for (var i = 0, l = o.length; i < l; i++) {
+    for (var i = 0, l = items.length; i < l; i++) {
       contains = o.indexOf(items[i]) !== -1;
       if (contains) break;
     }
