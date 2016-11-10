@@ -42,7 +42,7 @@ function not_in() { return !_in.apply(null, arguments); }
 function contains(o) {
   var contains = false;
   var items = rest(arguments);
-  for (var i = 0, l = o.length; i < l; i++) {
+  for (var i = 0, l = items.length; i < l; i++) {
     contains = o.indexOf(items[i]) !== -1;
     if (contains) break;
   }
