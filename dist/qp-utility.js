@@ -1828,7 +1828,6 @@
   
   function http_request(options) {
     options.done = options.done || noop;
-    if (options.bind) options.done.bind(options.bind);
     options.headers = options.headers || {};
     options.method = options.method || 'GET';
     options.data = options.data || null;
@@ -1848,8 +1847,26 @@
     } else if (options.html) {
       options.headers['Content-Type'] = 'text/html';
       options.data = options.html;
+    } else if (options.files) {
+      options.method = 'POST';
+      options.headers['Content-Type'] = 'multipart/form-data';
+      var data = options.data = new FormData();
+      for (var i = 0, l = options.files.length; i < l; i++) {
+        var file = options.files[i];
+        data.append('file' + i, file, file.name);
+      }
     }
     options.method = upper(options.method);
+    if (options.upload_progress) {
+      request.upload.onprogress = function(e) {
+        if (e.lengthComputable) options.upload_progress.call(options.bind, e, (e.loaded / e.total) * 100);
+      };
+    }
+    if (options.download_progress) {
+      request.onprogress = function(e) {
+        if (e.lengthComputable) options.download_progress.call(options.bind, e, (e.loaded / e.total) * 100);
+      };
+    }
     request.open(options.method, options.url, true);
     set_request_headers(request, options.headers);
     request.onload = function() {
@@ -1871,13 +1888,13 @@
       }
       if (request.status >= 200 && request.status < 400) {
         response.ok = true;
-        options.done(null, response);
+        options.done.call(options.bind, null, response);
       } else {
-        options.done(new Error(response.status), response);
+        options.done.call(options.bind, new Error(response.status), response);
       }
     };
     request.onerror = function(e) {
-      options.done(e, null);
+      options.done.call(options.bind, e, null);
     };
     if (options.timeout) {
       options.timeout_id = setTimeout(function() {
