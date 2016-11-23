@@ -1253,15 +1253,15 @@
     } else if (is_array(o)) {
       return o.map(fn, scope);
     } else if (o.length) {
-      var out = [];
+      var out0 = [];
       for (var i = 0, l = o.length; i < l; i++) {
-        out.push(fn.call(scope, o[i]));
+        out0.push(fn.call(scope, o[i]));
       }
-      return out;
+      return out0;
     } else if (is(o, 'object')) {
-      var out = [];
-      each_own(o, function(item) { out.push(fn.call(scope, item)); });
-      return out;
+      var out1 = [];
+      each_own(o, function(v, k, i, o) { out1.push(fn.call(scope, v, k, i, o)); });
+      return out1;
     } else {
       return [];
     }
@@ -1281,51 +1281,60 @@
     return no_exit;
   }
   
-  function series() {
-    var args = slice.call(arguments);
-    var data = args[2] ? args[0] : null;
-    var actions = args[2] ? args[1] : args[0];
-    var done = args[2] ? args[2] : args[1];
-    var results = {};
-    function next() {
-      var action = actions.shift();
-      if (action) {
-        action[1](data, function(error, result) {
-          results[action[0]] = result;
-          if (error) {
-            done(error, results);
-          } else {
-            next();
-          }
+  function each_series(items, action, done) {
+    var results = [ ];
+    var next = function() {
+      if (items.length) {
+        action(items.shift(), function(error, result) {
+          results.push(result);
+          if (error) return done(error, results); else next();
         });
       } else {
         done(null, results);
       }
-    }
+    };
     next();
   }
   
-  function parallel() {
-    var args = slice.call(arguments);
-    var data = args[2] ? args[0] : null;
-    var actions = args[2] ? args[1] : args[0];
-    var done = args[2] ? args[2] : args[1];
-    var errors = null;
-    var results = {};
-    var remaining = size(actions) - 1;
-    each(actions, function(action, key) {
-      action(data, function(error, result) {
+  function series(data, actions, done) {
+    var results = { };
+    actions = get_async_actions(actions);
+    var next = function() {
+      var action = actions.shift();
+      if (action) {
+        action.fn(null, function(error, result) {
+          results[action.name] = result;
+          if (error) done(error, results); else next();
+        });
+      } else {
+        done(null, results);
+      }
+    };
+    next();
+  }
+  
+  function parallel(data, actions, done) {
+    var results = { };
+    actions = get_async_actions(actions);
+    var action_count = actions.length;
+    each(actions, function(action) {
+      action.fn(data, function(error, result) {
+        results[action.name] = result;
         if (error) {
-          errors = errors || {};
-          errors[key] = error;
-        }
-        results[key] = result;
-        remaining--;
-        if (!remaining) {
-          done(errors, results);
+          done(error, results);
+        } else if (!--action_count) {
+          done(null, results);
         }
       });
     });
+  }
+  
+  function get_async_actions(o) {
+    if (is(o, 'array')) {
+      return o;
+    } else if (is(o, 'object')) {
+      return map(o, function(fn, name) { return { name: name, fn: fn }; });
+    }
   }
   
   function find_predicate(arg1, arg2) {
@@ -2328,12 +2337,13 @@
     options: qp_options,
     id: qp_id,
     uuid: uuid,
-    series: series,
-    parallel: parallel,
     get: get,
     take: take,
     has: has,
     set: set,
+    each_series: each_series,
+    series: series,
+    parallel: parallel,
     union: union,
     unique: unique,
     clear: clear,
