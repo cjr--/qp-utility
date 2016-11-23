@@ -1,46 +1,55 @@
-function series() {
-  var args = slice.call(arguments);
-  var data = args[2] ? args[0] : null;
-  var actions = args[2] ? args[1] : args[0];
-  var done = args[2] ? args[2] : args[1];
-  var results = {};
-  function next() {
-    var action = actions.shift();
-    if (action) {
-      action[1](data, function(error, result) {
-        results[action[0]] = result;
-        if (error) {
-          done(error, results);
-        } else {
-          next();
-        }
+function each_series(items, action, done) {
+  var results = [ ];
+  var next = function() {
+    if (items.length) {
+      action(items.shift(), function(error, result) {
+        results.push(result);
+        if (error) return done(error, results); else next();
       });
     } else {
       done(null, results);
     }
-  }
+  };
   next();
 }
 
-function parallel() {
-  var args = slice.call(arguments);
-  var data = args[2] ? args[0] : null;
-  var actions = args[2] ? args[1] : args[0];
-  var done = args[2] ? args[2] : args[1];
-  var errors = null;
-  var results = {};
-  var remaining = size(actions) - 1;
-  each(actions, function(action, key) {
-    action(data, function(error, result) {
+function series(data, actions, done) {
+  var results = { };
+  actions = get_async_actions(actions);
+  var next = function() {
+    var action = actions.shift();
+    if (action) {
+      action.fn(null, function(error, result) {
+        results[action.name] = result;
+        if (error) done(error, results); else next();
+      });
+    } else {
+      done(null, results);
+    }
+  };
+  next();
+}
+
+function parallel(data, actions, done) {
+  var results = { };
+  actions = get_async_actions(actions);
+  var action_count = actions.length;
+  each(actions, function(action) {
+    action.fn(data, function(error, result) {
+      results[action.name] = result;
       if (error) {
-        errors = errors || {};
-        errors[key] = error;
-      }
-      results[key] = result;
-      remaining--;
-      if (!remaining) {
-        done(errors, results);
+        done(error, results);
+      } else if (!--action_count) {
+        done(null, results);
       }
     });
   });
+}
+
+function get_async_actions(o) {
+  if (is(o, 'array')) {
+    return o;
+  } else if (is(o, 'object')) {
+    return map(o, function(fn, name) { return { name: name, fn: fn }; });
+  }
 }
