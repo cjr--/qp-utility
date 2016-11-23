@@ -35,15 +35,15 @@ function map(o, fn, scope) {
   } else if (is_array(o)) {
     return o.map(fn, scope);
   } else if (o.length) {
-    var out = [];
+    var out0 = [];
     for (var i = 0, l = o.length; i < l; i++) {
-      out.push(fn.call(scope, o[i]));
+      out0.push(fn.call(scope, o[i]));
     }
-    return out;
+    return out0;
   } else if (is(o, 'object')) {
-    var out = [];
-    each_own(o, function(item) { out.push(fn.call(scope, item)); });
-    return out;
+    var out1 = [];
+    each_own(o, function(v, k, i, o) { out1.push(fn.call(scope, v, k, i, o)); });
+    return out1;
   } else {
     return [];
   }
