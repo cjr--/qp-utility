@@ -1924,7 +1924,7 @@
   function get_response_headers(http_request) {
     var headers = { };
     http_request.getAllResponseHeaders().split('\r\n').forEach(function(header) {
-      if (not_empty(header)) {
+      if (not_empty(clean_whitespace(header))) {
         var h = lower(header).split(': ');
         var v = h[1].split('; ');
         if (v.length === 1) {
@@ -2089,7 +2089,7 @@
   }
   
   function html() {
-    var tmp = document.implementation.createHTMLDocument();
+    var tmp = document.implementation.createHTMLDocument('');
     tmp.body.innerHTML = slice.call(arguments).join('');
     return tmp.body.children[0];
   }
@@ -2099,7 +2099,7 @@
     a = element(a);
     a.parentNode.replaceChild(b, a);
     return b;
-  };
+  }
   
   function parents_until(child_el, parent_el, match) {
     var result = match(child_el);
@@ -2186,7 +2186,7 @@
   function matches(el, selector) {
     el = element(el);
     if (el) {
-      return (el.matches || el.matchesSelector).call(el, selector);
+      return (el.matches || el.matchesSelector || el.msMatchesSelector).call(el, selector);
     }
     return false;
   }
