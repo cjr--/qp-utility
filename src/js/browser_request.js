@@ -87,7 +87,7 @@ function set_request_headers(http_request, headers) {
 function get_response_headers(http_request) {
   var headers = { };
   http_request.getAllResponseHeaders().split('\r\n').forEach(function(header) {
-    if (not_empty(header)) {
+    if (not_empty(clean_whitespace(header))) {
       var h = lower(header).split(': ');
       var v = h[1].split('; ');
       if (v.length === 1) {
