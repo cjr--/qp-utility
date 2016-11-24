@@ -20,7 +20,7 @@ function select_children(element, selector) {
 function matches(el, selector) {
   el = element(el);
   if (el) {
-    return (el.matches || el.matchesSelector).call(el, selector);
+    return (el.matches || el.matchesSelector || el.msMatchesSelector).call(el, selector);
   }
   return false;
 }
