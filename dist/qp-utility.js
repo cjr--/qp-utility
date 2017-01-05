@@ -1854,6 +1854,14 @@
     return false;
   }
   
+  function collect(items, fn, scope) {
+    var out = [];
+    for (var i = 0, l = items.length; i < l; i++) {
+      fn.call(scope, items[i], out);
+    }
+    return out;
+  }
+  
   global.debug = function() {
     var format = ['%cDEBUG:','color:black;background-color:yellow;'];
     console.log.apply(console, format.concat(slice.call(arguments)));
@@ -2400,6 +2408,7 @@
     delete_key: delete_key,
     delete: qp_delete,
     select: select,
+    collect: collect,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
     animate: animate,

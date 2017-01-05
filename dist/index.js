@@ -1857,6 +1857,14 @@
     return false;
   }
   
+  function collect(items, fn, scope) {
+    var out = [];
+    for (var i = 0, l = items.length; i < l; i++) {
+      fn.call(scope, items[i], out);
+    }
+    return out;
+  }
+  
   function http_request(options) {
     options.done = options.done || noop;
     if (options.bind) options.done.bind(options.bind);
@@ -2086,6 +2094,7 @@
     delete_key: delete_key,
     delete: qp_delete,
     select: select,
+    collect: collect,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
     request: http_request

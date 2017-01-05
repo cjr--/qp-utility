@@ -20,7 +20,8 @@ module.exports = function(target) {
   js_files = js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
-    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate'
+    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
+    'collect'
   ]);
 
   css_files = css_files.concat([
@@ -50,7 +51,7 @@ module.exports = function(target) {
     'each_series','series','parallel',
     'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
     'set_data','count','all','none','exists','replace','upsert',
-    'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select',
+    'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select','collect',
     'is_alpha_numeric','is_length'
   ]);
 
