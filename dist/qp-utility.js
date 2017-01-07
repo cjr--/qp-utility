@@ -1495,9 +1495,10 @@
         });
       });
     }
+    
+    each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
   
     each(definition, function(v, k) {
-      each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
       if (inlist(k, 'ns', 'mixin', 'self')) {
       } else if (is(v, 'function')) {
         if (k === 'init') {
