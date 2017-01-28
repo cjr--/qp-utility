@@ -47,7 +47,7 @@ function clean_whitespace(s) {
 }
 
 function split(s, chars) {
-  return s.split(chars);
+  return String(s).split(chars);
 }
 
 function join(o, s) {
