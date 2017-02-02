@@ -633,6 +633,13 @@
     return o;
   }
   
+  function partial(fn) {
+    var args = slice.call(arguments, 1);
+    return function() {
+      return fn.apply(this, args.concat(slice.call(arguments)));
+    };
+  }
+  
   function invoke(fn, ctx) {
     var type = qp_typeof(arguments[0]);
     if (fn && type === 'function') {
@@ -1976,23 +1983,44 @@
     return headers;
   }
   
-  function get_attributes(el) {
+  function get_attributes(el, name) {
     if (el && el.attributes) {
-      return slice.call(el.attributes);
+      var attributes = slice.call(el.attributes);
+      if (is(name, 'string')) {
+        return select(attributes, function(attribute) {
+          if (match(attribute.name, name)) return attr_object(attribute);
+        });
+      } else {
+        return map(attributes, attr_object);
+      }
     } else {
       return [];
     }
   }
   
+  function attr_object(attribute) {
+    if (attribute) return { name: attribute.nodeName, value: attribute.nodeValue };
+  }
+  
+  function set_attributes(el, attributes) {
+    el = element(el);
+    if (el && is(attributes, 'array')) {
+      each(attributes, partial(set_attribute, el));
+    }
+  }
+  
   function get_attribute(el, name) {
     if (el && el.attributes) {
-      var attributes = el.attributes;
-      for (var i = 0, l = attributes.length; i < l; i++) {
-        var attribute = el.attributes[i];
-        if (match(attribute.name, name)) {
-          return attribute;
-        }
-      }
+      return attr_object(qp.find(el.attributes, function(attribute) {
+        return match(attribute.nodeName, name);
+      }));
+    }
+  }
+  
+  function set_attribute(el, attribute) {
+    el = element(el);
+    if (el && attribute) {
+      el.setAttribute(attribute.name, attribute.value);
     }
   }
   
@@ -2325,6 +2353,7 @@
     combine: combine,
     done: done,
     bind: bind,
+    partial: partial,
     invoke: invoke,
     invoke_after: invoke_after,
     invoke_delay: invoke_delay,
@@ -2417,7 +2446,9 @@
     animate: animate,
     debug: debug,
     get_attributes: get_attributes,
+    set_attributes: set_attributes,
     get_attribute: get_attribute,
+    set_attribute: set_attribute,
     is_element: is_element,
     not_element: not_element,
     element: element,

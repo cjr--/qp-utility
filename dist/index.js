@@ -636,6 +636,13 @@
     return o;
   }
   
+  function partial(fn) {
+    var args = slice.call(arguments, 1);
+    return function() {
+      return fn.apply(this, args.concat(slice.call(arguments)));
+    };
+  }
+  
   function invoke(fn, ctx) {
     var type = qp_typeof(arguments[0]);
     if (fn && type === 'function') {
@@ -2011,6 +2018,7 @@
     combine: combine,
     done: done,
     bind: bind,
+    partial: partial,
     invoke: invoke,
     invoke_after: invoke_after,
     invoke_delay: invoke_delay,

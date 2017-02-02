@@ -41,7 +41,7 @@ module.exports = function(target) {
     'currency',
     'map','reduce','arg','to_array','flatten','compact',
     'now','date','date_time','file_date','get_fn_name','timer',
-    'combine','done','bind','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle','patch',
+    'combine','done','bind','partial','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle','patch',
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',
     'assign_own','assign_if','eq','neq','clone','copy','merge','extend','override',
     'make','first','last','rest','at','range','in:_in','not_in','find_predicate',
@@ -67,7 +67,7 @@ module.exports = function(target) {
       'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app'
     ]);
     fns = fns.concat([
-      'animate','debug','get_attributes','get_attribute','is_element','not_element','element','on','off','nodefault',
+      'animate','debug','get_attributes','set_attributes','get_attribute','set_attribute','is_element','not_element','element','on','off','nodefault',
       'show','hide','visible','hidden','text','add_class','remove_class','html','swap',
       'set_style','get_style','attr','has_attr',
       'parents_until','ready', 'select_all','select_children','matches','select_each','select_first',
