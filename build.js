@@ -28,6 +28,10 @@ function make_node_file(node) {
       '  if (global.define) global.define.make = make;',
       '  module.exports = qp;',
       '',
+      '  global.debug = function() {',
+      '    console.log.apply(console, ["\x1b[43m\x1b[30m:DEBUG:\x1b[0m\x1b[0m"].concat(slice.call(arguments)));',
+      '  }',
+      '',
     '})(global);'
   ].join('\n');
 }
@@ -45,6 +49,10 @@ function make_browser_file(browser) {
       '    global.module.require.cache["qp-utility"] = qp;',
       '  } else {',
       '    global.qp = qp;',
+      '  }',
+      '',
+      '  global.debug = function() {',
+      '    console.log.apply(console, ["%cDEBUG:", "color:black;background-color:yellow;"].concat(slice.call(arguments)));',
       '  }',
       '',
       indent(join_files(browser.files.type_definitions, 'js')),

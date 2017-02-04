@@ -2114,4 +2114,8 @@
   if (global.define) global.define.make = make;
   module.exports = qp;
 
+  global.debug = function() {
+    console.log.apply(console, ["[43m[30m:DEBUG:[0m[0m"].concat(slice.call(arguments)));
+  }
+
 })(global);

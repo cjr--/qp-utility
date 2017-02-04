@@ -2485,6 +2485,10 @@
     global.qp = qp;
   }
 
+  global.debug = function() {
+    console.log.apply(console, ["%cDEBUG:", "color:black;background-color:yellow;"].concat(slice.call(arguments)));
+  }
+
   define(module, function(exports, require, make) {
   
     var qp = require('qp-utility');
