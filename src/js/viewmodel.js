@@ -6,28 +6,27 @@ define(module, function(exports, require, make) {
 
     ns: 'qp-utility/viewmodel',
 
-    properties: {
-      model: null,
-      element: null,
-      view: {},
-      bindings: []
-    },
+    model: null,
+    node: null,
 
     init: function(config) {
       this.model = config.model;
-      this.element = config.el || config.element || config.view;
+      this.node = {
+        element: config.el || config.element || config.view,
+        bindings: []
+      };
     },
 
     bind: function() {
-      this.bindings = this.parse({ element: this.element, bindings: [] });
+      this.parse(this.node);
     },
 
     update_view: function(node_name) {
-      this.sync('view', this.bindings, this.model, node_name);
+      this.sync('view', this.node, this.model, node_name);
     },
 
     update_model: function(node_name) {
-      this.sync('model', this.bindings, this.model, node_name);
+      this.sync('model', this.node, this.model, node_name);
     },
 
     sync: function(target, node, model, node_name) {
@@ -50,7 +49,7 @@ define(module, function(exports, require, make) {
     parse: function(node) {
       this.parse_node(node);
       if (node.element.parentNode) {
-        node.children = qp.select(node.element.children, function(child_element) {
+        node.children = qp.select(qp.to_array(node.element.children), function(child_element) {
           if (qp.is_element(child_element)) {
             if (child_element.hasAttribute('v-each')) {
               node.parent = node.element;
@@ -75,11 +74,11 @@ define(module, function(exports, require, make) {
             node.name = binding.path;
           } else if (binding.name === 'if') {
             binding.type = 'if';
-          } else if (qp.inlist(binding.name, 'show', 'hide')) {
+          } else if (qp.in(binding.name, 'show', 'hide')) {
             binding.type = 'visible';
             binding.show = binding.name === 'show';
             binding.hide = !binding.show;
-          } else if (qp.inlist(binding.name, 'readonly', 'disabled')) {
+          } else if (qp.in(binding.name, 'readonly', 'disabled')) {
             binding.attribute = binding.name;
             binding.boolean = true;
           } else if (binding.name === 'text') {
@@ -112,7 +111,7 @@ define(module, function(exports, require, make) {
             binding.attribute = binding.type;
           }
 
-          if (binding.type === 'node') {
+          if (binding.ignore) {
             //
           } else if (binding.property) {
             this.property(binding, node.element);
@@ -141,7 +140,9 @@ define(module, function(exports, require, make) {
         binding.path = attribute.value.slice(4);
         binding.negate = true;
       }
-      if (binding.type !== 'node') {
+      if (qp.in(binding.type, 'node', 'page')) {
+        node.ignore = true;
+      } else {
         node.bindings.push(binding);
       }
       return binding;
