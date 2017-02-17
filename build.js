@@ -4,18 +4,14 @@ var CleanCSS = require('clean-css');
 var path = require('path');
 var definition = require('./definition');
 
-process.stdout.write(String.fromCharCode(27) + ']0;' + 'qp-utility' + String.fromCharCode(7));
-
 var browser = definition('browser');
 var node = definition('node');
 
-console.log('');
 write_file('index.js', make_node_file(node));
 write_file('qp-utility.js', make_browser_file(browser));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
 write_file('qp-utility.css', join_files(browser.files.css, 'css'));
 write_file('qp-utility.min.css', make_min_file('qp-utility.css'));
-console.log('');
 
 function make_node_file(node) {
   return [
