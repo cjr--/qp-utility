@@ -85,16 +85,16 @@ function nodefault(e) {
 }
 
 function show(el, v) {
-  el.style.display = v || 'block';
+  el.style.display = v || 'inline';
 }
 
 function hide(el, v) {
-  el.style.display = v || '';
+  el.style.display = v || 'none';
 }
 
 function visible(el) {
   el = element(el);
-  if (el) return el.style.display !== 'hidden' && el.style.display !== '';
+  if (el) return el.style.display !== 'none' && el.style.display !== '';
   return false;
 }
 
