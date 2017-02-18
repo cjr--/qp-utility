@@ -24,7 +24,7 @@ function make(definition) {
       });
     });
   }
-  
+
   each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
 
   each(definition, function(v, k) {
@@ -48,7 +48,9 @@ function make(definition) {
     bind(this);
     this.reset();
     this.self = ctor;
-    assign_own(this, options);
+    each_own(options, function(v, k) {
+      if (defined(v) && !is_function(this[k]) && this.hasOwnProperty(k)) this[k] = v;
+    });
     invoke(ctor.inits, this, options);
     invoke(ctor.setups, this);
   };
