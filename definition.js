@@ -74,7 +74,7 @@ module.exports = function(target) {
       'request:http_request'
     ]);
     type_definitions = type_definitions.concat([
-      'browser_socket','browser_store','viewmodel'
+      'browser_socket','browser_store'
     ]);
   }
 
