@@ -1531,7 +1531,13 @@
       this.self = ctor;
       each_own(options, function(v, k) {
         if (defined(v) && !is_function(this[k]) && this.hasOwnProperty(k)) this[k] = v;
-      });
+      }, this);
+      // assign_own(this, options);
+      // each_own(options, function(value, key) {
+      //   if (typeof value !== 'undefined' && this.hasOwnProperty(key)) {
+      //     this[key] = value;
+      //   }
+      // });
       invoke(ctor.inits, this, options);
       invoke(ctor.setups, this);
     };
