@@ -50,7 +50,7 @@ function make(definition) {
     this.self = ctor;
     each_own(options, function(v, k) {
       if (defined(v) && !is_function(this[k]) && this.hasOwnProperty(k)) this[k] = v;
-    });
+    }, this);
     invoke(ctor.inits, this, options);
     invoke(ctor.setups, this);
   };
