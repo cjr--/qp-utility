@@ -51,6 +51,8 @@ function make_browser_file(browser) {
       '    console.log.apply(console, ["%cDEBUG:", "color:black;background-color:yellow;"].concat(slice.call(arguments)));',
       '  }',
       '',
+      '  global.global = global;',
+      '',
       indent(join_files(browser.files.type_definitions, 'js')),
       '',
     '})(window);'

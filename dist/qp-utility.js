@@ -729,9 +729,10 @@
   
   function get(o, key, dfault) {
     var value = dfault;
-    if (is(o, 'object')) {
+    var path = key.split('.');
+    if (path[0] === 'global') return get(global, path.slice(1).join('.'), dfault);
+    if (is(o, 'object') || o === global) {
       var item = o;
-      var path = key.split('.');
       for (var i = 0, l = path.length; i < l; i++) {
         item = item[path[i]];
         if (item === undefined) break;
@@ -743,10 +744,11 @@
   
   function take(o, key, dfault) {
     var value = dfault;
-    if (is(o, 'object')) {
+    var path = key.split('.');
+    if (path[0] === 'global') return take(global, path.slice(1).join('.'), dfault);
+    if (is(o, 'object') || o === global) {
       var item = o;
       var last;
-      var path = key.split('.');
       for (var i = 0, l = path.length; i < l; i++) {
         last = item;
         item = item[path[i]];
@@ -762,9 +764,10 @@
   
   function has(o, key) {
     var has = false;
-    if (is(o, 'object')) {
+    var path = key.split('.');
+    if (path[0] === 'global') return has(global, path.slice(1).join('.'), dfault);
+    if (is(o, 'object') || o === global) {
       var item = o;
-      var path = key.split('.');
       for (var i = 0, l = path.length; i < l; i++) {
         var item_key = path[i];
         if (item.hasOwnProperty(item_key)) {
@@ -780,6 +783,7 @@
   function set(o, key, value) {
     var item = o;
     var path = key.split('.');
+    if (path[0] === 'global') return set(global, path.slice(1).join('.'), value);
     for (var i = 0, l = path.length; i < l; i++) {
       if (i == (l - 1)) {
         item[path[i]] = value;
@@ -1529,12 +1533,6 @@
       each_own(options, function(v, k) {
         if (defined(v) && !is_function(this[k]) && this.hasOwnProperty(k)) this[k] = v;
       }, this);
-      // assign_own(this, options);
-      // each_own(options, function(value, key) {
-      //   if (typeof value !== 'undefined' && this.hasOwnProperty(key)) {
-      //     this[key] = value;
-      //   }
-      // });
       invoke(ctor.inits, this, options);
       invoke(ctor.setups, this);
     };
@@ -2496,6 +2494,8 @@
   global.debug = function() {
     console.log.apply(console, ["%cDEBUG:", "color:black;background-color:yellow;"].concat(slice.call(arguments)));
   }
+
+  global.global = global;
 
   define(module, function(exports, require, make) {
   
