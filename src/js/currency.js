@@ -1,3 +1,4 @@
 function currency(n, currency, locale) {
-  return Number(n).toLocaleString(locale || 'en-GB', { style: 'currency', currency: currency || 'GBP' });
+  var value = Number(String(n).replace(/[^0-9.]/g, ''));
+  return value.toLocaleString(locale || 'en-GB', { style: 'currency', currency: currency || 'GBP' });
 }
