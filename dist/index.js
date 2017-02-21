@@ -1810,9 +1810,13 @@
     return d ? r / m : r;
   }
   
-  function currency(n, currency, locale) {
-    var value = Number(String(n).replace(/[^0-9.]/g, ''));
+  function currency(o, currency, locale) {
+    var value = currency_value(o);
     return value.toLocaleString(locale || 'en-GB', { style: 'currency', currency: currency || 'GBP' });
+  }
+  
+  function currency_value(o) {
+    return Number(String(o).replace(/[^0-9.]/g, ''));
   }
   
   function build_match(s) {
@@ -2010,6 +2014,7 @@
     clamp: clamp,
     round_currency: round_currency,
     currency: currency,
+    currency_value: currency_value,
     map: map,
     reduce: reduce,
     arg: arg,
