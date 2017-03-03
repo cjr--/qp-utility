@@ -21,7 +21,7 @@ module.exports = function(target) {
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
     'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
-    'collect'
+    'collect', 'filter'
   ]);
 
   css_files = css_files.concat([
@@ -52,7 +52,8 @@ module.exports = function(target) {
     'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select','collect',
-    'is_alpha_numeric','is_length'
+    'is_alpha_numeric','is_length',
+    'filter_key','filter_display','filter_predicate','filter'
   ]);
 
   if (target === 'node') {
