@@ -10,6 +10,10 @@ define(module, function(exports, require) {
   var term = require('qp-library/term');
 
   term.set_title('build @ qp-utility');
+  term.keypress((key) => {
+    if (key === 'b') build();
+    else if (key === 'esc') exit_process();
+  });
   log.clear();
   log(log.blue_white(' qp-utility '));
 
@@ -18,12 +22,16 @@ define(module, function(exports, require) {
   ]);
 
   watcher.on('change', file => {
-    if (/\.(js|css)$/.test(file)) {
-      cp.execFile('node', ['build'], (error, stdout, stderr) => {
-        console.log(stdout);
-      });
-    }
+    if (/\.(js|css)$/.test(file)) build();
   });
 
+  function build() {
+    cp.execFile('node', ['build'], (ex, out, err) => log(out));
+  }
+
+  function exit_process() {
+    watcher.close();
+    process.exit(0);
+  }
 
 });
