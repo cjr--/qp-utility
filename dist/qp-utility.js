@@ -2137,7 +2137,13 @@
   }
   
   function show(el, v) {
-    el.style.display = v || 'inline';
+    if (v === 'auto') {
+      var name = qp.lower(el.nodeName);
+      if (qp.in(name, 'span', 'a', 'button', 'img', 'textarea', 'select')) v = 'inline';
+      else if (qp.in(name, 'input')) v = 'inline-block';
+      else v = 'block';
+    }
+    el.style.display = v || 'block';
   }
   
   function hide(el, v) {
