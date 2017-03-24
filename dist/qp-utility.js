@@ -735,7 +735,7 @@
       var item = o;
       for (var i = 0, l = path.length; i < l; i++) {
         item = item[path[i]];
-        if (item === undefined) break;
+        if (item === null || item === undefined) break;
         if (i == (l - 1)) value = item;
       }
     }
@@ -2341,8 +2341,6 @@
     return select_all.apply(null, arguments)[0];
   }
   
-  global.app = { };
-  
 
   var qp = {
     noop: noop,
@@ -2655,7 +2653,7 @@
       },
   
       get_key: function(key) { return this.key + (this.ctx ? '.' + this.ctx : '') + (key ? '.' + key : ''); },
-      set_context: function(ctx) { this.ctx = ctx; },
+      set_context: function(ctx) { this.ctx = ctx || ''; },
   
       size: function() {
         var kb = 0;
@@ -2671,7 +2669,7 @@
       data: function(include_meta) {
         var data = {};
         var key = this.get_key();
-        var key_len = key.length
+        var key_len = key.length;
         qp.each_own(this.store, function(v, k) {
           if (qp.starts(k, key)) {
             var item = JSON.parse(v);

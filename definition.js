@@ -65,7 +65,7 @@ module.exports = function(target) {
     ]);
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector', 'app'
+      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector'
     ]);
     fns = fns.concat([
       'animate','debug','get_attributes','set_attributes','get_attribute','set_attribute','is_element','not_element','element','on','off','nodefault',

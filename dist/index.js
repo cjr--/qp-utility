@@ -738,7 +738,7 @@
       var item = o;
       for (var i = 0, l = path.length; i < l; i++) {
         item = item[path[i]];
-        if (item === undefined) break;
+        if (item === null || item === undefined) break;
         if (i == (l - 1)) value = item;
       }
     }
