@@ -1308,6 +1308,11 @@
   }
   
   function series(data, actions, done) {
+    var args = slice.call(arguments);
+    done = args.pop();
+    actions = args.pop();
+    data = args.pop() || {};
+  
     var results = { };
     actions = get_async_actions(actions);
     var next = function() {
@@ -1325,6 +1330,11 @@
   }
   
   function parallel(data, actions, done) {
+    var args = slice.call(arguments);
+    done = args.pop();
+    actions = args.pop();
+    data = args.pop() || {};
+  
     var results = { };
     actions = get_async_actions(actions);
     var action_count = actions.length;
@@ -2643,6 +2653,33 @@
     make({
   
       ns: 'qp-utility/store',
+  
+      self: {
+  
+        get: function() {
+          var key = qp.arg(arguments).join('.');
+          var value = window.localStorage.getItem(key);
+          if (qp.defined(value)) {
+            return JSON.parse(value);
+          }
+        },
+  
+        set: function() {
+          var args = qp.arg(arguments);
+          var value = args.pop();
+          if (qp.defined(value)) {
+            var key = args.join('.');
+            window.localStorage.setItem(key, JSON.stringify(value));
+            return value;
+          }
+        },
+  
+        remove: function() {
+          var key = qp.arg(arguments).join('.');
+          window.localStorage.removeItem(key);
+        }
+  
+      },
   
       store: null,
       key: 'qp',

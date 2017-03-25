@@ -1311,6 +1311,11 @@
   }
   
   function series(data, actions, done) {
+    var args = slice.call(arguments);
+    done = args.pop();
+    actions = args.pop();
+    data = args.pop() || {};
+  
     var results = { };
     actions = get_async_actions(actions);
     var next = function() {
@@ -1328,6 +1333,11 @@
   }
   
   function parallel(data, actions, done) {
+    var args = slice.call(arguments);
+    done = args.pop();
+    actions = args.pop();
+    data = args.pop() || {};
+  
     var results = { };
     actions = get_async_actions(actions);
     var action_count = actions.length;
