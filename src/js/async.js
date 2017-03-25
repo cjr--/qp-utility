@@ -14,6 +14,11 @@ function each_series(items, action, done) {
 }
 
 function series(data, actions, done) {
+  var args = slice.call(arguments);
+  done = args.pop();
+  actions = args.pop();
+  data = args.pop() || {};
+
   var results = { };
   actions = get_async_actions(actions);
   var next = function() {
@@ -31,6 +36,11 @@ function series(data, actions, done) {
 }
 
 function parallel(data, actions, done) {
+  var args = slice.call(arguments);
+  done = args.pop();
+  actions = args.pop();
+  data = args.pop() || {};
+
   var results = { };
   actions = get_async_actions(actions);
   var action_count = actions.length;
