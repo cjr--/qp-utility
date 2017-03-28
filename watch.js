@@ -19,9 +19,7 @@ define(module, function(exports, require) {
 
   var watcher = watch([
     path.join(process.cwd(), 'src')
-  ]);
-
-  watcher.on('change', file => {
+  ], { recursive: true }, (event_type, file) => {
     if (/\.(js|css)$/.test(file)) build();
   });
 
