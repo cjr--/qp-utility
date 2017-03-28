@@ -2764,6 +2764,10 @@
         this.store.removeItem(this.get_key(options.key));
       },
   
+      destroy: function() {
+        qp.each_own(this.store, function(v, k) { this.store.removeItem(k); }.bind(this));
+      },
+  
       // Collections
   
       find: function(options) {
