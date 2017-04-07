@@ -39,6 +39,20 @@ function set_attribute(el, attribute) {
   }
 }
 
+function remove_attribute(el, attribute) {
+  el = element(el);
+  if (el && attribute) {
+    el.removeAttribute(attribute.name || attribute);
+  }
+}
+
+function has_attribute(el, attribute) {
+  el = element(el);
+  if (el && attribute) {
+    el.hasAttribute(attribute.name || attribute);
+  }
+}
+
 function is_element(el) {
   if (el) {
     var node_type = el.nodeType;

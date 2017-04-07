@@ -10,7 +10,7 @@ define(module, function(exports, require) {
   var term = require('qp-library/term');
 
   term.set_title('build @ qp-utility');
-  term.keypress((key) => {
+  term.keypress(key => {
     if (key === 'b') build();
     else if (key === 'esc') exit_process();
   });
@@ -19,7 +19,8 @@ define(module, function(exports, require) {
 
   var watcher = watch([
     path.join(process.cwd(), 'src')
-  ], { recursive: true }, (event_type, file) => {
+  ], { recursive: true }, (type, file) => {
+    file = file || type;
     if (/\.(js|css)$/.test(file)) build();
   });
 

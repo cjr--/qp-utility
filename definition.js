@@ -24,11 +24,7 @@ module.exports = function(target) {
     'collect', 'filter'
   ]);
 
-  css_files = css_files.concat([
-    'normalize', 'base', 'code', 'form', 'misc', 'text', 'media',
-    'grid', 'grid-xs', 'grid-sm', 'grid-md', 'grid-lg',
-    'flex-grid'
-  ]);
+  css_files = css_files.concat([ ]);
 
   fns = fns.concat([
     'noop','noop_callback','escape_re','is_value','is_number','is_function','is_string','is_array','is_array_like','defined',
@@ -68,7 +64,8 @@ module.exports = function(target) {
       'debug', 'log', 'browser_request', 'dom', 'animate', 'selector'
     ]);
     fns = fns.concat([
-      'animate','debug','get_attributes','set_attributes','get_attribute','set_attribute','is_element','not_element','element','on','off','nodefault',
+      'animate','debug','get_attributes','set_attributes','get_attribute','set_attribute','has_attribute','remove_attribute',
+      'is_element','not_element','element','on','off','nodefault',
       'show','hide','visible','hidden','text','add_class','remove_class','html','swap',
       'set_style','get_style','attr','has_attr',
       'parents_until','ready', 'select_all','select_children','matches','select_each','select_first',
