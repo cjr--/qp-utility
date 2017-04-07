@@ -2101,6 +2101,20 @@
     }
   }
   
+  function remove_attribute(el, attribute) {
+    el = element(el);
+    if (el && attribute) {
+      el.removeAttribute(attribute.name || attribute);
+    }
+  }
+  
+  function has_attribute(el, attribute) {
+    el = element(el);
+    if (el && attribute) {
+      el.hasAttribute(attribute.name || attribute);
+    }
+  }
+  
   function is_element(el) {
     if (el) {
       var node_type = el.nodeType;
@@ -2535,6 +2549,8 @@
     set_attributes: set_attributes,
     get_attribute: get_attribute,
     set_attribute: set_attribute,
+    has_attribute: has_attribute,
+    remove_attribute: remove_attribute,
     is_element: is_element,
     not_element: not_element,
     element: element,
