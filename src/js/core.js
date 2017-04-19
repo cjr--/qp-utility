@@ -36,4 +36,6 @@ function empty(o) {
 
 function not_empty(o) { return !empty(o); }
 
+function not(o) { return o === false; }
+
 function dfault(value, dfault_value) { return not_defined(value) ? dfault_value : value; }
