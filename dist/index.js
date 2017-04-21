@@ -1418,7 +1418,7 @@
   }
   
   function all(items, arg1, arg2) {
-    return find(items, arg1, arg2, { find_all: true }).length !== items.length;
+    return find(items, arg1, arg2, { find_all: true }).length === items.length;
   }
   
   function none(items, arg1, arg2) {
