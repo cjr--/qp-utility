@@ -34,8 +34,8 @@ function find(items, arg1, arg2, options) {
         }
       }
       if (options.remove || options.remove_all) {
-        for (var j = 0, jl = match_index.length; j < jl; j++) {
-          items.splice(match_index[j], 1);
+        while (match_index.length) {
+          items.splice(match_index.pop(), 1);
         }
       }
     }
