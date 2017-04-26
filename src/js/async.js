@@ -58,7 +58,11 @@ function parallel(data, actions, done) {
 
 function get_async_actions(o) {
   if (is(o, 'array')) {
-    return o;
+    if (is(o[0], 'function')) {
+      return qp.map(o, function(fn, index) { return { name: index, fn: fn }; });
+    } else {
+      return o;
+    }
   } else if (is(o, 'object')) {
     return map(o, function(fn, name) { return { name: name, fn: fn }; });
   }
