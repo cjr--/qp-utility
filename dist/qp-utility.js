@@ -116,7 +116,7 @@
   
   function plural(o, prefix, single, multi, suffix) {
     var size = size(o);
-    return size + ' ' + (prefix || '') + (size > 1 ? multi : single) + (suffix || '');
+    return size + ' ' + (prefix + ' ' || '') + (size > 1 ? multi : single) + (suffix || '');
   }
   
   function escape(s) {
@@ -841,10 +841,10 @@
   }
   
   function qp_typeof(o, ctor) {
-    var type = to_string.call(o).slice(8, -1).toLowerCase();
+    var type = lower(to_string.call(o).slice(8, -1));
     if (ctor && type === 'object') {
       if (o.constructor) {
-        type = get_fn_name(o.constructor).toLowerCase();
+        type = lower(get_fn_name(o.constructor));
         return type === 'object' ? 'pojo' : type;
       } else {
         return 'pojo';
@@ -859,7 +859,7 @@
       var args = rest(arguments);
       return args.indexOf(type) != -1 || (type === 'object' && args.indexOf(qp_typeof(o, true)));
     } else {
-      return type === o_class || (type === 'object' && qp_typeof(o, true) === o_class);
+      return type === o_class || (type === 'object' && qp_typeof(o, true) === lower(o_class));
     }
   }
   
