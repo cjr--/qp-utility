@@ -68,7 +68,7 @@ function build() {
 
 function plural(o, prefix, single, multi, suffix) {
   var size = size(o);
-  return size + ' ' + (prefix || '') + (size > 1 ? multi : single) + (suffix || '');
+  return size + ' ' + (prefix + ' ' || '') + (size > 1 ? multi : single) + (suffix || '');
 }
 
 function escape(s) {
