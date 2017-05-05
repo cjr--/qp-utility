@@ -1299,6 +1299,7 @@
   }
   
   function each_series(items, action, done) {
+    items = [].concat(items);
     var results = [ ];
     var next = function() {
       if (items.length) {
