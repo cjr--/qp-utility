@@ -1,3 +1,7 @@
+function empty_or_whitespace(o) {
+  return empty(o) || (is_string(o) && o.replace(/\s/g, '').length === 0);
+}
+
 function lower(s) {
   return String(s).toLocaleLowerCase();
 }
