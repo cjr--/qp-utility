@@ -11,6 +11,8 @@ function noop_callback(data, done) { invoke_next(done, null, data); }
 
 function is_value(o) { return typeof o !== 'undefined' && o !== null; }
 
+function is_boolean(o) { return typeof o === 'boolean'; }
+
 function is_number(o) { return o - parseFloat(o) >= 0; }
 
 function is_string(o) { return typeof o === 'string'; }
@@ -38,4 +40,6 @@ function not_empty(o) { return !empty(o); }
 
 function not(o) { return o === false; }
 
-function dfault(value, dfault_value) { return not_defined(value) ? dfault_value : value; }
+function dfault(value, dfault) { return not_defined(value) ? dfault : value; }
+
+function boolean(value, dfault) { return is_boolean(value) ? value : dfault; }
