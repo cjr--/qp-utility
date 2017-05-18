@@ -1,3 +1,5 @@
+/* eslint indent: 0 */
+
 var fs = require('fs');
 var uglify = require('uglify-js');
 var CleanCSS = require('clean-css');

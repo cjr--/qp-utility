@@ -20,6 +20,8 @@
   
   function is_value(o) { return typeof o !== 'undefined' && o !== null; }
   
+  function is_boolean(o) { return typeof o === 'boolean'; }
+  
   function is_number(o) { return o - parseFloat(o) >= 0; }
   
   function is_string(o) { return typeof o === 'string'; }
@@ -47,7 +49,13 @@
   
   function not(o) { return o === false; }
   
-  function dfault(value, dfault_value) { return not_defined(value) ? dfault_value : value; }
+  function dfault(value, dfault) { return not_defined(value) ? dfault : value; }
+  
+  function boolean(value, dfault) { return is_boolean(value) ? value : dfault; }
+  
+  function empty_or_whitespace(o) {
+    return empty(o) || (is_string(o) && o.replace(/\s/g, '').length === 0);
+  }
   
   function lower(s) {
     return String(s).toLocaleLowerCase();
@@ -2082,6 +2090,61 @@
     }
   }
   
+  function watch(target, on_change) {
+    each_own(target, function(value, key) {
+      watch_property(target, key, on_change);
+      if (is(value, 'object')) watch(value, on_change);
+    });
+    return target;
+  }
+  
+  function unwatch(target) {
+    each_own(target, function(value, key) {
+      unwatch_property(target, key);
+      if (is(value, 'object')) unwatch(value);
+    });
+    return target;
+  }
+  
+  function watch_property(target, key, on_change) {
+    var value = target[key];
+    if (delete target[key]) {
+      Object.defineProperty(target, key, {
+        enumerable: true,
+        configurable: true,
+        get: function() { return value; },
+        set: function(new_value) {
+          var old_value = value;
+          if (qp.is(new_value, 'object')) watch(new_value, on_change);
+          value = new_value;
+          on_change.call(target, key, new_value, old_value);
+        }
+      });
+    }
+  }
+  
+  function unwatch_property(target, key) {
+    var value = target[key];
+    delete target[key];
+    target[key] = value;
+  }
+  
+  function define_property(target, key, on_change) {
+    var value = target[key];
+    if (delete target[key]) {
+      Object.defineProperty(target, key, {
+        enumerable: true,
+        configurable: true,
+        get: function() { return value; },
+        set: function(new_value) {
+          var old_value = value;
+          value = new_value;
+          on_change.call(target, key, new_value, old_value);
+        }
+      });
+    }
+  }
+  
   function http_request(options) {
     options.done = options.done || noop;
     if (options.bind) options.done.bind(options.bind);
@@ -2148,6 +2211,7 @@
     noop_callback: noop_callback,
     escape_re: escape_re,
     is_value: is_value,
+    is_boolean: is_boolean,
     is_number: is_number,
     is_function: is_function,
     is_string: is_string,
@@ -2157,10 +2221,12 @@
     undefined: not_defined,
     random: random,
     dfault: dfault,
+    boolean: boolean,
     no: empty,
     not: not,
     empty: empty,
     not_empty: not_empty,
+    empty_or_whitespace: empty_or_whitespace,
     upper: upper,
     lower: lower,
     trim: trim,
@@ -2326,6 +2392,11 @@
     filter_display: filter_display,
     filter_predicate: filter_predicate,
     filter: filter,
+    define_property: define_property,
+    watch: watch,
+    unwatch: unwatch,
+    watch_property: watch_property,
+    unwatch_property: unwatch_property,
     request: http_request
   };
 

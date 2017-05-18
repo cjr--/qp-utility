@@ -21,14 +21,15 @@ module.exports = function(target) {
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
     'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
-    'collect', 'filter'
+    'collect', 'filter', 'watch', 'define_property'
   ]);
 
   css_files = css_files.concat([ ]);
 
   fns = fns.concat([
-    'noop','noop_callback','escape_re','is_value','is_number','is_function','is_string','is_array','is_array_like','defined',
-    'undefined:not_defined','random','dfault','no:empty','not','empty','not_empty','upper','lower','trim',
+    'noop','noop_callback','escape_re','is_value','is_boolean','is_number','is_function','is_string','is_array','is_array_like','defined',
+    'undefined:not_defined','random','dfault','boolean','no:empty','not','empty','not_empty',
+    'empty_or_whitespace','upper','lower','trim',
     'ltrim','rtrim','split','join','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
     'ends','between','before','before_last','after','after_last','title_case','to_title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',
@@ -49,7 +50,8 @@ module.exports = function(target) {
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select','collect',
     'is_alpha_numeric','is_length',
-    'filter_key','filter_display','filter_predicate','filter'
+    'filter_key','filter_display','filter_predicate','filter',
+    'define_property','watch','unwatch','watch_property','unwatch_property'
   ]);
 
   if (target === 'node') {
