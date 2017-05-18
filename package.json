@@ -1,6 +1,6 @@
 {
   "name": "qp-utility",
-  "version": "1.3.8",
+  "version": "1.3.9",
   "author": "CJR",
   "license": "MIT",
   "description": "javascript utilities for server (v8) and modern browsers",
