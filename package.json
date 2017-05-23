@@ -15,10 +15,10 @@
   "homepage": "https://github.com/cjr--/qp-utility",
   "devDependencies": {
     "node-watch": "^0.x",
-    "qp-library": "^1.x",
+    "qp-library": "^2.x",
     "uglify-js": "^3.x"
   },
   "dependencies": {
-    "qp-define": "^1.x"
+    "qp-define": "^2.x"
   }
 }
