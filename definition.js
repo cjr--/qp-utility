@@ -20,7 +20,7 @@ module.exports = function(target) {
   js_files = js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
-    'iteration', 'async', 'find', 'id', 'make', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
+    'iteration', 'async', 'find', 'id', 'make', 'module', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
     'collect', 'filter', 'watch', 'define_property'
   ]);
 
@@ -41,7 +41,7 @@ module.exports = function(target) {
     'combine','done','bind','partial','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle','patch',
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',
     'assign_own','assign_if','eq','neq','clone','copy','merge','extend','override',
-    'make','first','last','rest','at','range','in:_in','not_in','find_predicate',
+    'make','module:_module','first','last','rest','at','range','in:_in','not_in','find_predicate',
     'find','any','find_all','find_last','find_last_index','find_index','remove','remove_all','pick_predicate',
     'pick','pick_own','pairs','keys','values','pick_values','sort','get_comparer','group','ungroup','ns',
     'options:qp_options','id:qp_id','uuid','get','take','has','set',

@@ -1,4 +1,4 @@
-function make(definition) {
+function make(_exports, definition) {
   var name = definition.ns.split('/').pop().toLowerCase();
   /*jslint evil: true*/
   var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
@@ -55,5 +55,5 @@ function make(definition) {
     invoke(ctor.setups, this);
   };
 
-  return ctor;
+  return _exports(ctor.ns, ctor);
 }

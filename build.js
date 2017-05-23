@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var uglify = require('uglify-js');
-var CleanCSS = require('clean-css');
 var path = require('path');
 var definition = require('./definition');
 
@@ -12,8 +11,6 @@ var node = definition('node');
 write_file('index.js', make_node_file(node));
 write_file('qp-utility.js', make_browser_file(browser));
 write_file('qp-utility.min.js', make_min_file('qp-utility.js'));
-write_file('qp-utility.css', join_files(browser.files.css, 'css'));
-write_file('qp-utility.min.css', make_min_file('qp-utility.css'));
 
 function make_node_file(node) {
   return [
@@ -62,25 +59,20 @@ function make_browser_file(browser) {
 }
 
 function make_min_file(filename) {
-  var ext = path.extname(filename);
-  if (ext === '.js') {
-    var min = uglify.minify(path.join('dist', filename), { compress: { dead_code: false, unused: false } });
-    return min.code;
-  } else if (ext === '.css') {
-    var css = fs.readFileSync(path.join(__dirname, 'dist', filename), 'utf8');
-    return new CleanCSS().minify(css).styles;
-  }
-  return '';
+  return uglify.minify(
+    fs.readFileSync(path.join(__dirname, 'dist', filename), 'utf8'),
+    { compress: { dead_code: false, unused: false } }
+  ).code;
 }
 
 function join_files(files, ext) {
   return files.map(function(file) {
-    return read_file(file + '.' + ext, ext);
+    return read_file(file + '.' + ext);
   }).join('\n');
 }
 
-function read_file(file, type) {
-  return fs.readFileSync(path.join(__dirname, 'src', type, file), 'utf8');
+function read_file(file) {
+  return fs.readFileSync(path.join(__dirname, 'src', file), 'utf8');
 }
 
 function write_file(file, data) {

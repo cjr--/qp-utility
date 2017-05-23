@@ -98,20 +98,35 @@ function replace(items, arg1, arg2, item) {
   return index !== -1;
 }
 
-function upsert(items, arg1, arg2, item) {
-  if (is(items, 'array') && is(item, 'object')) {
-    var index = find(items, arg1, arg2, { index: true });
-    if (index !== -1) {
-      var target = items[index];
-      each_own(item, function(v, k) {
-        if (target.hasOwnProperty(k) && target[k] !== v) {
-          target[k] = v;
-        }
-      });
-    } else {
-      items.push(item);
+function upsert(items) {
+  if (is(items, 'array')) {
+    var args = qp.arg(arguments);
+    var arg1, arg2, item;
+    if (args.length === 2 && is(args[1], 'object')) {
+      item = args[1];
+      arg1 = { id: item.id };
+    } else if (args.length === 3) {
+      arg1 = args[1];
+      item = args[2];
+    } else if (args.length === 4) {
+      arg1 = args[1];
+      arg2 = args[2];
+      item = args[3];
     }
-    return true;
+    if (is(item, 'object')) {
+      var index = find(items, arg1, arg2, { index: true });
+      if (index === -1) {
+        items.push(item);
+      } else {
+        var target = items[index];
+        each_own(item, function(v, k) {
+          if (target.hasOwnProperty(k) && target[k] !== v) {
+            target[k] = v;
+          }
+        });
+      }
+      return true;
+    }
   }
   return false;
 }

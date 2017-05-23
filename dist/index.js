@@ -1480,20 +1480,35 @@
     return index !== -1;
   }
   
-  function upsert(items, arg1, arg2, item) {
-    if (is(items, 'array') && is(item, 'object')) {
-      var index = find(items, arg1, arg2, { index: true });
-      if (index !== -1) {
-        var target = items[index];
-        each_own(item, function(v, k) {
-          if (target.hasOwnProperty(k) && target[k] !== v) {
-            target[k] = v;
-          }
-        });
-      } else {
-        items.push(item);
+  function upsert(items) {
+    if (is(items, 'array')) {
+      var args = qp.arg(arguments);
+      var arg1, arg2, item;
+      if (args.length === 2 && is(args[1], 'object')) {
+        item = args[1];
+        arg1 = { id: item.id };
+      } else if (args.length === 3) {
+        arg1 = args[1];
+        item = args[2];
+      } else if (args.length === 4) {
+        arg1 = args[1];
+        arg2 = args[2];
+        item = args[3];
       }
-      return true;
+      if (is(item, 'object')) {
+        var index = find(items, arg1, arg2, { index: true });
+        if (index === -1) {
+          items.push(item);
+        } else {
+          var target = items[index];
+          each_own(item, function(v, k) {
+            if (target.hasOwnProperty(k) && target[k] !== v) {
+              target[k] = v;
+            }
+          });
+        }
+        return true;
+      }
     }
     return false;
   }
@@ -1512,7 +1527,7 @@
     return _uuid;
   }
   
-  function make(definition) {
+  function make(_exports, definition) {
     var name = definition.ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
     var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
@@ -1569,7 +1584,33 @@
       invoke(ctor.setups, this);
     };
   
-    return ctor;
+    return _exports(ctor.ns, ctor);
+  }
+  
+  function _module(_exports) {
+    var args = slice.call(arguments, 1);
+    var id;
+    if (is(args[0], 'string')) id = args.shift();
+    var _export = args.shift();
+    for (var i = args.length, l = 0; i >= l; i--) {
+      for (var key in args[i]) {
+        if (args[i].hasOwnProperty(key)) _export[key] = args[i][key];
+      }
+    }
+    
+    if (_export.ns) {
+      id = _export.ns;
+    } else if (id) {
+      _export.ns = id;
+    }
+  
+    if (_export) {
+      for (var k in _export) {
+        if (typeof _export[k] === 'function' && _export.hasOwnProperty(k)) _export[k] = _export[k].bind(_export);
+      }
+      if (_export.init) _export.init();
+      return _exports(id, _export);
+    }
   }
   
   var sort = (function() {
@@ -2324,6 +2365,7 @@
     extend: extend,
     override: override,
     make: make,
+    module: _module,
     first: first,
     last: last,
     rest: rest,

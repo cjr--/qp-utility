@@ -1,8 +1,8 @@
-define(module, function(exports, require, make) {
+define(module, function(exports, require) {
 
   var qp = require('qp-utility');
 
-  make({
+  qp.make(exports, {
 
     ns: 'qp-utility/websocket',
 
