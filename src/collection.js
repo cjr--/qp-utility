@@ -52,13 +52,3 @@ function contains(o) {
 function inlist(o) {
   return rest(arguments).indexOf(o) !== -1;
 }
-
-function pick_path(o) {
-  var keys = flatten(rest(arguments));
-  var output = {};
-  for (var i = 0, l = keys.length; i < l; i++) {
-    var key = keys[i];
-    ns(o, key, ns(o, key));
-  }
-  return output;
-}

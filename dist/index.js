@@ -747,8 +747,7 @@
   function get(o, key, dfault) {
     var value = dfault;
     var path = key.split('.');
-    if (path[0] === 'global') return get(global, path.slice(1).join('.'), dfault);
-    if (is(o, 'object') || o === global) {
+    if (is(o, 'object')) {
       var item = o;
       for (var i = 0, l = path.length; i < l; i++) {
         item = item[path[i]];
@@ -762,8 +761,7 @@
   function take(o, key, dfault) {
     var value = dfault;
     var path = key.split('.');
-    if (path[0] === 'global') return take(global, path.slice(1).join('.'), dfault);
-    if (is(o, 'object') || o === global) {
+    if (is(o, 'object')) {
       var item = o;
       var last;
       for (var i = 0, l = path.length; i < l; i++) {
@@ -782,8 +780,7 @@
   function has(o, key) {
     var has = false;
     var path = key.split('.');
-    if (path[0] === 'global') return has(global, path.slice(1).join('.'), dfault);
-    if (is(o, 'object') || o === global) {
+    if (is(o, 'object')) {
       var item = o;
       for (var i = 0, l = path.length; i < l; i++) {
         var item_key = path[i];
@@ -800,7 +797,6 @@
   function set(o, key, value) {
     var item = o;
     var path = key.split('.');
-    if (path[0] === 'global') return set(global, path.slice(1).join('.'), value);
     for (var i = 0, l = path.length; i < l; i++) {
       if (i == (l - 1)) {
         item[path[i]] = value;
@@ -955,23 +951,6 @@
     return _equals(o1, o2);
   }
   
-  function extend(a, b) {
-    if (is_function(b)) {
-      b = b.apply(null, slice.call(arguments, 2));
-    }
-    for (var key in b) {
-      if (b.hasOwnProperty(key)) {
-        var v = b[key];
-        if (is_function(v)) {
-          a[key] = v.bind(a);
-        } else {
-          a[key] = v;
-        }
-      }
-    }
-    return a;
-  }
-  
   function merge(target, source, override) {
     function _merge(a, b) {
       var type_a = qp_typeof(a);
@@ -1015,22 +994,6 @@
     return _merge(target, source);
   }
   
-  function ns(scope, _ns, value) {
-    scope = scope || global;
-    var setter = arguments.length === 3;
-    each(_ns.split('.'), function(part, index, parts) {
-      if (setter && index === parts.length - 1) {
-        if (!scope[part]) {
-          scope[part] = {};
-        }
-        scope = (scope[part] = value);
-      } else {
-        scope = scope[part] || (scope[part] = {});
-      }
-    });
-    return scope;
-  }
-  
   function qp_options(_options, defaults) {
     if (is(_options, 'object') && is(defaults, 'object')) {
       each_own(defaults, function(v, k) {
@@ -1046,81 +1009,6 @@
   
   function override(target, source) {
     return merge(target, source, true); 
-  }
-  
-  function pick_predicate() {
-    if (is_function(arguments[0])) {
-      return arguments[1] ? arguments[0].bind(arguments[1]) : arguments[0];
-    } else {
-      var picks = flatten(slice.call(arguments));
-      return function(v, k, o) { return picks.indexOf(k) !== -1; };
-    }
-    return undefined;
-  }
-  
-  function _pick(o, predicate, options) {
-    options = options || {};
-    if (predicate) {
-      var output = {};
-      for (var key in o) {
-        if (!options.own || o.hasOwnProperty(key)) {
-          if (predicate(o[key], key, o)) {
-            output[key] = o[key];
-          }
-        }
-      }
-      return output;
-    }
-    return undefined;
-  }
-  
-  function pick(o) {
-    return _pick(o, pick_predicate.apply(null, rest(arguments)));
-  }
-  
-  function pick_own(o) {
-    return _pick(o, pick_predicate.apply(null, rest(arguments)), { own: true });
-  }
-  
-  function pairs(o) {
-    var _pairs = [];
-    if (is(o, 'object')) {
-      each_own(o, function(v, k) { _pairs.push([k, v]); });
-    }
-    return _pairs;
-  }
-  
-  function keys(o) {
-    var _keys = [];
-    for (var key in o) {
-      if (o.hasOwnProperty(key)) {
-        _keys.push(key);
-      }
-    }
-    return _keys;
-  }
-  
-  function values(o) {
-    var _values = [];
-    for (var key in o) {
-      if (o.hasOwnProperty(key)) {
-        _values.push(o[key]);
-      }
-    }
-    return _values;
-  }
-  
-  function pick_values(o) {
-    var keys = flatten(rest(arguments));
-    var output = [];
-    for (var key in o) {
-      if (o.hasOwnProperty(key)) {
-        if (keys.indexOf(key) !== -1) {
-          output.push(o[key]);
-        }
-      }
-    }
-    return output;
   }
   
   function get_data(original) {
@@ -1232,16 +1120,6 @@
   
   function inlist(o) {
     return rest(arguments).indexOf(o) !== -1;
-  }
-  
-  function pick_path(o) {
-    var keys = flatten(rest(arguments));
-    var output = {};
-    for (var i = 0, l = keys.length; i < l; i++) {
-      var key = keys[i];
-      ns(o, key, ns(o, key));
-    }
-    return output;
   }
   
   function size(o) {
@@ -2067,14 +1945,6 @@
     return false;
   }
   
-  function collect(items, fn, scope) {
-    var out = [];
-    for (var i = 0, l = items.length; i < l; i++) {
-      fn.call(scope, items[i], out);
-    }
-    return out;
-  }
-  
   function filter_key() {
     var key = '';
     if (is(arguments[0], 'array')) {
@@ -2362,7 +2232,6 @@
     clone: clone,
     copy: copy,
     merge: merge,
-    extend: extend,
     override: override,
     make: make,
     module: _module,
@@ -2382,18 +2251,10 @@
     find_index: find_index,
     remove: remove,
     remove_all: remove_all,
-    pick_predicate: pick_predicate,
-    pick: pick,
-    pick_own: pick_own,
-    pairs: pairs,
-    keys: keys,
-    values: values,
-    pick_values: pick_values,
     sort: sort,
     get_comparer: get_comparer,
     group: group,
     ungroup: ungroup,
-    ns: ns,
     options: qp_options,
     id: qp_id,
     uuid: uuid,
@@ -2411,7 +2272,6 @@
     load: load,
     contains: contains,
     inlist: inlist,
-    pick_path: pick_path,
     get_data: get_data,
     set_data: set_data,
     count: count,
@@ -2427,7 +2287,6 @@
     delete_key: delete_key,
     delete: qp_delete,
     select: select,
-    collect: collect,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
     filter_key: filter_key,

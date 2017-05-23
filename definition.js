@@ -19,9 +19,9 @@ module.exports = function(target) {
 
   js_files = js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
-    'clone', 'copy', 'equals', 'extend', 'merge', 'ns', 'options', 'override', 'pick', 'data', 'collection',
+    'clone', 'copy', 'equals', 'merge', 'options', 'override', 'data', 'collection',
     'iteration', 'async', 'find', 'id', 'make', 'module', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
-    'collect', 'filter', 'watch', 'define_property'
+    'filter', 'watch', 'define_property'
   ]);
 
   css_files = css_files.concat([ ]);
@@ -40,15 +40,15 @@ module.exports = function(target) {
     'now','date','date_time','file_date','get_fn_name','timer',
     'combine','done','bind','partial','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle','patch',
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',
-    'assign_own','assign_if','eq','neq','clone','copy','merge','extend','override',
+    'assign_own','assign_if','eq','neq','clone','copy','merge','override',
     'make','module:_module','first','last','rest','at','range','in:_in','not_in','find_predicate',
-    'find','any','find_all','find_last','find_last_index','find_index','remove','remove_all','pick_predicate',
-    'pick','pick_own','pairs','keys','values','pick_values','sort','get_comparer','group','ungroup','ns',
+    'find','any','find_all','find_last','find_last_index','find_index','remove','remove_all',
+    'sort','get_comparer','group','ungroup',
     'options:qp_options','id:qp_id','uuid','get','take','has','set',
     'each_series','series','parallel',
-    'union','unique','clear','push','load','contains','inlist','pick_path','get_data',
+    'union','unique','clear','push','load','contains','inlist','get_data',
     'set_data','count','all','none','exists','replace','upsert',
-    'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select','collect',
+    'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select',
     'is_alpha_numeric','is_length',
     'filter_key','filter_display','filter_predicate','filter',
     'define_property','watch','unwatch','watch_property','unwatch_property'
@@ -63,10 +63,10 @@ module.exports = function(target) {
     ]);
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'debug', 'log', 'browser_request', 'dom', 'animate', 'selector'
+      'debug', 'log', 'browser_request', 'dom', 'selector'
     ]);
     fns = fns.concat([
-      'animate','debug','get_attributes','set_attributes','get_attribute','set_attribute','has_attribute','remove_attribute',
+      'debug','get_attributes','set_attributes','get_attribute','set_attribute','has_attribute','remove_attribute',
       'is_element','not_element','element','on','off','nodefault',
       'show','hide','visible','hidden','text','add_class','remove_class','html','swap',
       'set_style','get_style','attr','has_attr',

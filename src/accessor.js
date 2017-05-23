@@ -1,8 +1,7 @@
 function get(o, key, dfault) {
   var value = dfault;
   var path = key.split('.');
-  if (path[0] === 'global') return get(global, path.slice(1).join('.'), dfault);
-  if (is(o, 'object') || o === global) {
+  if (is(o, 'object')) {
     var item = o;
     for (var i = 0, l = path.length; i < l; i++) {
       item = item[path[i]];
@@ -16,8 +15,7 @@ function get(o, key, dfault) {
 function take(o, key, dfault) {
   var value = dfault;
   var path = key.split('.');
-  if (path[0] === 'global') return take(global, path.slice(1).join('.'), dfault);
-  if (is(o, 'object') || o === global) {
+  if (is(o, 'object')) {
     var item = o;
     var last;
     for (var i = 0, l = path.length; i < l; i++) {
@@ -36,8 +34,7 @@ function take(o, key, dfault) {
 function has(o, key) {
   var has = false;
   var path = key.split('.');
-  if (path[0] === 'global') return has(global, path.slice(1).join('.'), dfault);
-  if (is(o, 'object') || o === global) {
+  if (is(o, 'object')) {
     var item = o;
     for (var i = 0, l = path.length; i < l; i++) {
       var item_key = path[i];
@@ -54,7 +51,6 @@ function has(o, key) {
 function set(o, key, value) {
   var item = o;
   var path = key.split('.');
-  if (path[0] === 'global') return set(global, path.slice(1).join('.'), value);
   for (var i = 0, l = path.length; i < l; i++) {
     if (i == (l - 1)) {
       item[path[i]] = value;
