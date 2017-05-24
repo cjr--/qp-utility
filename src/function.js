@@ -31,9 +31,7 @@ function done() {
 function bind(o) {
   if (arguments.length === 1 || (arguments.length === 2 && is(arguments[1], 'object'))) {
     var scope = arguments[1] || o;
-    each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
-      o[k] = v.bind(scope);
-    });
+    each(o, function(v, k) { if (is(v, 'function')) o[k] = v.bind(scope); });
   } else {
     each(rest(arguments), function(v, k) {
       o[k] = v.bind(o);

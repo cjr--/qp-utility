@@ -639,9 +639,7 @@
   function bind(o) {
     if (arguments.length === 1 || (arguments.length === 2 && is(arguments[1], 'object'))) {
       var scope = arguments[1] || o;
-      each(pick(o, function(v) { return is(v, 'function'); }), function(v, k) {
-        o[k] = v.bind(scope);
-      });
+      each(o, function(v, k) { if (is(v, 'function')) o[k] = v.bind(scope); });
     } else {
       each(rest(arguments), function(v, k) {
         o[k] = v.bind(o);
@@ -1258,12 +1256,18 @@
     }
   }
   
+  function pick(o1, keys) {
+    var o2 = { };
+    each(keys, function(k) { o2[k] = o1[k]; });
+    return o2;
+  }
+  
   function find_predicate(arg1, arg2) {
     var predicate;
     if (is(arg1, 'function')) {
       predicate = not_empty(arg2) ? arg1.bind(arg2) : arg1;
     } else if (is(arg1, 'object')) {
-      var object_keys = keys(arg1);
+      var object_keys = Object.keys(arg1);
       predicate = function(item, index, items) {
         return eq(pick(item, object_keys), arg1);
       };
