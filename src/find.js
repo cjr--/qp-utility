@@ -1,9 +1,3 @@
-function pick(o1, keys) {
-  var o2 = { };
-  each(keys, function(k) { o2[k] = o1[k]; });
-  return o2;
-}
-
 function find_predicate(arg1, arg2) {
   var predicate;
   if (is(arg1, 'function')) {

@@ -304,6 +304,14 @@ function format(s, o, options) {
   }
 }
 
+function pairs(o) {
+  var _pairs = [];
+  if (is(o, 'object')) {
+    each_own(o, function(v, k) { _pairs.push([k, v]); });
+  }
+  return _pairs;
+}
+
 function stringify(o, options) {
   if (qp.is(options, 'string') && options === 'json') {
     return JSON.stringify(o, null, '  ');

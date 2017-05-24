@@ -20,7 +20,7 @@ module.exports = function(target) {
   js_files = js_files.concat([
     'core', 'string', 'array', 'object', 'date', 'function', 'accessor', 'assign', 'typeof',
     'clone', 'copy', 'equals', 'merge', 'options', 'override', 'data', 'collection',
-    'iteration', 'async', 'find', 'id', 'make', 'module', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
+    'iteration', 'async', 'pick', 'find', 'id', 'make', 'module', 'sort', 'group', 'math', 'currency', 'match', 'select', 'validate',
     'filter', 'watch', 'define_property'
   ]);
 
@@ -45,7 +45,7 @@ module.exports = function(target) {
     'find','any','find_all','find_last','find_last_index','find_index','remove','remove_all',
     'sort','get_comparer','group','ungroup',
     'options:qp_options','id:qp_id','uuid','get','take','has','set',
-    'each_series','series','parallel',
+    'each_series','series','parallel','pick',
     'union','unique','clear','push','load','contains','inlist','get_data',
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select',
