@@ -189,7 +189,8 @@
   }
   
   function after(s, str) {
-    return s.slice(s.indexOf(str) + str.length);
+    var i = s.indexOf(str);
+    return i === -1 ? s : s.slice(i + str.length);
   }
   
   function after_last(s, str) {
@@ -1264,10 +1265,14 @@
     }
   }
   
-  function pick(o1, keys) {
-    var o2 = { };
-    each(keys, function(k) { o2[k] = o1[k]; });
-    return o2;
+  function pick(source, o) {
+    var target = { };
+    if (is(o, 'array')) {
+      each(o, function(k) { if (source.hasOwnProperty(k)) target[k] = source[k]; });
+    } else if (is(o, 'function')) {
+      each_own(source, function(v, k) { if (o(v, k, i)) target[k] = v; });
+    }
+    return target;
   }
   
   function find_predicate(arg1, arg2) {

@@ -134,7 +134,8 @@ function before_last(s, str) {
 }
 
 function after(s, str) {
-  return s.slice(s.indexOf(str) + str.length);
+  var i = s.indexOf(str);
+  return i === -1 ? s : s.slice(i + str.length);
 }
 
 function after_last(s, str) {
