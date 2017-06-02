@@ -66,8 +66,7 @@
     if (s === undefined || s === null) {
       return '';
     } else if (chars === undefined || chars === null) {
-      var trim_re = /(^\s+|\s+$)/g;
-      return String(s).replace(trim_re, '');
+      return String(s).replace(/(^\s+|\s+$)/g, '');
     } else {
       chars = escape_re(chars);
       return String(s).replace(new RegExp('^' + chars + '+|' + chars + '+$', 'g'), '');
@@ -75,20 +74,22 @@
   }
   
   function ltrim(s, chars) {
-    chars = chars ? escape_re(chars) : ' ';
     if (s === undefined || s === null) {
       return '';
+    } else if (chars === undefined || chars === null) {
+      return String(s).replace(/^\s+/, '');
     } else {
-      return String(s).replace(new RegExp('^' + chars + '+'), '');
+      return String(s).replace(new RegExp('^' + escape_re(chars) + '+'), '');
     }
   }
   
   function rtrim(s, chars) {
-    chars = chars ? escape_re(chars) : ' ';
     if (s === undefined || s === null) {
       return '';
+    } else if (chars === undefined || chars === null) {
+      return String(s).replace(/\s+$/, '');
     } else {
-      return String(s).replace(new RegExp(chars + '+$'), '');
+      return String(s).replace(new RegExp(escape_re(chars) + '+$'), '');
     }
   }
   
