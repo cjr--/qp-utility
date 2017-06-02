@@ -71,8 +71,8 @@ function build() {
 }
 
 function plural(o, prefix, single, multi, suffix) {
-  var size = size(o);
-  return size + ' ' + (prefix + ' ' || '') + (size > 1 ? multi : single) + (suffix || '');
+  var _size = size(o);
+  return _size + ' ' + (prefix + ' ' || '') + (_size > 1 ? multi : single) + (' ' + suffix || '');
 }
 
 function escape(s) {
@@ -322,10 +322,14 @@ function stringify(o, options) {
       return empty(o) ? '' : '{ ' + pairs(o).map(function(pair) {
         var value = pair[1];
         var type = qp_typeof(value);
-        if (type === 'function') value = value.name || 'fn';
-        if (type === 'array') value = '[ ' + value.length + ' ]';
-        if (type === 'object') {
-          if (empty(value)) value = '{ }'; else value = '{ … }';
+        if (type === 'function') { value = value.name || 'fn';
+        } else if (type === 'array') { value = '[ ' + value.length + ' ]';
+        } else if (type === 'string') {
+          if (value.length > 79) value = value.slice(0, 79) + '…';
+        } else if (type === 'object') {
+          if (empty(value)) value = '{ }';
+          else if (value.id) value = '{ id: ' + value.id + ' }';
+          else value = '{ … }';
         }
         return pair[0] + ': ' + value;
       }).join(', ') + ' }';
