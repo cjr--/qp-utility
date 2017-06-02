@@ -18,14 +18,14 @@ function series(data, actions, done) {
   var args = slice.call(arguments);
   done = args.pop();
   actions = args.pop();
-  data = args.pop() || {};
+  data = args.pop() || null;
 
   var results = { };
   actions = get_async_actions(actions);
   var next = function() {
     var action = actions.shift();
     if (action) {
-      action.fn(null, function(error, result) {
+      action.fn(data, function(error, result) {
         results[action.name] = result;
         if (error) done(error, results); else next();
       });
