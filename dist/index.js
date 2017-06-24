@@ -223,7 +223,7 @@
       } else if (chr === sep) {
         out += s[++i].toUpperCase();
       } else {
-        out += chr;
+        out += chr.toLowerCase();
       }
     }
     return out;
@@ -402,6 +402,10 @@
             }).join(', ') + ' ]';
           } else if (is(value, 'object')) {
             return pair[0] + ': ' + stringify(value);
+          } else if (is(value, 'string')) {
+            if (value.length > 79) value = value.slice(0, 79) + '…';
+            else if (value.length === 0) value = '\'\'';
+            return pair[0] + ': ' + value;
           } else {
             return pair[0] + ': ' + value;
           }

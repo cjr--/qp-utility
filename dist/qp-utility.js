@@ -220,7 +220,7 @@
       } else if (chr === sep) {
         out += s[++i].toUpperCase();
       } else {
-        out += chr;
+        out += chr.toLowerCase();
       }
     }
     return out;
@@ -399,6 +399,10 @@
             }).join(', ') + ' ]';
           } else if (is(value, 'object')) {
             return pair[0] + ': ' + stringify(value);
+          } else if (is(value, 'string')) {
+            if (value.length > 79) value = value.slice(0, 79) + '…';
+            else if (value.length === 0) value = '\'\'';
+            return pair[0] + ': ' + value;
           } else {
             return pair[0] + ': ' + value;
           }
@@ -2696,7 +2700,7 @@
       on_error: false,
       on_close: false,
       on_open: false,
-      message: false,
+      on_data: false,
       json: false,
   
       init: function(options) {
@@ -2713,12 +2717,12 @@
           }
           websocket.addEventListener('open', function(e) {
             if (this.on_open) this.on_open(e);
-            if (this.message) {
+            if (this.on_data) {
               websocket.addEventListener('message', function(e) {
                 var data = e.data;
                 if (this.json) data = JSON.parse(data);
                 log('MSG_IN', qp.stringify(data, true));
-                if (this.message) this.message(data, e);
+                if (this.on_data) this.on_data(data, e);
               }.bind(this));
             }
           }.bind(this));
@@ -2783,11 +2787,13 @@
   
       },
   
+      root: null,
       store: null,
       key: 'qp',
       ctx: '',
   
       init: function(options) {
+        this.root = this.self;
         this.store = window.localStorage;
       },
   
