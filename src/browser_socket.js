@@ -15,7 +15,7 @@ define(module, function(exports, require) {
     on_error: false,
     on_close: false,
     on_open: false,
-    message: false,
+    on_data: false,
     json: false,
 
     init: function(options) {
@@ -32,12 +32,12 @@ define(module, function(exports, require) {
         }
         websocket.addEventListener('open', function(e) {
           if (this.on_open) this.on_open(e);
-          if (this.message) {
+          if (this.on_data) {
             websocket.addEventListener('message', function(e) {
               var data = e.data;
               if (this.json) data = JSON.parse(data);
               log('MSG_IN', qp.stringify(data, true));
-              if (this.message) this.message(data, e);
+              if (this.on_data) this.on_data(data, e);
             }.bind(this));
           }
         }.bind(this));
