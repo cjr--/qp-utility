@@ -33,11 +33,13 @@ define(module, function(exports, require) {
 
     },
 
+    root: null,
     store: null,
     key: 'qp',
     ctx: '',
 
     init: function(options) {
+      this.root = this.self;
       this.store = window.localStorage;
     },
 
