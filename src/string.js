@@ -51,9 +51,11 @@ function clean_whitespace(s) {
   }
 }
 
-function split(s, chars) {
+function split(s, chars, o) {
   if (is(s, 'string') && s.length > 0) {
-    return String(s).split(chars);
+    var parts = String(s).split(chars);
+    if (o && o.remove_empty) parts = qp.compact(parts);
+    return parts;
   } else {
     return [];
   }
