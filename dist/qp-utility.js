@@ -1861,7 +1861,7 @@
   }
   
   function Money(currency_code, value, o) {
-    o = qp_options(o, { locale: navigator.language, symbol: true });
+    o = qp_options(o, { locale: navigator.language });
     this.input = value;
     this.locale = o.locale;
     this.currency = currency(currency_code);
@@ -1878,19 +1878,16 @@
       }
       this.precision = this.currency.decimals;
       this.value = this.int_value / this.currency.pow;
-      if (o.symbol) {
-        this.display = this.value.toLocaleString(this.locale, { style: 'currency', currency: this.currency.code });
-      } else {
-        this.display = this.value.toLocaleString(this.locale, {
-          style: 'decimal',
-          minimumFractionDigits: this.currency.decimals,
-          maximumFractionDigits: this.currency.decimals
-        });
-      }
+      this.display = this.value.toLocaleString(this.locale, { style: 'currency', currency: this.currency.code });
+      this.entry = this.value.toLocaleString(this.locale, {
+        style: 'decimal',
+        minimumFractionDigits: this.currency.decimals,
+        maximumFractionDigits: this.currency.decimals
+      });
     } else {
       this.precision = 0;
       this.int_value = this.value = 0;
-      this.display = '0';
+      this.entry = this.display = '0';
     }
   }
   
