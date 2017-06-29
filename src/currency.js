@@ -90,7 +90,11 @@ function Money(currency_code, value, o) {
   o = qp_options(o, { locale: navigator.language });
   this.input = value;
   this.locale = o.locale;
-  this.currency = currency(currency_code);
+  if (is(currency_code, 'string')) {
+    this.currency = currency(currency_code);
+  } else if (is(currency_code, 'object')) {
+    this.currency = currency_code;
+  }
   if (this.currency) {
     if (typeof value === 'string') {
       var sign = value.indexOf('-') !== -1 ? '-' : '';
@@ -120,25 +124,25 @@ function Money(currency_code, value, o) {
 Money.prototype.toString = function() { return this.display; };
 
 Money.prototype.clone = function() {
-  return new Money(this.currency.code, this.input, this.locale);
+  return new Money(this.currency, this.input, this.locale);
 };
 
 Money.prototype.add = function(value) {
-  var money = value instanceof Money ? value : new Money(this.currency.code, value, this.locale);
-  return new Money(this.currency.code, (this.int_value + money.int_value) / this.currency.pow, this.locale);
+  var money = value instanceof Money ? value : new Money(this.currency, value, this.locale);
+  return new Money(this.currency, (this.int_value + money.int_value) / this.currency.pow, this.locale);
 };
 
 Money.prototype.subtract = function(value) {
-  var money = value instanceof Money ? value : new Money(this.currency.code, value, this.locale);
-  return new Money(this.currency.code, (this.int_value - money.int_value) / this.currency.pow, this.locale);
+  var money = value instanceof Money ? value : new Money(this.currency, value, this.locale);
+  return new Money(this.currency, (this.int_value - money.int_value) / this.currency.pow, this.locale);
 };
 
 Money.prototype.divide = function(value) {
   var decimal = value instanceof Decimal ? value : new Decimal(value);
-  return new Money(this.currency.code, bankers_round((this.value / decimal.value), this.precision), this.locale);
+  return new Money(this.currency, bankers_round((this.value / decimal.value), this.precision), this.locale);
 };
 
 Money.prototype.multiply = function(value) {
   var decimal = value instanceof Decimal ? value : new Decimal(value);
-  return new Money(this.currency.code, bankers_round(this.value * decimal.value, (this.precision + decimal.precision)), this.locale);
+  return new Money(this.currency, bankers_round(this.value * decimal.value, (this.precision + decimal.precision)), this.locale);
 };
