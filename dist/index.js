@@ -1872,7 +1872,7 @@
     } else if (is(currency_code, 'object')) {
       this.currency = currency_code;
     }
-    if (this.currency) {
+    if (this.currency && this.currency.code !== '') {
       if (typeof value === 'string') {
         var sign = value.indexOf('-') !== -1 ? '-' : '';
         value = value.replace(/[^0-9.]/g, '');
@@ -1892,9 +1892,10 @@
         maximumFractionDigits: this.currency.decimals
       });
     } else {
-      this.precision = 0;
-      this.int_value = this.value = 0;
-      this.entry = this.display = '0';
+      this.currency = { code: '', decimals: 2, pow: 100 };
+      this.precision = 0.00;
+      this.int_value = this.value = 0.00;
+      this.entry = this.display = '0.00';
     }
   }
   
