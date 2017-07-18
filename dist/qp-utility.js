@@ -2132,6 +2132,7 @@
       }
     }
     options.method = upper(options.method);
+  
     if (options.upload_progress) {
       request.upload.onprogress = function(e) {
         if (e.lengthComputable) options.upload_progress.call(options.bind, e, (e.loaded / e.total) * 100);
@@ -2142,6 +2143,34 @@
         if (e.lengthComputable) options.download_progress.call(options.bind, e, (e.loaded / e.total) * 100);
       };
     }
+    if (options.timeout) {
+      request.timeout = options.timeout;
+      request.ontimeout = function(e) {
+        var error = new Error('Request Timed Out');
+        error.timeout = true;
+        if (options.on_timeout) options.on_timeout.call(options.bind, error);
+        options.done.call(options.bind, error, null);
+      }
+    }
+    request.onabort = function() {
+      var error;
+      if (request.user_cancelled) {
+        error = new Error('Request Cancelled');
+        error.cancelled = true;
+      } else if (request.user_timeout) {
+        error = new Error('Request Timeout');
+        error.timeout = true;      
+      } else {
+        error = new Error('Request Aborted');
+      }
+      error.abort = true;
+      if (options.on_abort) options.on_abort.call(options.bind, error);
+      options.done.call(options.bind, error, null);
+    };
+    request.onerror = function(e) {
+      options.done.call(options.bind, e, null);
+    };
+  
     request.open(options.method, options.url, true);
     set_request_headers(request, options.headers);
     request.onload = function() {
@@ -2168,15 +2197,6 @@
         options.done.call(options.bind, new Error(response.status), response);
       }
     };
-    request.onerror = function(e) {
-      options.done.call(options.bind, e, null);
-    };
-    if (options.timeout) {
-      options.timeout_id = setTimeout(function() {
-        response.timeout = true;
-        request.abort();
-      }, options.timeout);
-    }
     request.send(options.data);
     return request;
   }
@@ -2667,6 +2687,7 @@
     text: text,
     add_class: add_class,
     remove_class: remove_class,
+    has_class: has_class,
     html: html,
     swap: swap,
     set_style: set_style,

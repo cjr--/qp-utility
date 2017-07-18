@@ -68,7 +68,7 @@ module.exports = function(target) {
     fns = fns.concat([
       'debug','get_attributes','set_attributes','get_attribute','set_attribute','has_attribute','remove_attribute',
       'is_element','not_element','element','on','off','nodefault',
-      'show','hide','visible','hidden','text','add_class','remove_class','html','swap',
+      'show','hide','visible','hidden','text','add_class','remove_class','has_class','html','swap',
       'set_style','get_style','attr','has_attr',
       'parents_until','ready', 'select_all','select_children','matches','select_each','select_first',
       'request:http_request'
