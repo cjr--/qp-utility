@@ -31,6 +31,8 @@ function round(n, decimals) {
   return Number(Math.round(n + 'e' + decimals) + 'e-' + decimals);
 }
 
+function max_number(s, d) { return Number(repeat('9', s) + '.' + repeat('9', d)); }
+
 function truncate(n, decimals) {
   var pow = Math.pow(10, decimals);
   return ~~(n * pow) / pow;
