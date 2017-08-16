@@ -113,7 +113,7 @@ function Money(currency_code, value, o) {
       style: 'decimal',
       minimumFractionDigits: this.currency.decimals,
       maximumFractionDigits: this.currency.decimals
-    });
+    }).replace(/[^0-9.]/g, '');
   } else {
     this.currency = { code: '', decimals: 2, pow: 100 };
     this.precision = 0.00;
