@@ -34,7 +34,7 @@ module.exports = function(target) {
     'ends','between','before','before_last','after','after_last','title_case','to_title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',
     'increase_indent','hashcode','title_case','get_utf8_length','stringify','json','eol',
-    'sum','min','max','avg','round','truncate','clamp',
+    'sum','min','max','avg','round','max_number','truncate','clamp',
     'currency','currency_list','Money','money','Decimal','decimal',
     'map','reduce','arg','to_array','flatten','compact',
     'now','date','date_time','file_date','get_fn_name','timer',
@@ -49,7 +49,7 @@ module.exports = function(target) {
     'union','unique','clear','push','load','contains','inlist','get_data',
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select',
-    'is_alpha_numeric','is_length',
+    'is_alpha_numeric','is_length','validate_type','validate_number','validate_not_empty','validate_string',
     'filter_key','filter_display','filter_predicate','filter',
     'define_property','watch','unwatch','watch_property','unwatch_property'
   ]);
