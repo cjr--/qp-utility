@@ -53,7 +53,8 @@ function any(items, arg1, arg2) {
 }
 
 function all(items, arg1, arg2) {
-  return find(items, arg1, arg2, { find_all: true }).length === items.length;
+  items = to_array(items);
+  return items.length > 0 && find(items, arg1, arg2, { find_all: true }).length === items.length;
 }
 
 function none(items, arg1, arg2) {
