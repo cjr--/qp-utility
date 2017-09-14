@@ -25,6 +25,10 @@
   
   function is_function(o) { return typeof o === 'function'; }
   
+  function is_null(o) { return o === null; }
+  
+  function not_null(o) { return o !== null; }
+  
   function defined(o) { return !not_defined(o); }
   
   function not_defined(o) { return typeof o === 'undefined'; }
@@ -1338,7 +1342,8 @@
   }
   
   function all(items, arg1, arg2) {
-    return find(items, arg1, arg2, { find_all: true }).length === items.length;
+    items = to_array(items);
+    return items.length > 0 && find(items, arg1, arg2, { find_all: true }).length === items.length;
   }
   
   function none(items, arg1, arg2) {
@@ -2570,6 +2575,8 @@
     boolean: boolean,
     no: empty,
     not: not,
+    is_null: is_null,
+    not_null: not_null,
     empty: empty,
     not_empty: not_empty,
     empty_or_whitespace: empty_or_whitespace,
