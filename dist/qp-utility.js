@@ -490,6 +490,10 @@
     return result;
   }
   
+  function insert_at(o, index, value) {
+    o.splice(index, 0, value);
+  }
+  
   function clear(o) {
     if (is_array(o)) {
       for (var i = 0, l = o.length; i < l; i++) { o.pop(); }
@@ -2643,6 +2647,7 @@
     to_array: to_array,
     flatten: flatten,
     compact: compact,
+    insert_at: insert_at,
     now: now,
     date: date,
     date_time: date_time,
