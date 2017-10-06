@@ -88,21 +88,26 @@ define(module, function(exports, require) {
     },
 
     get: function(options) {
-      var item = this.get_item(options.key);
-      if (options.max_age && options.max_age > 0) {
-        var max_age = moment().subtract(options.max_age);
-        if (item.data === null) {
-          log('%cCACHE FAIL %s', 'color:darkblue', item.key);
-          return null;
-        } else if (max_age < item.modified) {
-          log('%cCACHE HIT %s expires in %s', 'color:darkblue', item.key, moment.duration(item.modified - max_age).humanize());
-          return item.data;
-        } else {
-          log('%cCACHE MISS %s expired %s ago', 'color:darkblue', item.key, moment.duration(item.modified - max_age).humanize());
-          return null;
-        }
+      if (qp.defined(options.max_age) && options.max_age === 0) {
+        log('%cCACHE OVERRIDE %s', 'color:darkblue', item.key);
+        return null;
       } else {
-        return item ? item.data : null;
+        var item = this.get_item(options.key);
+        if (options.max_age && qp.is_number(options.max_age)) {
+          var max_age = moment().subtract(options.max_age);
+          if (item.data === null) {
+            log('%cCACHE FAIL %s', 'color:darkblue', item.key);
+            return null;
+          } else if (max_age < item.modified) {
+            log('%cCACHE HIT %s expires in %s', 'color:darkblue', item.key, moment.duration(item.modified - max_age).humanize());
+            return item.data;
+          } else {
+            log('%cCACHE MISS %s expired %s ago', 'color:darkblue', item.key, moment.duration(item.modified - max_age).humanize());
+            return null;
+          }
+        } else {
+          return item ? item.data : null;
+        }
       }
     },
 
