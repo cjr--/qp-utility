@@ -641,6 +641,13 @@
     }
   }
   
+  function call(fn) {
+    if (is(fn, 'function')) {
+      var args = qp.rest(arguments);
+      return fn.apply(null, args);
+    }
+  }
+  
   function combine() {
     var fns = slice.call(arguments);
     return function() {
@@ -2666,6 +2673,7 @@
     debounce: debounce,
     throttle: throttle,
     patch: patch,
+    call: call,
     typeof: qp_typeof,
     is: is,
     is_not: is_not,
