@@ -2969,7 +2969,10 @@
   
       get: function(options) {
         var item = this.get_item(options.key);
-        if (options.max_age && options.max_age > 0) {
+        if (qp.defined(options.max_age) && options.max_age === 0) {
+          log('%cCACHE OVERRIDE %s', 'color:darkblue', item.key);
+          return null;
+        } else if (options.max_age && qp.is_number(options.max_age)) {
           var max_age = moment().subtract(options.max_age);
           if (item.data === null) {
             log('%cCACHE FAIL %s', 'color:darkblue', item.key);
