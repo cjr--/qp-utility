@@ -8,6 +8,13 @@ function get_fn_name(fn) {
   }
 }
 
+function call(fn) {
+  if (is(fn, 'function')) {
+    var args = qp.rest(arguments);
+    return fn.apply(null, args);
+  }
+}
+
 function combine() {
   var fns = slice.call(arguments);
   return function() {
