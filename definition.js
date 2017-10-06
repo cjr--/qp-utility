@@ -36,7 +36,7 @@ module.exports = function(target) {
     'increase_indent','hashcode','title_case','get_utf8_length','stringify','json','eol',
     'sum','min','max','avg','round','max_number','truncate','clamp',
     'currency','currency_list','Money','money','Decimal','decimal',
-    'map','reduce','arg','to_array','flatten','compact',
+    'map','reduce','arg','to_array','flatten','compact','insert_at',
     'now','date','date_time','file_date','get_fn_name','timer',
     'combine','done','bind','partial','invoke','invoke_after','invoke_delay','invoke_next','invoke_when','debounce','throttle','patch',
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',

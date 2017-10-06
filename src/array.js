@@ -61,6 +61,10 @@ function compact(array) {
   return result;
 }
 
+function insert_at(o, index, value) {
+  o.splice(index, 0, value);
+}
+
 function clear(o) {
   if (is_array(o)) {
     for (var i = 0, l = o.length; i < l; i++) { o.pop(); }
