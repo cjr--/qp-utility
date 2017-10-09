@@ -89,7 +89,7 @@ define(module, function(exports, require) {
 
     get: function(options) {
       if (qp.defined(options.max_age) && options.max_age === 0) {
-        log('%cCACHE OVERRIDE %s', 'color:darkblue', item.key);
+        log('%cCACHE OVERRIDE %s', 'color:darkblue', options.key);
         return null;
       } else {
         var item = this.get_item(options.key);
