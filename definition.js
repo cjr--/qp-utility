@@ -29,7 +29,7 @@ module.exports = function(target) {
   fns = fns.concat([
     'noop','noop_callback','escape_re','is_value','is_boolean','is_number','is_function','is_string','is_array','is_array_like','defined',
     'undefined:not_defined','random','dfault','boolean','no:empty','not','is_null','not_null','empty','not_empty',
-    'empty_or_whitespace','upper','lower','trim',
+    'empty_or_whitespace','upper','lower','trim','items',
     'ltrim','rtrim','split','join','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
     'ends','between','before','before_last','after','after_last','title_case','to_title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',

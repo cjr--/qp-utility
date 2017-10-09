@@ -10,6 +10,21 @@ function upper(s) {
   return String(s).toLocaleUpperCase();
 }
 
+function items(array) {
+  var list = '';
+  for (var i = 0, l = array.length; i < l; i++) {
+    var item = array[i];
+    if (i === 0) {
+      list = item;
+    } else if (i === (l - 1)) {
+      list += (' & ' + item);
+    } else {
+      list += (', ' + item);
+    }
+  }
+  return list;
+}
+
 function trim(s, chars) {
   if (s === undefined || s === null) {
     return '';
@@ -83,8 +98,8 @@ function escape(s) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\"/g, '&quot;')
-    .replace(/\'/g, '&#39;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function unescape(s) {
@@ -295,7 +310,7 @@ function get_utf8_length(s) {
 function format(s, o, options) {
   if (is(o, 'object')) {
     options = qp_options(options, { leave_unmatched: false });
-    return s.replace(/\{{([A-Za-z0-9_\.]+)\}}/g, function(t, k) {
+    return s.replace(/\{{([A-Za-z0-9_.]+)\}}/g, function(t, k) {
       var v = get(o, k);
       return v === undefined ? options.leave_unmatched ? t : '' : v;
     });
