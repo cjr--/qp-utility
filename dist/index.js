@@ -69,16 +69,18 @@
     return String(s).toLocaleUpperCase();
   }
   
-  function items(array) {
+  function items(o) {
     var list = '';
-    for (var i = 0, l = array.length; i < l; i++) {
-      var item = array[i];
-      if (i === 0) {
-        list = item;
-      } else if (i === (l - 1)) {
-        list += (' & ' + item);
-      } else {
-        list += (', ' + item);
+    if (is_array(o)) {
+      for (var i = 0, l = o.length; i < l; i++) {
+        var item = o[i];
+        if (i === 0) {
+          list = item;
+        } else if (i === (l - 1)) {
+          list += (' & ' + item);
+        } else {
+          list += (', ' + item);
+        }
       }
     }
     return list;
