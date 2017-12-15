@@ -148,7 +148,7 @@
   
   function plural(o, prefix, single, multi, suffix) {
     var _size = size(o);
-    return _size + ' ' + (prefix + ' ' || '') + (_size > 1 ? multi : single) + (' ' + suffix || '');
+    return _size + ' ' + (prefix) + (_size > 1 ? multi : single) + (' ' + suffix || '');
   }
   
   function escape(s) {
