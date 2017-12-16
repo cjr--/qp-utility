@@ -2,7 +2,7 @@ function qp_typeof(o, ctor) {
   var type = lower(to_string.call(o).slice(8, -1));
   if (ctor && type === 'object') {
     if (o.constructor) {
-      type = lower(get_fn_name(o.constructor));
+      type = lower(o.constructor.type || o.constructor.name) || 'object';
       return type === 'object' ? 'pojo' : type;
     } else {
       return 'pojo';
