@@ -898,7 +898,7 @@
     var type = lower(to_string.call(o).slice(8, -1));
     if (ctor && type === 'object') {
       if (o.constructor) {
-        type = lower(get_fn_name(o.constructor));
+        type = lower(o.constructor.type || o.constructor.name) || 'object';
         return type === 'object' ? 'pojo' : type;
       } else {
         return 'pojo';
@@ -1468,8 +1468,9 @@
   function make(_exports, definition) {
     var name = definition.ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
-    var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
-    ctor.name = name;
+    // var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
+    var ctor = function(o) { this.construct.call(this, o || {}); };
+    ctor.name = ctor.type = name;
     ctor.create = function(o) { return new ctor(o); };
     ctor.ns = definition.ns;
     ctor.properties = {};
@@ -1485,7 +1486,7 @@
         ctor.properties = override(ctor.properties, mixin.properties);
         each(mixin.prototype, function(v, k) { ctor.prototype[k] = v; });
         each(mixin, function(v, k) {
-          if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits', 'setups')) {
+          if (!inlist(k, 'ns', 'create', 'properties', 'mixins', 'inits', 'setups', 'type')) {
             ctor[k] = v;
           }
         });
