@@ -26,6 +26,47 @@ function union() {
   }, []);
 }
 
+function chunk(o, n) {
+  var out = [];
+  var l = o.length;
+  var i = 0;
+  var size;
+  if (len % n === 0) {
+    size = Math.floor(l / n);
+    while (i < l) {
+      out.push(o.slice(i, i += size));
+    }
+  } else {
+    n--;
+    size = Math.floor(l / n);
+    if (l % size === 0) size--;
+    while (i < size * n) {
+      out.push(o.slice(i, i += size));
+    }
+    out.push(o.slice(size * n));
+  }
+  return out;
+}
+
+function segment(o, n) {
+  var out = [];
+  while (o.length) {
+    out.push(o.splice(0, n));
+  }
+  return out;
+}
+
+function shuffle(set) {
+  var i = set.length;
+  while (i) {
+    var rnd = Math.floor(Math.random() * i--);
+    var tmp = set[i];
+    set[i] = set[rnd];
+    set[rnd] = tmp;
+  }
+  return set;
+}
+
 function unique(o, fn) {
   var unique = [];
   if (is_array(o)) {
