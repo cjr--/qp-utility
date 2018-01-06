@@ -47,10 +47,11 @@ module.exports = function(target) {
     'sort','get_comparer','group','ungroup',
     'options:qp_options','id:qp_id','uuid','get','take','has','set',
     'each_series','series','parallel','pick',
-    'union','unique','clear','push','load','contains','inlist','get_data',
+    'union','chunk','segment','shuffle','unique','clear','push','load','contains','inlist','get_data',
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','select',
-    'is_alpha_numeric','is_length','validate_type','validate_number','validate_not_empty','validate_string',
+    'is_valid','is_alpha_numeric','is_length',
+    'validate_type','validate_number','validate_not_empty','validate_string',
     'filter_key','filter_display','filter_predicate','filter',
     'define_property','watch','unwatch','watch_property','unwatch_property'
   ]);

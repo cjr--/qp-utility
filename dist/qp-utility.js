@@ -472,6 +472,47 @@
     }, []);
   }
   
+  function chunk(o, n) {
+    var out = [];
+    var l = o.length;
+    var i = 0;
+    var size;
+    if (len % n === 0) {
+      size = Math.floor(l / n);
+      while (i < l) {
+        out.push(o.slice(i, i += size));
+      }
+    } else {
+      n--;
+      size = Math.floor(l / n);
+      if (l % size === 0) size--;
+      while (i < size * n) {
+        out.push(o.slice(i, i += size));
+      }
+      out.push(o.slice(size * n));
+    }
+    return out;
+  }
+  
+  function segment(o, n) {
+    var out = [];
+    while (o.length) {
+      out.push(o.splice(0, n));
+    }
+    return out;
+  }
+  
+  function shuffle(set) {
+    var i = set.length;
+    while (i) {
+      var rnd = Math.floor(Math.random() * i--);
+      var tmp = set[i];
+      set[i] = set[rnd];
+      set[rnd] = tmp;
+    }
+    return set;
+  }
+  
   function unique(o, fn) {
     var unique = [];
     if (is_array(o)) {
@@ -2004,6 +2045,13 @@
   
   var alpha_numeric_re = /^[a-z0-9]+$/i;
   
+  function is_valid(s, re) {
+    if (is(s, 'string')) {
+      return re.test(s);
+    }
+    return false;
+  }
+  
   function is_alpha_numeric(s) {
     return alpha_numeric_re.test(s);
   }
@@ -2744,6 +2792,9 @@
     parallel: parallel,
     pick: pick,
     union: union,
+    chunk: chunk,
+    segment: segment,
+    shuffle: shuffle,
     unique: unique,
     clear: clear,
     push: push,
@@ -2765,6 +2816,7 @@
     delete_key: delete_key,
     delete: qp_delete,
     select: select,
+    is_valid: is_valid,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
     validate_type: validate_type,
