@@ -1,5 +1,12 @@
 var alpha_numeric_re = /^[a-z0-9]+$/i;
 
+function is_valid(s, re) {
+  if (is(s, 'string')) {
+    return re.test(s);
+  }
+  return false;
+}
+
 function is_alpha_numeric(s) {
   return alpha_numeric_re.test(s);
 }
