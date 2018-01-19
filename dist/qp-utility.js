@@ -718,7 +718,7 @@
   function done() {
     var args = slice.call(arguments);
     var type = qp_typeof(args[0]);
-    if (type === 'object') {
+    if (type === 'object' && args[0].done) {
       invoke_next(args[0].done.bind(args[0].context || args[0].bind), args[1], args[2]);
     } else if (type === 'function') {
       invoke_next(args[0].bind(args[1]), args[2], args[3]);
@@ -1852,27 +1852,27 @@
   }
   
   var currency_definitions = [
-    { id: 1,  code: 'USD', name: 'US Dollar',           unit: 'dollar', symbol: '$',  fa: 'usd',    decimals: 2 },
-    { id: 2,  code: 'EUR', name: 'Euro',                unit: 'euro',   symbol: '€',  fa: 'eur',    decimals: 2 },
-    { id: 3,  code: 'JPY', name: 'Japanese Yen',        unit: 'yen',    symbol: '¥',  fa: 'jpy',    decimals: 0 },
-    { id: 4,  code: 'GBP', name: 'Pound Sterling',      unit: 'pound',  symbol: '£',  fa: 'gbp',    decimals: 2 },
-    { id: 5,  code: 'AUD', name: 'Australian Dollar',   unit: 'dollar', symbol: '$',  fa: 'dollar', decimals: 2 },
-    { id: 6,  code: 'CAD', name: 'Canadian Dollar',     unit: 'dollar', symbol: '$',  fa: 'dollar', decimals: 2 },
-    { id: 7,  code: 'CHF', name: 'Swiss Franc',         unit: 'franc',  symbol: 'Fr', fa: '',       decimals: 2 },
-    { id: 8,  code: 'CNY', name: 'Chineese Yuan',       unit: 'yuan',   symbol: '¥',  fa: 'cny',    decimals: 2 },
-    { id: 9,  code: 'SEK', name: 'Swedish Krona',       unit: 'krona',  symbol: 'kr', fa: '',       decimals: 2 },
-    { id: 10, code: 'NZD', name: 'New Zealand Dollar',  unit: 'dollar', symbol: '$',  fa: 'dollar', decimals: 2 },
-    { id: 11, code: 'MXN', name: 'Mexican Peso',        unit: 'peso',   symbol: '$',  fa: 'dollar', decimals: 2 },
-    { id: 12, code: 'SGD', name: 'Singapore Dollar',    unit: 'dollar', symbol: '$',  fa: 'dollar', decimals: 2 },
-    { id: 13, code: 'HKD', name: 'Hong Kong Dollar',    unit: 'dollar', symbol: '$',  fa: 'dollar', decimals: 2 },
-    { id: 14, code: 'NOK', name: 'Norwegian Krone',     unit: 'krone',  symbol: 'kr', fa: '',       decimals: 2 },
-    { id: 15, code: 'KRW', name: 'South Korean Won',    unit: 'won',    symbol: '₩',  fa: 'krw',    decimals: 0 },
-    { id: 16, code: 'TRY', name: 'Turkish Lira',        unit: 'lira',   symbol: '₺',  fa: 'try',    decimals: 2 },
-    { id: 17, code: 'RUB', name: 'Russian Ruble',       unit: 'ruble',  symbol: '₽',  fa: 'rub',    decimals: 2 },
-    { id: 18, code: 'INR', name: 'Indian Rupee',        unit: 'rupee',  symbol: '₹',  fa: 'inr',    decimals: 2 },
-    { id: 19, code: 'BRL', name: 'Brazilian Real',      unit: 'real',   symbol: 'R$', fa: '',       decimals: 2 },
-    { id: 20, code: 'ZAR', name: 'South African Rand',  unit: 'rand',   symbol: 'R',  fa: '',       decimals: 2 },
-    { id: 21, code: 'THB', name: 'Thai Baht',           unit: 'baht',   symbol: '฿',  fa: '',       decimals: 2 }
+    { id: 1,  code: 'USD', name: 'US Dollar',           unit: 'dollar', symbol: '$',  decimals: 2, html: '&#0024;' },
+    { id: 2,  code: 'EUR', name: 'Euro',                unit: 'euro',   symbol: '€',  decimals: 2, html: '&#20AC;' },
+    { id: 3,  code: 'JPY', name: 'Japanese Yen',        unit: 'yen',    symbol: '¥',  decimals: 0, html: '&#00A5;' },
+    { id: 4,  code: 'GBP', name: 'Pound Sterling',      unit: 'pound',  symbol: '£',  decimals: 2, html: '&#00A3;' },
+    { id: 5,  code: 'AUD', name: 'Australian Dollar',   unit: 'dollar', symbol: '$',  decimals: 2, html: '&#0024;' },
+    { id: 6,  code: 'CAD', name: 'Canadian Dollar',     unit: 'dollar', symbol: '$',  decimals: 2, html: '&#0024;' },
+    { id: 7,  code: 'CHF', name: 'Swiss Franc',         unit: 'franc',  symbol: 'Fr', decimals: 2, html: '&#0070;&#0114;' },
+    { id: 8,  code: 'CNY', name: 'Chineese Yuan',       unit: 'yuan',   symbol: '¥',  decimals: 2, html: '&#00A5;' },
+    { id: 9,  code: 'SEK', name: 'Swedish Krona',       unit: 'krona',  symbol: 'kr', decimals: 2, html: '&#0107;&#0114;' },
+    { id: 10, code: 'NZD', name: 'New Zealand Dollar',  unit: 'dollar', symbol: '$',  decimals: 2, html: '&#0024;' },
+    { id: 11, code: 'MXN', name: 'Mexican Peso',        unit: 'peso',   symbol: '$',  decimals: 2, html: '&#20B1;' },
+    { id: 12, code: 'SGD', name: 'Singapore Dollar',    unit: 'dollar', symbol: '$',  decimals: 2, html: '&#0024;' },
+    { id: 13, code: 'HKD', name: 'Hong Kong Dollar',    unit: 'dollar', symbol: '$',  decimals: 2, html: '&#0024;' },
+    { id: 14, code: 'NOK', name: 'Norwegian Krone',     unit: 'krone',  symbol: 'kr', decimals: 2, html: '&#0107;&#0114;' },
+    { id: 15, code: 'KRW', name: 'South Korean Won',    unit: 'won',    symbol: '₩',  decimals: 0, html: '&#20A9;' },
+    { id: 16, code: 'TRY', name: 'Turkish Lira',        unit: 'lira',   symbol: '₺',  decimals: 2, html: '&#20BA;' },
+    { id: 17, code: 'RUB', name: 'Russian Ruble',       unit: 'ruble',  symbol: '₽',  decimals: 2, html: '&#20BD;' },
+    { id: 18, code: 'INR', name: 'Indian Rupee',        unit: 'rupee',  symbol: '₹',  decimals: 2, html: '&#20B9;' },
+    { id: 19, code: 'BRL', name: 'Brazilian Real',      unit: 'real',   symbol: 'R$', decimals: 2, html: '&#0024;' },
+    { id: 20, code: 'ZAR', name: 'South African Rand',  unit: 'rand',   symbol: 'R',  decimals: 2, html: '&#0082;' },
+    { id: 21, code: 'THB', name: 'Thai Baht',           unit: 'baht',   symbol: '฿',  decimals: 2, html: '&#0E3F;' } 
   ];
   
   var currency_lookup = { };
@@ -2037,7 +2037,7 @@
       for (var i = 0, l = items.length; i < l; i++) {
         args[0] = items[i];
         var result = fn.apply(scope, args);
-        if (result !== undefined) out.push(result);
+        if (result !== undefined) push(out, result);
       }
     }
     return out;
