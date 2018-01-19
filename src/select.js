@@ -5,7 +5,7 @@ function select(items, fn, scope) {
     for (var i = 0, l = items.length; i < l; i++) {
       args[0] = items[i];
       var result = fn.apply(scope, args);
-      if (result !== undefined) out.push(result);
+      if (result !== undefined) push(out, result);
     }
   }
   return out;
