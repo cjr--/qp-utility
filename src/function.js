@@ -27,7 +27,7 @@ function combine() {
 function done() {
   var args = slice.call(arguments);
   var type = qp_typeof(args[0]);
-  if (type === 'object') {
+  if (type === 'object' && args[0].done) {
     invoke_next(args[0].done.bind(args[0].context || args[0].bind), args[1], args[2]);
   } else if (type === 'function') {
     invoke_next(args[0].bind(args[1]), args[2], args[3]);
