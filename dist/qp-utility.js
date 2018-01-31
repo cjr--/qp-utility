@@ -618,6 +618,7 @@
   var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
+  var beginning_of_time = -62135596800000;
   
   function now(format) {
     var _now = new Date();
@@ -650,6 +651,25 @@
   
   function date(dt) {
     return new Date(dt);
+  }
+  
+  function empty_date(format) {
+    var dt = new Date(beginning_of_time);
+    if (format === 'utc') {
+      return dt.toUTCString();
+    } else if (format === 'iso') {
+      return dt.toISOString();
+    } else if (format === 'int') {
+      return dt.getTime();
+    } else if (format === 'string') {
+      return String(dt.getTime());
+    } else {
+      return dt;
+    }
+  }
+  
+  function is_empty_date(dt) {
+    return +dt === beginning_of_time;
   }
   
   function file_date() {
@@ -2729,6 +2749,8 @@
     now: now,
     date: date,
     date_time: date_time,
+    empty_date: empty_date,
+    is_empty_date: is_empty_date,
     file_date: file_date,
     get_fn_name: get_fn_name,
     timer: timer,
