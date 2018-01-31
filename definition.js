@@ -37,7 +37,7 @@ module.exports = function(target) {
     'sum','min','max','avg','round','max_number','truncate','clamp',
     'currency','currency_list','Money','money','Decimal','decimal',
     'map','reduce','arg','to_array','flatten','compact','insert_at',
-    'now','date','date_time','empty_date','is_empty_date','file_date','get_fn_name','timer',
+    'now','date','date_time','empty_date','is_empty_date','bot','is_bot','eot','is_eot','file_date','get_fn_name','timer',
     'combine','done','bind','partial','invoke','invoke_after','invoke_delay','invoke_next','invoke_when',
     'debounce','throttle','patch','call',
     'typeof:qp_typeof','is','is_not','size','each','each_own','assign',
