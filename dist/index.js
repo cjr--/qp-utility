@@ -1262,8 +1262,8 @@
   function each(o, fn, scope) {
     var no_exit = true;
     if (is_array(o)) {
-      for (var i = 0, l = o.length; i < l; i++) {
-        if (fn.call(scope, o[i], i, o) === false) {
+      for (var i = 0, l = o.length, last = o.length - 1; i < l; i++) {
+        if (fn.call(scope, o[i], i, last, o) === false) {
           no_exit = false;
           break;
         }
