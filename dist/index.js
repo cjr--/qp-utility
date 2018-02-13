@@ -1644,7 +1644,11 @@
         var result = 0;
         for (var i = 0; i < sorters_length; i++) {
           var sorter = sorters[i];
-          result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
+          if (is(sorter.key, 'function')) {
+            result = sorter.fn(sorter.key(a), sorter.key(b));
+          } else {
+            result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
+          }
           if (result !== 0) break;
         }
         return result === 0 ? (a.__idx > b.__idx ? 1 : -1) : result;
@@ -1658,30 +1662,31 @@
        * https://github.com/overset/javascript-natural-sort
        */
       return function(a, b) {
-        var re = /(^([+\-]?(?:\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[\da-fA-F]+$|\d+)/g,
-            sre = /^\s+|\s+$/g,   // trim pre-post whitespace
-            snre = /\s+/g,        // normalize all whitespace to single ' ' character
-            dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
-            hre = /^0x[0-9a-f]+$/i,
-            ore = /^0/,
-            i = function(s) {
-              return (case_insensitive && ('' + s).toLowerCase() || '' + s).replace(sre, '');
-            },
-            // convert all to strings strip whitespace
-            x = i(a) || '',
-            y = i(b) || '',
-            // chunk/tokenize
-            xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
-            yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
-            // numeric, hex or date detection
-            xD = parseInt(x.match(hre), 16) || (xN.length !== 1 && Date.parse(x)),
-            yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null,
-            normChunk = function(s, l) {
-              // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
-              if (typeof s === 'undefined') return 0;
-              return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
-            },
-            oFxNcL, oFyNcL;
+        var re = /(^([+\-]?(?:\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[\da-fA-F]+$|\d+)/g;
+        // trim pre-post whitespace
+        var sre = /^\s+|\s+$/g;
+        // normalize all whitespace to single ' ' character
+        var snre = /\s+/g;
+        var dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/;
+        var hre = /^0x[0-9a-f]+$/i;
+        var ore = /^0/;
+        var i = function(s) { return (case_insensitive && ('' + s).toLowerCase() || '' + s).replace(sre, ''); };
+        // convert all to strings strip whitespace
+        var x = i(a) || '';
+        var y = i(b) || '';
+        // chunk/tokenize
+        var xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0');
+        var yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0');
+        // numeric, hex or date detection
+        var xD = parseInt(x.match(hre), 16) || (xN.length !== 1 && Date.parse(x));
+        var yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null;
+        var normChunk = function(s, l) {
+          // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
+          if (typeof s === 'undefined') return 0;
+          return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
+        };
+        var oFxNcL, oFyNcL;
+  
         // first try and sort Hex codes or Dates
         if (yD) {
           if (xD < yD) { return -1; }

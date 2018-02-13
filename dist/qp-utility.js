@@ -1641,7 +1641,11 @@
         var result = 0;
         for (var i = 0; i < sorters_length; i++) {
           var sorter = sorters[i];
-          result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
+          if (is(sorter.key, 'function')) {
+            result = sorter.fn(sorter.key(a), sorter.key(b));
+          } else {
+            result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
+          }
           if (result !== 0) break;
         }
         return result === 0 ? (a.__idx > b.__idx ? 1 : -1) : result;
@@ -1655,30 +1659,31 @@
        * https://github.com/overset/javascript-natural-sort
        */
       return function(a, b) {
-        var re = /(^([+\-]?(?:\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[\da-fA-F]+$|\d+)/g,
-            sre = /^\s+|\s+$/g,   // trim pre-post whitespace
-            snre = /\s+/g,        // normalize all whitespace to single ' ' character
-            dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
-            hre = /^0x[0-9a-f]+$/i,
-            ore = /^0/,
-            i = function(s) {
-              return (case_insensitive && ('' + s).toLowerCase() || '' + s).replace(sre, '');
-            },
-            // convert all to strings strip whitespace
-            x = i(a) || '',
-            y = i(b) || '',
-            // chunk/tokenize
-            xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
-            yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0'),
-            // numeric, hex or date detection
-            xD = parseInt(x.match(hre), 16) || (xN.length !== 1 && Date.parse(x)),
-            yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null,
-            normChunk = function(s, l) {
-              // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
-              if (typeof s === 'undefined') return 0;
-              return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
-            },
-            oFxNcL, oFyNcL;
+        var re = /(^([+\-]?(?:\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[\da-fA-F]+$|\d+)/g;
+        // trim pre-post whitespace
+        var sre = /^\s+|\s+$/g;
+        // normalize all whitespace to single ' ' character
+        var snre = /\s+/g;
+        var dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/;
+        var hre = /^0x[0-9a-f]+$/i;
+        var ore = /^0/;
+        var i = function(s) { return (case_insensitive && ('' + s).toLowerCase() || '' + s).replace(sre, ''); };
+        // convert all to strings strip whitespace
+        var x = i(a) || '';
+        var y = i(b) || '';
+        // chunk/tokenize
+        var xN = x.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0');
+        var yN = y.replace(re, '\0$1\0').replace(/\0$/,'').replace(/^\0/,'').split('\0');
+        // numeric, hex or date detection
+        var xD = parseInt(x.match(hre), 16) || (xN.length !== 1 && Date.parse(x));
+        var yD = parseInt(y.match(hre), 16) || xD && y.match(dre) && Date.parse(y) || null;
+        var normChunk = function(s, l) {
+          // normalize spaces; find floats not starting with '0', string or 0 if not defined (Clint Priest)
+          if (typeof s === 'undefined') return 0;
+          return (!s.match(ore) || l == 1) && parseFloat(s) || s.replace(snre, ' ').replace(sre, '') || 0;
+        };
+        var oFxNcL, oFyNcL;
+  
         // first try and sort Hex codes or Dates
         if (yD) {
           if (xD < yD) { return -1; }
@@ -2935,40 +2940,78 @@
       ns: 'qp-utility/websocket',
   
       websocket: null,
-      secure: false,
-      auto: true,
   
       url: '',
+      auto: true,
+      secure: false,
       protocols: null,
+      json: false,
+  
+      retry_interval: 2000,
+      retry_count: 0,
+      retry_max: Infinity,
+  
       on_error: false,
       on_close: false,
       on_open: false,
       on_data: false,
-      json: false,
   
       init: function(options) {
+        if (this.protocols) this.json = qp.contains(this.protocols, 'json-message');
         if (this.auto) this.open();
       },
   
       open: function() {
-        if (!this.websocket) {
-          var websocket = this.websocket = new WebSocket((this.secure ? 'wss://' : 'ws://') + this.url, this.protocols);
-          if (this.on_error) websocket.addEventListener('error', this.on_error.bind(this));
-          if (this.on_close) websocket.addEventListener('close', this.on_close.bind(this));
-          if (this.protocols) {
-            this.json = qp.contains(this.protocols, 'json-message');
+        if (!this.websocket) this.connect();
+      },
+  
+      connect: function() {
+        this.websocket = new WebSocket((this.secure ? 'wss://' : 'ws://') + this.url, this.protocols);
+        this.websocket.addEventListener('error', this.error_handler);
+        this.websocket.addEventListener('close', this.close_handler);
+        this.websocket.addEventListener('open', function(e) {
+          this.retry_count = 0;
+          if (this.on_open) this.on_open(e);
+          if (this.on_data) {
+            this.websocket.addEventListener('message', function(e) {
+              var data = e.data;
+              if (this.json) data = JSON.parse(data);
+              log('MSG_IN', qp.stringify(data, true));
+              if (this.on_data) this.on_data(data, e);
+            }.bind(this));
           }
-          websocket.addEventListener('open', function(e) {
-            if (this.on_open) this.on_open(e);
-            if (this.on_data) {
-              websocket.addEventListener('message', function(e) {
-                var data = e.data;
-                if (this.json) data = JSON.parse(data);
-                log('MSG_IN', qp.stringify(data, true));
-                if (this.on_data) this.on_data(data, e);
-              }.bind(this));
-            }
-          }.bind(this));
+        }.bind(this));
+      },
+  
+      reconnect: function(e) {
+        if (this.retry_count++ < this.retry_max) {
+          setTimeout(function() {
+            if (this.on_reconnect) this.on_reconnect(e);
+            this.connect();
+          }.bind(this), this.retry_interval);
+        } else if (this.on_reconnect_failed) {
+          this.on_reconnect_failed(this);
+        }
+      },
+  
+      retry: function() {
+        this.retry_count = 0;
+        this.reconnect();
+      },
+  
+      error_handler: function(e) {
+        if (this.auto && e && e.code === 'ECONNREFUSED') {
+          this.reconnect();
+        } else if (this.on_error) {
+          this.on_error.call(this, e);
+        }
+      },
+  
+      close_handler: function(e) {
+        if (this.auto && e.code === 1005) {
+          this.reconnect();
+        } else if (this.on_close) {
+          this.on_close(this);
         }
       },
   
