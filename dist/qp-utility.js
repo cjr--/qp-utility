@@ -1407,8 +1407,9 @@
       };
     } else if (is(arg1, 'string')) {
       var truthy = is(arg2, 'undefined');
+      var path = arg1.indexOf('.') !== -1;
       predicate = function(item, index, items) {
-        var value = item[arg1];
+        var value = path ? get(item, arg1) : item[arg1];
         return truthy ? !!value : value === arg2;
       };
     }
