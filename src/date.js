@@ -73,6 +73,28 @@ function is_empty_date(dt) {
   return +dt === beginning_of_time;
 }
 
+function time_ago(dt) {
+  function epoch(interval, epoch) {
+    return interval + ' ' + epoch + (interval <= 1 ? '' : 's');
+  }
+
+  var interval;
+  var seconds = Math.floor((new Date() - dt) / 1000);
+
+  interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) return epoch(interval, 'year');
+  interval = Math.floor(seconds / 2592000);
+  if (interval >= 1) return epoch(interval, 'month');
+  interval = Math.floor(seconds / 86400);
+  if (interval >= 1) return epoch(interval, 'day');
+  interval = Math.floor(seconds / 3600);
+  if (interval >= 1) return epoch(interval, 'hour');
+  interval = Math.floor(seconds / 60);
+  if (interval >= 1) return epoch(interval, 'minute');
+
+  return epoch(Math.floor(seconds), 'second');
+}
+
 function file_date() {
   var dt = now();
   var year = dt.getUTCFullYear().toString();
