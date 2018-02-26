@@ -30,16 +30,17 @@ function format_date(dt, format) {
 
 function now(format) {
   var _now = new Date();
-  if (format) {
+  if (is(format, 'string')) {
     return format_date(_now, format);
   } else {
-    _now.offset = function(offset, unit) {
+    _now.offset = function(offset, unit, format_offset) {
       if (unit === 'day' || unit === 'days') {
         offset = offset * 24 * 60 * 60 * 1000;
       } else if (unit === 'hour' || unit === 'hours') {
         offset = offset * 60 * 60 * 1000;
       }
-      return new Date(_now.getTime() + offset);
+      var dt = new Date(_now.getTime() + offset);
+      return (format_offset ? format_date(dt, format_offset) : dt);
     };
     return _now;
   }
