@@ -2193,6 +2193,8 @@
       fn: function(value, model) {
         if (qp.is_not(value, 'string')) {
           return { message: this.name + ' is not a text value' };
+        } else if (min_length === 1 && value.length === 0) {
+          return { message: 'Please provide a value for ' + this.name };
         } else if (value.length < min_length) {
           return { message: this.name + ' must be longer than ' + this.min_length + ' characters' };
         } else if (value.length > max_length) {
