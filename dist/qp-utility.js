@@ -1303,12 +1303,10 @@
   function map(o, fn, scope) {
     if (empty(o)) {
       return [];
-    } else if (is_array(o)) {
-      return o.map(fn, scope);
-    } else if (o.length) {
+    } else if (is_array(o) || o.length) {
       var out0 = [];
-      for (var i = 0, l = o.length; i < l; i++) {
-        out0.push(fn.call(scope, o[i]));
+      for (var i = 0, l = o.length, last = o.length - 1; i < l; i++) {
+        out0.push(fn.call(scope, o[i], i, last, o));
       }
       return out0;
     } else if (is(o, 'object')) {
