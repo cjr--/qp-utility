@@ -8,7 +8,9 @@ var sort = (function() {
       var result = 0;
       for (var i = 0; i < sorters_length; i++) {
         var sorter = sorters[i];
-        if (is(sorter.key, 'function')) {
+        if (is(sorter, 'function')) {
+          result = sorter(a, b);
+        } else if (is(sorter.key, 'function')) {
           result = sorter.fn(sorter.key(a), sorter.key(b));
         } else {
           result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
