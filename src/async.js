@@ -18,7 +18,7 @@ function series(data, actions, done) {
   var args = slice.call(arguments);
   done = args.pop();
   actions = args.pop();
-  data = args.pop() || null;
+  data = args.pop() || {};
 
   var results = { };
   actions = get_async_actions(actions);
