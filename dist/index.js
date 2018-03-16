@@ -456,6 +456,8 @@
   function to_array(o) {
     if (is_array(o)) {
       return o;
+    } else if (typeof o === 'function') {
+      return [o];
     } else if (o && o['length']) {
       return slice.call(o);
     } else if (typeof o === 'string') {
@@ -798,6 +800,12 @@
       });
     }
     return o;
+  }
+  
+  function chain() {
+    var data = null;
+    each(slice.call(arguments), function(fn) { data = fn(data); });
+    return data;
   }
   
   function partial(fn) {
@@ -1355,7 +1363,7 @@
     var args = slice.call(arguments);
     done = args.pop();
     actions = args.pop();
-    data = args.pop() || null;
+    data = args.pop() || {};
   
     var results = { };
     actions = get_async_actions(actions);
@@ -1666,7 +1674,9 @@
         var result = 0;
         for (var i = 0; i < sorters_length; i++) {
           var sorter = sorters[i];
-          if (is(sorter.key, 'function')) {
+          if (is(sorter, 'function')) {
+            result = sorter(a, b);
+          } else if (is(sorter.key, 'function')) {
             result = sorter.fn(sorter.key(a), sorter.key(b));
           } else {
             result = sorter.fn(get(a, sorter.key), get(b, sorter.key));
@@ -2478,6 +2488,7 @@
     combine: combine,
     done: done,
     bind: bind,
+    chain: chain,
     partial: partial,
     invoke: invoke,
     invoke_after: invoke_after,
