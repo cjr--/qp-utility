@@ -47,6 +47,12 @@ function bind(o) {
   return o;
 }
 
+function chain() {
+  var data = null;
+  each(slice.call(arguments), function(fn) { data = fn(data); });
+  return data;
+}
+
 function partial(fn) {
   var args = slice.call(arguments, 1);
   return function() {
