@@ -14,6 +14,8 @@ function find_predicate(arg1, arg2) {
       var value = path ? get(item, arg1) : item[arg1];
       return truthy ? !!value : value === arg2;
     };
+  } else {
+    predicate = function() { return true; };
   }
   return predicate;
 }
@@ -50,7 +52,8 @@ function count(items, arg1, arg2) {
 }
 
 function any(items, arg1, arg2) {
-  return find(items, arg1, arg2, { index: true }) !== -1;
+  items = to_array(items);
+  return items.length > 0 && find(items, arg1, arg2, { index: true }) !== -1;
 }
 
 function all(items, arg1, arg2) {
