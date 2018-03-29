@@ -14,7 +14,7 @@ module.exports = function(target) {
     js_files = js_files.concat([
       'browser_core'
     ]);
-    fns = fns.concat([]);
+    fns = fns.concat([ 'hex_to_rgb', 'validate_color_hex', 'brighten_hex', 'darken_hex' ]);
   }
 
   js_files = js_files.concat([
@@ -34,7 +34,8 @@ module.exports = function(target) {
     'ends','between','before','before_last','after','after_last','title_case','to_title_case','repeat','replace_all','format',
     'camel_to','to_camel','snake_to_camel','camel_to_snake','snake_to_kebab','kebab_to_snake','camel_to_kebab','kebab_to_camel',
     'increase_indent','hashcode','title_case','get_utf8_length','stringify','json','eol',
-    'sum','min','max','avg','round','max_number','truncate','clamp',
+    'sum','min','max','avg','round','random','random_pick','random_bool','in_range','max_number','truncate','clamp',
+    'interpolate','ease_in','ease_out','ease_in_out','lerp',
     'currency','currency_list','Money','money','Decimal','decimal',
     'map','reduce','arg','to_array','flatten','compact','insert_at',
     'now','date','date_time','empty_date','is_empty_date','bot','is_bot','eot','is_eot','file_date','get_fn_name','timer','time_ago',

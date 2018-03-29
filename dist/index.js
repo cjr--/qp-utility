@@ -1444,6 +1444,8 @@
         var value = path ? get(item, arg1) : item[arg1];
         return truthy ? !!value : value === arg2;
       };
+    } else {
+      predicate = function() { return true; };
     }
     return predicate;
   }
@@ -1480,7 +1482,8 @@
   }
   
   function any(items, arg1, arg2) {
-    return find(items, arg1, arg2, { index: true }) !== -1;
+    items = to_array(items);
+    return items.length > 0 && find(items, arg1, arg2, { index: true }) !== -1;
   }
   
   function all(items, arg1, arg2) {
@@ -1916,6 +1919,44 @@
   
   function round(n, decimals) {
     return Number(Math.round(n + 'e' + decimals) + 'e-' + decimals);
+  }
+  
+  function random(min, max) {
+    return Math.round(min + (Math.random() * (max -min)));
+  }
+  
+  function random_pick(o) {
+    if (is_array(o)) {
+      return o[random(0, o.length - 1)];
+    }
+  }
+  
+  function random_bool() {
+    return Math.random() > 0.5;
+  }
+  
+  function in_range(n, min, max) {
+    return ((n >= min) && (n <= max));
+  }
+  
+  function interpolate(a, b, percent) {
+    return a + (b - a) * (percent || 0.1);
+  }
+  
+  function ease_in(a, b, percent) {
+    return a + (b - a) * Math.pow(percent, 2);
+  }
+  
+  function ease_out(a, b, percent) {
+    return a + (b - a) * (1 - Math.pow(1 - percent, 2));
+  }
+  
+  function ease_in_out(a, b, percent) {
+    return a + (b - a) * ((-Math.cos(percent * Math.PI) / 2) + 0.5);
+  }
+  
+  function lerp(n, dn, dt) {
+    return n + (dn * dt);
   }
   
   function max_number(s, d) { return Number(repeat('9', s) + '.' + repeat('9', d)); }
@@ -2456,9 +2497,18 @@
     max: max,
     avg: avg,
     round: round,
+    random: random,
+    random_pick: random_pick,
+    random_bool: random_bool,
+    in_range: in_range,
     max_number: max_number,
     truncate: truncate,
     clamp: clamp,
+    interpolate: interpolate,
+    ease_in: ease_in,
+    ease_out: ease_out,
+    ease_in_out: ease_in_out,
+    lerp: lerp,
     currency: currency,
     currency_list: currency_list,
     Money: Money,
