@@ -64,7 +64,7 @@ function clean_whitespace(s) {
   if (s === undefined || s === null) {
     return '';
   } else {
-    return String(s).replace(newline_re, ' ').replace(trim_re, '');
+    return String(s).replace(newline_re, '').replace(trim_re, '');
   }
 }
 
