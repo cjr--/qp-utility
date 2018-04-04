@@ -155,7 +155,7 @@
     if (s === undefined || s === null) {
       return '';
     } else {
-      return String(s).replace(newline_re, ' ').replace(trim_re, '');
+      return String(s).replace(newline_re, '').replace(trim_re, '');
     }
   }
   
@@ -514,7 +514,7 @@
     var l = o.length;
     var i = 0;
     var size;
-    if (len % n === 0) {
+    if (l % n === 0) {
       size = Math.floor(l / n);
       while (i < l) {
         out.push(o.slice(i, i += size));
