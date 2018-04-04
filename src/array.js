@@ -33,7 +33,7 @@ function chunk(o, n) {
   var l = o.length;
   var i = 0;
   var size;
-  if (len % n === 0) {
+  if (l % n === 0) {
     size = Math.floor(l / n);
     while (i < l) {
       out.push(o.slice(i, i += size));
