@@ -2,6 +2,7 @@
 
   var http = require('http');
   var os = require('os');
+  var url = require('url');
   
   function eol() {
     return os.EOL;
@@ -618,11 +619,13 @@
     return o;
   }
   
-  var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
+  var date_format = {
+    MMMM: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    MMM: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    dddd: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    ddd: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+  };
   
   // 0001-01-01T00:00:00+00:00
   var beginning_of_time = -62135596800000;
@@ -630,7 +633,15 @@
   var end_of_time = 253402214400000;
   
   function format_date(dt, format) {
-    if (format === 'utc') {
+    if (not_defined(format)) {
+      return dt;
+    } else if (format === 'YYYY') {
+      return dt.getUTCFullYear();
+    } else if (format === 'MMMM' || format === 'MMM') {
+      return date_format[format][dt.getUTCMonth()];
+    } else if (format === 'dddd' || format === 'ddd') {
+      return date_format[format][dt.getUTCDay()];
+    } else if (format === 'utc') {
       return dt.toUTCString();
     } else if (format === 'iso') {
       return dt.toISOString();
@@ -664,6 +675,23 @@
       };
       return _now;
     }
+  }
+  
+  function start_of(dt, epoch, format) {
+    if (epoch === 'month') {
+      dt = new Date(dt);
+      dt.setUTCDate(1);
+    }
+    return format_date(dt, format);
+  }
+  
+  function end_of(dt, epoch, format) {
+    if (epoch === 'month') {
+      dt = new Date(dt);
+      dt.setUTCMonth(dt.getUTCMonth() + 1);
+      dt.setUTCDate(0);
+    }
+    return format_date(dt, format);
   }
   
   function date(dt, format) {
@@ -730,8 +758,10 @@
       format: function(format) {
         if (format === 'utc') {
           return dt.toUTCString();
+        } else if (format === 'day month, year') {
+          return dt.getDate() + ' ' + date_format['MMM'][dt.getMonth()] + ', ' + dt.getFullYear();
         } else if (format === 'month day, year') {
-          return month_short[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+          return date_format['MMM'][dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
         }
         return dt;
       }
@@ -1581,6 +1611,10 @@
   }
   
   function make(_exports, definition) {
+    if (arguments.length === 1) {
+      definition = _exports;
+      _exports = false;
+    }
     var name = definition.ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
     // var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
@@ -1608,10 +1642,12 @@
       });
     }
   
-    each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+    // each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+    each(definition.self, function(v, k) { ctor[k] = v; });
   
     each(definition, function(v, k) {
       if (inlist(k, 'ns', 'mixin', 'self')) {
+        // nop
       } else if (is(v, 'function')) {
         if (k === 'init') {
           ctor.inits.push(v);
@@ -1638,7 +1674,7 @@
       invoke(ctor.setups, this);
     };
   
-    return _exports(ctor.ns, ctor);
+    return (_exports ? _exports(ctor.ns, ctor) : ctor);
   }
   
   function _module(_exports) {
@@ -1922,7 +1958,7 @@
   }
   
   function random(min, max) {
-    return Math.round(min + (Math.random() * (max -min)));
+    return Math.round(min + (Math.random() * (max - min)));
   }
   
   function random_pick(o) {
@@ -2365,6 +2401,7 @@
   }
   
   function http_request(options) {
+    options.url = url.parse(options.url);
     options.done = options.done || noop;
     if (options.bind) options.done.bind(options.bind);
     options.headers = options.headers || {};
@@ -2374,6 +2411,9 @@
     var response = { ok: false };
     var request = {
       method: options.method || 'GET',
+      hostname: options.url.hostname,
+      port: options.url.port,
+      path: options.url.path,
       headers: options.headers || {},
       data: options.data || null
     };
@@ -2381,45 +2421,50 @@
       request.method = 'POST';
       var json = JSON.stringify(options.json, null, '  ');
       if (json.length) request.data = json;
-      request.headers['Content-Type'] = 'application/json';
+      request.headers['Content-Type'] = 'application/json; charset=utf-8';
     } else if (options.text) {
       request.method = 'POST';
       request.data = options.text;
-      request.headers['Content-Type'] = 'text/plain';
+      request.headers['Content-Type'] = 'text/plain; charset=utf-8';
     } else if (options.html) {
       request.method = 'GET';
-      request.headers['Content-Type'] = 'text/html';
+      request.headers['Content-Type'] = 'text/html; charset=utf-8';
       request.data = options.html;
     } else {
       request.method = request.method.toUpperCase();
     }
+  
+    request.headers['Content-Length'] = Buffer.byteLength(request.data || '');
+    request.headers['User-Agent'] = `nodejs/${process.version} (${process.arch} ${process.platform} v8/${process.versions.v8})`;
+  
     var http_request = http.request(request, function(http_response) {
       http_response.setEncoding('utf8');
       response.headers = http_response.headers;
       response.status = http_response.statusCode;
       if (response.status >= 200 && response.status < 400) {
+        response.content_type = response.headers['content-type'];
+        response.json = /^application\/json/.test(response.content_type);
         response.ok = true;
-        response.text = null;
-        http_response.on('data', function(data) { response.text += data; });
-        http_response.on('end', function() {
-          if (response.headers['content-type'] === 'application/json') {
+        response.text = '';
+        http_response.on('data', (chunk) => response.text += chunk);
+        http_response.on('end', () => {
+          if (response.json) {
             try {
-              response.data = JSON.parse(response.text);
-            } catch (e) {
-              return options.done(e);
+              response.data = JSON.parse(trim(response.text));
+              response.result = response.data;
+            } catch (error) {
+              return options.done(error, response);
             }
           }
           options.done(null, response);
         });
       } else {
-        options.done({
-          status: response.status
-        }, null);
+        options.done({ status: response.status }, response);
       }
     });
-    http_request.on('error', options.done);
-    if (options.method === 'POST' && options.data) {
-      http_request.write(options.data);
+    http_request.on('error', (error) => options.done(error, {}));
+    if (options.method === 'POST' && request.data) {
+      http_request.write(request.data);
     }
     http_request.end();
   }
@@ -2535,6 +2580,8 @@
     get_fn_name: get_fn_name,
     timer: timer,
     time_ago: time_ago,
+    start_of: start_of,
+    end_of: end_of,
     combine: combine,
     done: done,
     bind: bind,

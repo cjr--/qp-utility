@@ -650,11 +650,13 @@
     return o;
   }
   
-  var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
+  var date_format = {
+    MMMM: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    MMM: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    dddd: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    ddd: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+  };
   
   // 0001-01-01T00:00:00+00:00
   var beginning_of_time = -62135596800000;
@@ -662,7 +664,15 @@
   var end_of_time = 253402214400000;
   
   function format_date(dt, format) {
-    if (format === 'utc') {
+    if (not_defined(format)) {
+      return dt;
+    } else if (format === 'YYYY') {
+      return dt.getUTCFullYear();
+    } else if (format === 'MMMM' || format === 'MMM') {
+      return date_format[format][dt.getUTCMonth()];
+    } else if (format === 'dddd' || format === 'ddd') {
+      return date_format[format][dt.getUTCDay()];
+    } else if (format === 'utc') {
       return dt.toUTCString();
     } else if (format === 'iso') {
       return dt.toISOString();
@@ -696,6 +706,23 @@
       };
       return _now;
     }
+  }
+  
+  function start_of(dt, epoch, format) {
+    if (epoch === 'month') {
+      dt = new Date(dt);
+      dt.setUTCDate(1);
+    }
+    return format_date(dt, format);
+  }
+  
+  function end_of(dt, epoch, format) {
+    if (epoch === 'month') {
+      dt = new Date(dt);
+      dt.setUTCMonth(dt.getUTCMonth() + 1);
+      dt.setUTCDate(0);
+    }
+    return format_date(dt, format);
   }
   
   function date(dt, format) {
@@ -762,8 +789,10 @@
       format: function(format) {
         if (format === 'utc') {
           return dt.toUTCString();
+        } else if (format === 'day month, year') {
+          return dt.getDate() + ' ' + date_format['MMM'][dt.getMonth()] + ', ' + dt.getFullYear();
         } else if (format === 'month day, year') {
-          return month_short[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+          return date_format['MMM'][dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
         }
         return dt;
       }
@@ -1613,6 +1642,10 @@
   }
   
   function make(_exports, definition) {
+    if (arguments.length === 1) {
+      definition = _exports;
+      _exports = false;
+    }
     var name = definition.ns.split('/').pop().toLowerCase();
     /*jslint evil: true*/
     // var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
@@ -1640,10 +1673,12 @@
       });
     }
   
-    each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+    // each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+    each(definition.self, function(v, k) { ctor[k] = v; });
   
     each(definition, function(v, k) {
       if (inlist(k, 'ns', 'mixin', 'self')) {
+        // nop
       } else if (is(v, 'function')) {
         if (k === 'init') {
           ctor.inits.push(v);
@@ -1670,7 +1705,7 @@
       invoke(ctor.setups, this);
     };
   
-    return _exports(ctor.ns, ctor);
+    return (_exports ? _exports(ctor.ns, ctor) : ctor);
   }
   
   function _module(_exports) {
@@ -1954,7 +1989,7 @@
   }
   
   function random(min, max) {
-    return Math.round(min + (Math.random() * (max -min)));
+    return Math.round(min + (Math.random() * (max - min)));
   }
   
   function random_pick(o) {
@@ -2453,8 +2488,8 @@
         var error = new Error('Request Timed Out');
         error.timeout = true;
         if (options.on_timeout) options.on_timeout.call(options.bind, error);
-        options.done.call(options.bind, error, null);
-      }
+        options.done.call(options.bind, error, {});
+      };
     }
     request.onabort = function() {
       var error;
@@ -2463,16 +2498,16 @@
         error.cancelled = true;
       } else if (request.user_timeout) {
         error = new Error('Request Timeout');
-        error.timeout = true;      
+        error.timeout = true;
       } else {
         error = new Error('Request Aborted');
       }
       error.abort = true;
       if (options.on_abort) options.on_abort.call(options.bind, error);
-      options.done.call(options.bind, error, null);
+      options.done.call(options.bind, error, {});
     };
-    request.onerror = function(e) {
-      options.done.call(options.bind, e, null);
+    request.onerror = function(error) {
+      options.done.call(options.bind, error, {});
     };
   
     request.open(options.method, options.url, true);
@@ -2493,6 +2528,7 @@
       };
       if (response.header('content-type', 'application/json')) {
         response.data = JSON.parse(response.text);
+        response.result = response.data;
       }
       if (request.status >= 200 && request.status < 400) {
         response.ok = true;
@@ -2903,6 +2939,8 @@
     get_fn_name: get_fn_name,
     timer: timer,
     time_ago: time_ago,
+    start_of: start_of,
+    end_of: end_of,
     combine: combine,
     done: done,
     bind: bind,
