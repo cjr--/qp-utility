@@ -46,8 +46,8 @@ function http_request(options) {
       var error = new Error('Request Timed Out');
       error.timeout = true;
       if (options.on_timeout) options.on_timeout.call(options.bind, error);
-      options.done.call(options.bind, error, null);
-    }
+      options.done.call(options.bind, error, {});
+    };
   }
   request.onabort = function() {
     var error;
@@ -56,16 +56,16 @@ function http_request(options) {
       error.cancelled = true;
     } else if (request.user_timeout) {
       error = new Error('Request Timeout');
-      error.timeout = true;      
+      error.timeout = true;
     } else {
       error = new Error('Request Aborted');
     }
     error.abort = true;
     if (options.on_abort) options.on_abort.call(options.bind, error);
-    options.done.call(options.bind, error, null);
+    options.done.call(options.bind, error, {});
   };
-  request.onerror = function(e) {
-    options.done.call(options.bind, e, null);
+  request.onerror = function(error) {
+    options.done.call(options.bind, error, {});
   };
 
   request.open(options.method, options.url, true);
@@ -86,6 +86,7 @@ function http_request(options) {
     };
     if (response.header('content-type', 'application/json')) {
       response.data = JSON.parse(response.text);
+      response.result = response.data;
     }
     if (request.status >= 200 && request.status < 400) {
       response.ok = true;
