@@ -1,8 +1,10 @@
-var month_long = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-var month_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-var day_long = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-var day_short = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
+var date_format = {
+  MMMM: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+  MMM: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  dddd: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+  ddd: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+};
 
 // 0001-01-01T00:00:00+00:00
 var beginning_of_time = -62135596800000;
@@ -10,7 +12,15 @@ var beginning_of_time = -62135596800000;
 var end_of_time = 253402214400000;
 
 function format_date(dt, format) {
-  if (format === 'utc') {
+  if (not_defined(format)) {
+    return dt;
+  } else if (format === 'YYYY') {
+    return dt.getUTCFullYear();
+  } else if (format === 'MMMM' || format === 'MMM') {
+    return date_format[format][dt.getUTCMonth()];
+  } else if (format === 'dddd' || format === 'ddd') {
+    return date_format[format][dt.getUTCDay()];
+  } else if (format === 'utc') {
     return dt.toUTCString();
   } else if (format === 'iso') {
     return dt.toISOString();
@@ -44,6 +54,23 @@ function now(format) {
     };
     return _now;
   }
+}
+
+function start_of(dt, epoch, format) {
+  if (epoch === 'month') {
+    dt = new Date(dt);
+    dt.setUTCDate(1);
+  }
+  return format_date(dt, format);
+}
+
+function end_of(dt, epoch, format) {
+  if (epoch === 'month') {
+    dt = new Date(dt);
+    dt.setUTCMonth(dt.getUTCMonth() + 1);
+    dt.setUTCDate(0);
+  }
+  return format_date(dt, format);
 }
 
 function date(dt, format) {
@@ -110,8 +137,10 @@ function date_time(dt) {
     format: function(format) {
       if (format === 'utc') {
         return dt.toUTCString();
+      } else if (format === 'day month, year') {
+        return dt.getDate() + ' ' + date_format['MMM'][dt.getMonth()] + ', ' + dt.getFullYear();
       } else if (format === 'month day, year') {
-        return month_short[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+        return date_format['MMM'][dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
       }
       return dt;
     }
