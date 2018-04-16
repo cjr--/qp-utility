@@ -32,7 +32,7 @@ function round(n, decimals) {
 }
 
 function random(min, max) {
-  return Math.round(min + (Math.random() * (max -min)));
+  return Math.round(min + (Math.random() * (max - min)));
 }
 
 function random_pick(o) {
