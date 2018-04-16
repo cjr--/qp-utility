@@ -1,4 +1,8 @@
 function make(_exports, definition) {
+  if (arguments.length === 1) {
+    definition = _exports;
+    _exports = false;
+  }
   var name = definition.ns.split('/').pop().toLowerCase();
   /*jslint evil: true*/
   // var ctor = (new Function('return function ' + name + '(o){this.construct.call(this,o||{});}'))();
@@ -26,10 +30,12 @@ function make(_exports, definition) {
     });
   }
 
-  each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+  // each(definition.self, function(v, k) { ctor[k] = is(v, 'function') ? v.bind(ctor) : v; });
+  each(definition.self, function(v, k) { ctor[k] = v; });
 
   each(definition, function(v, k) {
     if (inlist(k, 'ns', 'mixin', 'self')) {
+      // nop
     } else if (is(v, 'function')) {
       if (k === 'init') {
         ctor.inits.push(v);
@@ -56,5 +62,5 @@ function make(_exports, definition) {
     invoke(ctor.setups, this);
   };
 
-  return _exports(ctor.ns, ctor);
+  return (_exports ? _exports(ctor.ns, ctor) : ctor);
 }
