@@ -22,6 +22,25 @@ function to_array(o) {
   }
 }
 
+function zip(keys, values) {
+  var zipped = {};
+  if (is_array(keys) && is_array(values)) {
+    for (var i = 0, l = Math.min(keys.length, values.length); i < l; i++) {
+      zipped[keys[i]] = values[i];
+    }
+  }
+  return zipped;
+}
+
+function unzip(o) {
+  var unzipped = { keys: [], values: [] };
+  each_own(o, function(v, k) {
+    unzipped.values.push(v);
+    unzipped.keys.push(k);
+  });
+  return unzipped;
+}
+
 function union() {
   return slice.call(arguments).reduce(function(output, input) {
     return to_array(output).concat(to_array(input));
