@@ -37,7 +37,7 @@ module.exports = function(target) {
     'sum','min','max','avg','round','random','random_pick','random_bool','in_range','max_number','truncate','clamp',
     'interpolate','ease_in','ease_out','ease_in_out','lerp',
     'currency','currency_list','Money','money','Decimal','decimal',
-    'map','reduce','arg','to_array','flatten','compact','insert_at',
+    'map','reduce','arg','to_array','flatten','compact','insert_at','zip','unzip',
     'now','date','date_time','empty_date','is_empty_date','bot','is_bot','eot','is_eot','file_date',
     'get_fn_name','timer','time_ago','start_of','end_of',
     'combine','done','bind','chain','partial','invoke','invoke_after','invoke_delay','invoke_next','invoke_when',
