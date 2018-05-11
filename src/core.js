@@ -19,6 +19,8 @@ function is_string(o) { return typeof o === 'string'; }
 
 function is_function(o) { return typeof o === 'function'; }
 
+function is_object(o) { return o && o.constructor === Object; }
+
 function is_null(o) { return o === null; }
 
 function not_null(o) { return o !== null; }

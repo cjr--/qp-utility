@@ -29,6 +29,8 @@
   
   function is_function(o) { return typeof o === 'function'; }
   
+  function is_object(o) { return o && o.constructor === Object; }
+  
   function is_null(o) { return o === null; }
   
   function not_null(o) { return o !== null; }
@@ -2507,6 +2509,7 @@
     boolean: boolean,
     no: empty,
     not: not,
+    is_object: is_object,
     is_null: is_null,
     not_null: not_null,
     empty: empty,
