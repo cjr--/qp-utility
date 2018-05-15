@@ -29,6 +29,8 @@ function http_request(options) {
     }
   }
   options.method = upper(options.method);
+  request.open(options.method, options.url, true);
+  set_request_headers(request, options.headers);
 
   if (options.upload_progress) {
     request.upload.onprogress = function(e) {
@@ -68,8 +70,6 @@ function http_request(options) {
     options.done.call(options.bind, error, {});
   };
 
-  request.open(options.method, options.url, true);
-  set_request_headers(request, options.headers);
   request.onload = function() {
     if (options.timeout_id) { clearTimeout(options.timeout_id); }
     response.status = request.status;
@@ -100,9 +100,9 @@ function http_request(options) {
 }
 
 function set_request_headers(http_request, headers) {
-  for (var key in headers) {
-    http_request.setRequestHeader(key, headers[key]);
-  }
+  each_own(headers, function(header, key) {
+    http_request.setRequestHeader(key, header);
+  });
 }
 
 function get_response_headers(http_request) {
