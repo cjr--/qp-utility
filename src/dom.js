@@ -85,11 +85,13 @@ function element(arg0, arg1) {
 }
 
 function on(el, event_name, handler, scope) {
-  if (scope) handler.bind(scope);
+  if (scope) handler = handler.bind(scope);
+  el = element(el);
   el.addEventListener(event_name, handler, false);
 }
 
 function off(el, event_name, handler) {
+  el = element(el);
   el.removeEventListener(event_name, handler);
 }
 
