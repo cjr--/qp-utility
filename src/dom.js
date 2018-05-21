@@ -78,6 +78,8 @@ function element(arg0, arg1) {
     } else if (arg_count === 2) {
       return select_first(arg0, arg1);
     }
+  } else if (arg_count === 1 && (arg0 === window || arg0 === document)) {
+    return arg0;
   } else if (defined(arg0.length)) {
     return arg_count === 1 ? element(arg0[0]) : element(arg0[0], arg1);
   }
