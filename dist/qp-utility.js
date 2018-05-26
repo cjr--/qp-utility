@@ -487,9 +487,9 @@
   
   function arg(o) { return slice.call(o); }
   
-  function to_array(o) {
+  function to_array(o, copy) {
     if (is_array(o)) {
-      return o;
+      return copy ? o.slice(0) : o;
     } else if (typeof o === 'function') {
       return [o];
     } else if (o && o['length']) {
@@ -1757,7 +1757,8 @@
   
   var sort = (function() {
     function _sort(items, sorters, options) {
-      items = to_array(items);
+      options = qp_options(options, { copy: false });
+      items = to_array(items, options);
       each(items, function(item, i) { item.__idx = i; });
       sorters = to_array(sorters);
       var sorters_length = sorters.length;

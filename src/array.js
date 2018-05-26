@@ -4,9 +4,9 @@ function reduce(o, fn, init) {
 
 function arg(o) { return slice.call(o); }
 
-function to_array(o) {
+function to_array(o, copy) {
   if (is_array(o)) {
-    return o;
+    return copy ? o.slice(0) : o;
   } else if (typeof o === 'function') {
     return [o];
   } else if (o && o['length']) {

@@ -1,6 +1,7 @@
 var sort = (function() {
   function _sort(items, sorters, options) {
-    items = to_array(items);
+    options = qp_options(options, { copy: false });
+    items = to_array(items, options);
     each(items, function(item, i) { item.__idx = i; });
     sorters = to_array(sorters);
     var sorters_length = sorters.length;
