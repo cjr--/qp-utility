@@ -49,3 +49,5 @@ function not(o) { return o === false; }
 function dfault(value, dfault) { return not_defined(value) ? dfault : value; }
 
 function boolean(value, dfault) { return is_boolean(value) ? value : dfault; }
+
+function number(value, dfault) { return is_number(value) ? value : dfault; }
