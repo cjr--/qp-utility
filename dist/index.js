@@ -60,6 +60,8 @@
   
   function boolean(value, dfault) { return is_boolean(value) ? value : dfault; }
   
+  function number(value, dfault) { return is_number(value) ? value : dfault; }
+  
   function empty_or_whitespace(o) {
     return empty(o) || (is_string(o) && o.replace(/\s/g, '').length === 0);
   }
@@ -654,7 +656,9 @@
   var end_of_time = 253402214400000;
   
   function format_date(dt, format) {
-    if (not_defined(format)) {
+    if (isNaN(+dt)) {
+      return null;
+    } else if (not_defined(format)) {
       return dt;
     } else if (format === 'YYYY') {
       return dt.getUTCFullYear();
@@ -2508,6 +2512,7 @@
     random: random,
     dfault: dfault,
     boolean: boolean,
+    number: number,
     no: empty,
     not: not,
     is_object: is_object,
