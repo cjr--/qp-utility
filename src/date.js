@@ -12,7 +12,9 @@ var beginning_of_time = -62135596800000;
 var end_of_time = 253402214400000;
 
 function format_date(dt, format) {
-  if (not_defined(format)) {
+  if (isNaN(+dt)) {
+    return null;
+  } else if (not_defined(format)) {
     return dt;
   } else if (format === 'YYYY') {
     return dt.getUTCFullYear();
