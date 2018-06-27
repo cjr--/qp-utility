@@ -12,9 +12,9 @@ module.exports = function(target) {
     fns = fns.concat([]);
   } else if (target === 'browser') {
     js_files = js_files.concat([
-      'browser_core'
+      'browser_core', 'base64'
     ]);
-    fns = fns.concat([ 'hex_to_rgb', 'validate_color_hex', 'brighten_hex', 'darken_hex' ]);
+    fns = fns.concat([ 'hex_to_rgb', 'validate_color_hex', 'brighten_hex', 'darken_hex', 'base64_decode' ]);
   }
 
   js_files = js_files.concat([
