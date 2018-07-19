@@ -7,8 +7,7 @@ function base64_decode(data_uri) {
   var data = rtrim(data_uri.slice(data_uri.indexOf(';base64,') + 8), '=');
   var bytes = parseInt((data.length / 4) * 3, 10);
   var uarray = new Uint8Array(bytes);
-  var chr1, chr2, chr3;
-  var enc1, enc2, enc3, enc4;
+  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
   data = data.replace(/[^A-Za-z0-9\+\/\=]/g, "");
   for (var i = 0, j = 0; i < bytes; i += 3) {	
     // get the 3 octects in 4 ascii chars

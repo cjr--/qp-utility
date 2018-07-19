@@ -35,6 +35,15 @@ function random(min, max) { return Math.floor(Math.random() * (max - min)) + min
 
 function is_array_like(o) { return !is_array(o) && is_value(o) && !is_string(o) && !is_function(o) && o.length; }
 
+function is_empty(o) {
+  return o === null ||
+    typeof o === 'undefined' || 
+    (is_array(o) && o.length === 0) ||
+    (is_string(o) && o.length === 0) ||
+    (is_number(o) && o === 0) ||
+    (is_object(o) && Object.keys(o).length === 0);
+}
+
 function empty(o) {
   return typeof o === 'undefined' || o === null ||
     (is_array(o) && o.length === 0) ||
