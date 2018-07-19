@@ -48,8 +48,7 @@
     var data = rtrim(data_uri.slice(data_uri.indexOf(';base64,') + 8), '=');
     var bytes = parseInt((data.length / 4) * 3, 10);
     var uarray = new Uint8Array(bytes);
-    var chr1, chr2, chr3;
-    var enc1, enc2, enc3, enc4;
+    var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
     data = data.replace(/[^A-Za-z0-9\+\/\=]/g, "");
     for (var i = 0, j = 0; i < bytes; i += 3) {	
       // get the 3 octects in 4 ascii chars
@@ -103,6 +102,15 @@
   function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
   
   function is_array_like(o) { return !is_array(o) && is_value(o) && !is_string(o) && !is_function(o) && o.length; }
+  
+  function is_empty(o) {
+    return o === null ||
+      typeof o === 'undefined' || 
+      (is_array(o) && o.length === 0) ||
+      (is_string(o) && o.length === 0) ||
+      (is_number(o) && o === 0) ||
+      (is_object(o) && Object.keys(o).length === 0);
+  }
   
   function empty(o) {
     return typeof o === 'undefined' || o === null ||
@@ -2892,6 +2900,7 @@
     noop: noop,
     noop_callback: noop_callback,
     escape_re: escape_re,
+    is_empty: is_empty,
     is_value: is_value,
     is_boolean: is_boolean,
     is_number: is_number,
