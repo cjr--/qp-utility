@@ -1,9 +1,15 @@
 /* eslint indent: 0 */
+/* eslint no-console: 0 */
+
+require('qp-define');
 
 var fs = require('fs');
 var uglify = require('uglify-js');
 var path = require('path');
+var term = require('qp-library/term');
 var definition = require('./definition');
+
+term.set_title('qp-utility - build');
 
 var browser = definition('browser');
 var node = definition('node');

@@ -16,7 +16,8 @@
   "devDependencies": {
     "node-watch": "^0.5.8",
     "qp-library": "^2.1.30",
-    "uglify-js": "^3.4.9"
+    "uglify-js": "^3.4.9",
+    "qp-library": "*"
   },
   "dependencies": {
     "qp-define": "^2"
