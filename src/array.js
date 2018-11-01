@@ -22,6 +22,10 @@ function to_array(o, copy) {
   }
 }
 
+function csv() {
+  return compact(arguments).join(',');
+}
+
 function zip(keys, values) {
   var zipped = {};
   if (is_array(keys) && is_array(values)) {

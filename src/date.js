@@ -6,10 +6,15 @@ var date_format = {
   ddd: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 };
 
+// -271821-04-20T00:00:00.000Z
+// js_min_date = -8640000000000000
+// +275760-09-13T00:00:00.000Z
+// js_max_date = 8640000000000000
+
 // 0001-01-01T00:00:00+00:00
-var beginning_of_time = -62135596800000;
+var min_date = -62135596800000;
 // 9999-12-31T00:00:00+00:00
-var end_of_time = 253402214400000;
+var max_date = 253402214400000;
 
 function format_date(dt, format) {
   if (isNaN(+dt)) {
@@ -37,6 +42,26 @@ function format_date(dt, format) {
     return [hours, minutes, seconds].join(':');
   } else {
     return dt;
+  }
+}
+
+function iso(dt, offset) {
+  if (is(dt, 'number', 'string')) dt = new Date(dt);
+  if (is_not(dt, 'date')) dt = new Date(min_date);
+  if (offset) {
+    if (is(offset, 'boolean')) offset = '+00:00';
+    return [
+      lpad(dt.getUTCFullYear(),     '0', 4), '-',
+      lpad(dt.getUTCMonth() + 1,    '0', 2), '-',
+      lpad(dt.getUTCDate(),         '0', 2), 'T',
+      lpad(dt.getUTCHours(),        '0', 2), ':',
+      lpad(dt.getUTCMinutes(),      '0', 2), ':',
+      lpad(dt.getUTCSeconds(),      '0', 2), '.',
+      lpad(dt.getUTCMilliseconds(), '0', 3),
+      offset
+    ].join('');
+  } else {
+    return dt.toISOString();
   }
 }
 
@@ -80,27 +105,27 @@ function date(dt, format) {
 }
 
 function bot(format) {
-  return format_date(new Date(beginning_of_time), format);
+  return format_date(new Date(min_date), format);
 }
 
 function is_bot(dt) {
-  return +dt === beginning_of_time;
+  return +dt === min_date;
 }
 
 function eot(format) {
-  return format_date(new Date(end_of_time), format);
+  return format_date(new Date(max_date), format);
 }
 
 function is_eot(dt) {
-  return +dt === end_of_time;
+  return +dt === max_date;
 }
 
 function empty_date(format) {
-  return format_date(new Date(beginning_of_time), format);
+  return format_date(new Date(min_date), format);
 }
 
 function is_empty_date(dt) {
-  return +dt === beginning_of_time;
+  return +dt === min_date;
 }
 
 function time_ago(dt) {
