@@ -702,24 +702,15 @@
     }
   }
   
-  function iso(dt, offset) {
-    if (is(dt, 'number', 'string')) dt = new Date(dt);
-    if (is_not(dt, 'date')) dt = new Date(min_date);
-    if (offset) {
-      if (is(offset, 'boolean')) offset = '+00:00';
-      return [
-        lpad(dt.getUTCFullYear(),     '0', 4), '-',
-        lpad(dt.getUTCMonth() + 1,    '0', 2), '-',
-        lpad(dt.getUTCDate(),         '0', 2), 'T',
-        lpad(dt.getUTCHours(),        '0', 2), ':',
-        lpad(dt.getUTCMinutes(),      '0', 2), ':',
-        lpad(dt.getUTCSeconds(),      '0', 2), '.',
-        lpad(dt.getUTCMilliseconds(), '0', 3),
-        offset
-      ].join('');
-    } else {
-      return dt.toISOString();
+  function iso(dt) {
+    if (is(dt, 'string')) dt = new Date(dt);
+    if (is(dt, 'number')) {
+      if (dt === -Infinity) dt = new Date(min_date);
+      else if (dt === Infinity) dt = new Date(max_date);
+      else dt = new Date(dt);
     }
+    if (is_not(dt, 'date')) dt = new Date(min_date);
+    return dt.toISOString();
   }
   
   function now(format) {
