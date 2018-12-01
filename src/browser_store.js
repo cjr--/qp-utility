@@ -70,6 +70,10 @@ define(module, function(exports, require) {
       return data;
     },
 
+    each: function(fn) {
+      qp.each_own(this.store, fn);
+    },
+
     get_item: function(key) {
       var item = this.store.getItem(this.get_key(key));
       if (item) {
