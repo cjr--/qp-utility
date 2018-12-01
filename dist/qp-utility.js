@@ -297,9 +297,13 @@
     if (!right) right = left;
     if (s && left && right) {
       var startAt = s.indexOf(left) + 1;
-      return s.slice(startAt, s.indexOf(right, startAt));
+      if (startAt > 0) {
+        return s.slice(startAt, s.indexOf(right, startAt));
+      } else {
+        return '';
+      }
     } else {
-      return s;
+      return '';
     }
   }
   
@@ -3371,6 +3375,10 @@
           }
         });
         return data;
+      },
+  
+      each: function(fn) {
+        qp.each_own(this.store, fn);
       },
   
       get_item: function(key) {
