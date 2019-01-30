@@ -35,12 +35,14 @@ define(module, function(exports, require) {
 
     root: null,
     store: null,
+    cache: null,
     key: 'qp',
     ctx: '',
 
     init: function(options) {
       this.root = this.self;
       this.store = window.localStorage;
+      this.cache = { };
     },
 
     get_key: function(key) { return this.key + (this.ctx ? '.' + this.ctx : '') + (key ? '.' + key : ''); },
@@ -74,21 +76,25 @@ define(module, function(exports, require) {
       qp.each_own(this.store, fn);
     },
 
-    get_item: function(key) {
-      var item = this.store.getItem(this.get_key(key));
-      if (item) {
-        return JSON.parse(item);
+    get_item: function(key, o) {
+      key = this.get_key(key);
+      var item;
+      if (o.memory) {
+        item = this.cache[key];
       } else {
-        return {
-          key: key,
-          created: +(new Date()),
-          data: null
-        };
+        var value = this.store.getItem(key);
+        if (value) item = JSON.parse(value);
       }
+      return item || { key: key, created: +(new Date()), data: null };
     },
 
-    set_item: function(key, item) {
-      this.store.setItem(this.get_key(key), JSON.stringify(item));
+    set_item: function(key, item, o) {
+      key = this.get_key(key);
+      if (o.memory) {
+        this.cache[key] = item;
+      } else {
+        this.store.setItem(key, JSON.stringify(item));
+      }
     },
 
     get: function(options) {
@@ -96,7 +102,7 @@ define(module, function(exports, require) {
         log('%cCACHE OVERRIDE %s', 'color:darkblue', options.key);
         return null;
       } else {
-        var item = this.get_item(options.key);
+        var item = this.get_item(options.key, { memory: options.memory });
         if (options.max_age && qp.is_number(options.max_age)) {
           var max_age = moment().subtract(options.max_age);
           if (item.data === null) {
@@ -116,19 +122,25 @@ define(module, function(exports, require) {
     },
 
     set: function(options) {
-      var item = this.get_item(options.key);
+      var item = this.get_item(options.key, { memory: options.memory });
       item.modified = +(new Date());
       item.data = options.data;
-      this.set_item(options.key, item);
+      this.set_item(options.key, item, { memory: options.memory });
       return options.data;
     },
 
     remove: function(options) {
-      this.store.removeItem(this.get_key(options.key));
+      var key = this.get_key(options.key)
+      if (options.memory) {
+        qp.delete_key(this.cache, key);
+      } else {
+        this.store.removeItem(key);
+      }
     },
 
     destroy: function() {
       qp.each_own(this.store, function(v, k) { this.store.removeItem(k); }.bind(this));
+      this.cache = {};
     },
 
     // Collections
