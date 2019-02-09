@@ -23,3 +23,19 @@ function qp_delete(o, k) {
   }
   return o;
 }
+
+function hash(o, k) {
+  var hash = {};
+  if (is_array(o)) {
+    each(o, function(item, index) {
+      item.__idx = index;
+      if (item.hasOwnProperty(k)) hash[item[k]] = item;
+    });
+  } else if (is_object(o)) {
+    each_own(o, function(item, key, index) {
+      item.__idx = index;
+      if (item.hasOwnProperty(k)) hash[item[k]] = item;
+    });
+  }
+  return hash;
+}

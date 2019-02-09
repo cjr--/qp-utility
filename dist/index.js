@@ -659,6 +659,22 @@
     return o;
   }
   
+  function hash(o, k) {
+    var hash = {};
+    if (is_array(o)) {
+      each(o, function(item, index) {
+        item.__idx = index;
+        if (item.hasOwnProperty(k)) hash[item[k]] = item;
+      });
+    } else if (is_object(o)) {
+      each_own(o, function(item, key, index) {
+        item.__idx = index;
+        if (item.hasOwnProperty(k)) hash[item[k]] = item;
+      });
+    }
+    return hash;
+  }
+  
   var iso_date_re = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
   var date_format = {
     MMMM: ['January','February','March','April','May','June','July','August','September','October','November','December'],
@@ -2738,6 +2754,7 @@
     has_key: has_key,
     delete_key: delete_key,
     delete: qp_delete,
+    hash: hash,
     select: select,
     is_valid: is_valid,
     is_alpha_numeric: is_alpha_numeric,

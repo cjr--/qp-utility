@@ -77,6 +77,7 @@ define(module, function(exports, require) {
     },
 
     get_item: function(key, o) {
+      o = o || {};
       key = this.get_key(key);
       var item;
       if (o.memory) {
@@ -89,6 +90,7 @@ define(module, function(exports, require) {
     },
 
     set_item: function(key, item, o) {
+      o = o || {};
       key = this.get_key(key);
       if (o.memory) {
         this.cache[key] = item;
@@ -130,7 +132,7 @@ define(module, function(exports, require) {
     },
 
     remove: function(options) {
-      var key = this.get_key(options.key)
+      var key = this.get_key(options.key);
       if (options.memory) {
         qp.delete_key(this.cache, key);
       } else {
