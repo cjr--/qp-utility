@@ -6,7 +6,11 @@ function pick(source, o) {
     } else if (is(o, 'function')) {
       each_own(source, function(v, k) { if (o(v, k, i)) target[k] = v; });
     } else if (is(o, 'string')) {
-      return pick(source, rest(arguments));
+      if (arguments.length === 2) {
+        return pick(source, o.split(','));
+      } else {
+        return pick(source, rest(arguments));
+      }
     }
   }
   return target;
