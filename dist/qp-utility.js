@@ -2774,6 +2774,7 @@
   }
   
   function show(el, v) {
+    el = element(el);
     if (v === 'auto') {
       var name = qp.lower(el.nodeName);
       if (qp.in(name, 'span', 'a', 'button', 'img', 'textarea', 'select')) v = 'inline';
@@ -2784,6 +2785,7 @@
   }
   
   function hide(el, v) {
+    el = element(el);
     el.style.display = v || 'none';
   }
   
