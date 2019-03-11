@@ -9,7 +9,7 @@ var path = require('path');
 var term = require('qp-library/term');
 var definition = require('./definition');
 
-term.set_title('qp-utility - build');
+term.set_title('qp-utility');
 
 var browser = definition('browser');
 var node = definition('node');
