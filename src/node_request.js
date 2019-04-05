@@ -39,26 +39,27 @@ function http_request(options) {
     http_response.setEncoding('utf8');
     response.headers = http_response.headers;
     response.status = http_response.statusCode;
-    if (response.status >= 200 && response.status < 400) {
-      response.content_type = response.headers['content-type'];
-      response.json = /^application\/json/.test(response.content_type);
-      response.ok = true;
-      response.text = '';
-      http_response.on('data', (chunk) => response.text += chunk);
-      http_response.on('end', () => {
-        if (response.json) {
-          try {
-            response.data = JSON.parse(trim(response.text));
-            response.result = response.data;
-          } catch (error) {
-            return options.done(error, response);
-          }
+    response.content_type = response.headers['content-type'];
+    response.json = /^application\/json/.test(response.content_type);
+    response.text = '';
+    http_response.on('data', (chunk) => response.text += chunk);
+    http_response.on('end', () => {
+      if (response.json) {
+        try {
+          response.data = JSON.parse(trim(response.text));
+          response.result = response.data;
+        } catch (error) {
+          return options.done(error, response);
         }
+      }
+      if (response.status >= 200 && response.status < 400) {
+        response.ok = true;
         options.done(null, response);
-      });
-    } else {
-      options.done({ status: response.status }, response);
-    }
+      } else {
+        response.ok = false;
+        options.done({ status: response.status }, response);
+      }
+    });
   });
   http_request.on('error', (error) => options.done(error, {}));
   if (options.method === 'POST' && request.data) {
