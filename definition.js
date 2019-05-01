@@ -28,7 +28,7 @@ module.exports = function(target) {
 
   fns = fns.concat([
     'noop','noop_callback','escape_re','is_empty','is_value','is_boolean','is_number','is_function','is_string','is_array','is_array_like','defined',
-    'undefined:not_defined','random','dfault','boolean','number','no:empty','not','is_object','is_null','not_null','empty','not_empty',
+    'undefined:not_defined','random','iif','dfault','boolean','number','no:empty','not','is_object','is_null','not_null','empty','not_empty',
     'empty_or_whitespace','upper','lower','trim','items',
     'ltrim','rtrim','split','join','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',
     'ends','between','before','before_last','after','after_last','title_case','to_title_case','repeat','replace_all','format',
