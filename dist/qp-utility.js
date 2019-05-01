@@ -105,7 +105,7 @@
   
   function is_empty(o) {
     return o === null ||
-      typeof o === 'undefined' || 
+      typeof o === 'undefined' ||
       (is_array(o) && o.length === 0) ||
       (is_string(o) && o.length === 0) ||
       (is_number(o) && o === 0) ||
@@ -122,6 +122,8 @@
   function not_empty(o) { return !empty(o); }
   
   function not(o) { return o === false; }
+  
+  function iif(condition, a, b) { return condition ? a || b : b; }
   
   function dfault(value, dfault) { return not_defined(value) ? dfault : value; }
   
@@ -2957,6 +2959,7 @@
     defined: defined,
     undefined: not_defined,
     random: random,
+    iif: iif,
     dfault: dfault,
     boolean: boolean,
     number: number,
