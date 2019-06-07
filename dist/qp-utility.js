@@ -1533,7 +1533,7 @@
     actions = get_async_actions(actions);
     var next = function() {
       var action = actions.shift();
-      if (action) {
+      if (action && action.fn) {
         action.fn(data, function(error, result) {
           results[action.name] = result;
           if (error) done(error, results); else next();
