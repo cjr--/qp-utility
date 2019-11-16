@@ -52,7 +52,7 @@ module.exports = function(target) {
     'union','chunk','segment','shuffle','unique','clear','push','load','contains','inlist','get_data',
     'set_data','count','all','none','exists','replace','upsert',
     'build_match','match','get_matches','has_key','delete_key','delete:qp_delete','hash','select',
-    'is_valid','is_alpha_numeric','is_length',
+    'is_valid','is_alpha_numeric','is_length','is_url',
     'validate_type','validate_number','validate_not_empty','validate_string',
     'filter_key','filter_display','filter_predicate','filter',
     'define_property','watch','unwatch','watch_property','unwatch_property'
