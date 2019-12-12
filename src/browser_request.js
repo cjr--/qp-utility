@@ -67,6 +67,10 @@ function http_request(options) {
     options.done.call(options.bind, error, {});
   };
   request.onerror = function(error) {
+    if (error.type === 'error' && error.target && error.target.status === 0) {
+      error = new Error('Request Timed Out');
+      error.timeout = true;
+    }
     options.done.call(options.bind, error, {});
   };
 

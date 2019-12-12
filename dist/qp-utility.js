@@ -2338,6 +2338,7 @@
   }
   
   var alpha_numeric_re = /^[a-z0-9]+$/i;
+  var url_re = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gm;
   
   function is_valid(s, re) {
     if (is(s, 'string')) {
@@ -2348,6 +2349,10 @@
   
   function is_alpha_numeric(s) {
     return alpha_numeric_re.test(s);
+  }
+  
+  function is_url(s) {
+    return url_re.test(s);
   }
   
   function is_length(s, l0, l1) {
@@ -2617,6 +2622,10 @@
       options.done.call(options.bind, error, {});
     };
     request.onerror = function(error) {
+      if (error.type === 'error' && error.target && error.target.status === 0) {
+        error = new Error('Request Timed Out');
+        error.timeout = true;
+      }
       options.done.call(options.bind, error, {});
     };
   
@@ -3159,6 +3168,7 @@
     is_valid: is_valid,
     is_alpha_numeric: is_alpha_numeric,
     is_length: is_length,
+    is_url: is_url,
     validate_type: validate_type,
     validate_number: validate_number,
     validate_not_empty: validate_not_empty,
