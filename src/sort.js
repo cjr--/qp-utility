@@ -106,6 +106,10 @@ var sort = (function() {
 
 function get_comparer(type, asc, desc, key) {
   type = type || '';
-  var fn = (sort[type] || sort)[asc ? 'asc' : desc ? 'desc' : 'asc'];
-  return { fn: fn, key: key };
+  if (type === 'natural') {
+    return { fn: sort.natural, key: key, name: type };
+  } else {
+    var direction = asc ? 'asc' : desc ? 'desc' : 'asc';
+    return { fn: (sort[type] || sort)[direction], key: key, name: type + '_' + direction };
+  }
 }

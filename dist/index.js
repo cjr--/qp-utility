@@ -1891,118 +1891,82 @@
   
   function get_comparer(type, asc, desc, key) {
     type = type || '';
-    var fn = (sort[type] || sort)[asc ? 'asc' : desc ? 'desc' : 'asc'];
-    return { fn: fn, key: key };
+    if (type === 'natural') {
+      return { fn: sort.natural, key: key, name: type };
+    } else {
+      var direction = asc ? 'asc' : desc ? 'desc' : 'asc';
+      return { fn: (sort[type] || sort)[direction], key: key, name: type + '_' + direction };
+    }
   }
   
-  function ungroup(items) {
-    remove_all(items, { group: true });
-    return items;
+  function ungroup(item_list) {
+    remove_all(item_list, { group: true });
+    return item_list;
   }
   
-  function group(items, group_keys, options) {
-    items = to_array(items);
-    group_keys = to_array(group_keys);
-    var group_count = group_keys.length;
-    if (group_count === 0) return;
-  
-    var summary = [];
-    var group_id = -99;
+  function group(item_list, group_list) {
+    item_list = to_array(item_list);
+    group_list = to_array(group_list);
+    var reverse_group_list = copy(group_list).reverse();
+    var group_id = -1000;
     var item_index = 0;
+    var item = null;
+    var last_item = null;
+    while (item_index <= item_list.length) {
+      item = item_list[item_index];
+      if (item_index === 0) {
+        each(group_list, function(group) { add_item(header(item, group)); });
+      } else if (item_index < item_list.length) {
+        var header_list = [];
+        each(reverse_group_list, function(group) {
+          if (item[group.group_key] !== last_item[group.group_key]) {
+            add_item(footer(last_item, group));
+            header_list.unshift(header(item, group));
+          }
+        });
+        each(header_list, function(header) { add_item(header); });
+      } else if (item_index === item_list.length) {
+        each(reverse_group_list, function(group) { add_item(footer(last_item, group)); });
+      }
+      last_item = item;
+      item_index++;
+    }
   
-    while (item_index < items.length) {
-      if (group_count === 1) {
-        summary.push(create_group(group_id--, get_key(items[item_index], group_keys[0])));
+    function header(item, group) { return group_item(item, group, { header: true }); }
+    function footer(item, group) { return group_item(item, group, { footer: true }); }
+    function add_item(item) { item_list.splice(item_index++, 0, item); }
+  
+    function group_item(item, group, group_item) {
+      group_item.id = group_id--;
+      group_item.group = true;
+      group_item.key = item[group.group_key];
+      if (group.name_key) group_item.name = get(item, group.name_key);
+      if (group.data_key) group_item.data = get(item, group.data_key);
+      return group_item;
+    }
+  
+    return build_group_list(item_list);
+  }
+  
+  function build_group_list(item_list) {
+    var group = { group_list: [ ] };
+    var stack = [];
+    qp.each(item_list, function(item) {
+      if (item.group && item.header) {
+        var new_group = { header: item, key: item.key, group_list: [ ], item_list: [ ] };
+        if (item.name) new_group.name = item.name;
+        if (item.data) new_group.data = item.data;
+        group.group_list.push(new_group);
+        stack.push(group);
+        group = new_group;
+      } else if (item.group && item.footer) {
+        group.footer = item;
+        group = stack.pop();
       } else {
-        var groups = [];
-        var summary_groups = [];
-        while (groups.length < group_count - 1) {
-          var key = get_key(items[item_index], group_keys[groups.length]);
-          var group = create_header(group_id--, key);
-          groups.push(group);
-          items.splice(item_index++, 0, group);
-          summary_groups.push(create_group_summary(group, 'groups'));
-        }
-        var outer_group = groups[groups.length - 1];
-        var outer_summary_group = summary_groups[groups.length - 1];
-        while (items[item_index] && items[item_index][outer_group.name] === outer_group.key) {
-          outer_summary_group.groups.push(create_group(group_id--, get_key(items[item_index], group_keys[group_count - 1]), groups));
-        }
-        while (groups.length) {
-          groups.pop();
-          var group_summary = summary_groups.shift();
-          group_summary.footer = create_footer(group_summary.id, {
-            name: group_summary.name,
-            key: group_summary.key,
-            id_name: group_summary.id_name,
-            id_key: group_summary.id_key
-          });
-          items.splice(item_index++, 0, group_summary.footer);
-          summary.push(group_summary);
-        }
+        group.item_list.push(item);
       }
-    }
-  
-    function get_key(item, o) {
-      if (is(o, 'string')) {
-        var key_name = o;
-        var key_value = get(item, key_name);
-        return { name: key_name, value: key_value, id_name: key_name,  id_value: key_value };
-      } else if (is(o, 'object')) {
-        return { name: o.key, value: get(item, o.key), id_name: o.id_key, id_value: get(item, o.id_key) };
-      } else {
-        return null;
-      }
-    }
-  
-    function create_group(id, key, outer_groups) {
-      var header = create_header(id, key);
-      var group_summary = create_group_summary(header, 'items');
-      items.splice(item_index++, 0, header);
-      while (items[item_index] && get_key(items[item_index], key.name).value === key.value) {
-        group_summary.items.push(items[item_index]);
-        if (outer_groups) {
-          each(outer_groups, function(grp) { grp.count++; });
-        }
-        group_summary.count++;
-        item_index++;
-      }
-      group_summary.footer = create_footer(id, key);
-      items.splice(item_index++, 0, group_summary.footer);
-      return group_summary;
-    }
-  
-    function create_group_summary(group, list_key) {
-      var summary = { group_id: group.id, name: group.name, key: group.key, id_name: group.id_name, id_key: group.id_key, header: group, count: 0 };
-      summary[list_key] = [];
-      return summary;
-    }
-  
-    function create_header(id, key) {
-      return {
-        id: id,
-        group: true,
-        group_header: true,
-        name: key.name,
-        key: key.value,
-        id_name: key.id_name,
-        id_key: key.id_value
-      };
-    }
-  
-    function create_footer(id, key) {
-      return {
-        id: id,
-        group: true,
-        group_footer: true,
-        name: key.name,
-        key: key.value,
-        id_name: key.id_name,
-        id_key: key.id_value
-      };
-    }
-  
-    return summary;
+    });
+    return group.group_list;
   }
   
   function sum(o, key) {
