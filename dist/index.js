@@ -1918,12 +1918,14 @@
         each(group_list, function(group) { add_item(header(item, group)); });
       } else if (item_index < item_list.length) {
         var header_list = [];
-        each(reverse_group_list, function(group) {
-          if (item[group.group_key] !== last_item[group.group_key]) {
-            add_item(footer(last_item, group));
-            header_list.unshift(header(item, group));
+        var footer_list = [];
+        each(group_list, function(group, index) {
+          if (header_list.length || item[group.group_key] !== last_item[group.group_key]) {
+            footer_list.unshift(footer(last_item, group));
+            header_list.push(header(item, group));
           }
         });
+        each(footer_list, function(footer) { add_item(footer); });
         each(header_list, function(header) { add_item(header); });
       } else if (item_index === item_list.length) {
         each(reverse_group_list, function(group) { add_item(footer(last_item, group)); });
@@ -1962,7 +1964,7 @@
       } else if (item.group && item.footer) {
         group.footer = item;
         group = stack.pop();
-      } else {
+      } else if (group.group_list.length) {
         group.item_list.push(item);
       }
     });
