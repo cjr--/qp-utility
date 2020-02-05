@@ -2009,7 +2009,7 @@
   }
   
   function build_group_list(item_list) {
-    var group = { group_list: [ ] };
+    var group = { group_list: [ ], item_list: [ ] };
     var stack = [];
     qp.each(item_list, function(item) {
       if (item.group && item.header) {
@@ -2022,7 +2022,7 @@
       } else if (item.group && item.footer) {
         group.footer = item;
         group = stack.pop();
-      } else if (group.group_list.length) {
+      } else {
         group.item_list.push(item);
       }
     });
