@@ -1965,6 +1965,7 @@
   function group(item_list, group_list) {
     item_list = to_array(item_list);
     group_list = to_array(group_list);
+    if (empty(item_list) || empty(group_list)) return build_group_list(item_list);
     var reverse_group_list = copy(group_list).reverse();
     var group_id = -1000;
     var item_index = 0;
