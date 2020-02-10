@@ -95,6 +95,10 @@ function http_request(options) {
     if (request.status >= 200 && request.status < 400) {
       response.ok = true;
       options.done.call(options.bind, null, response);
+    } else if (response.status === 408) {
+      error = new Error('Request Timed Out');
+      error.timeout = true;
+      options.done.call(options.bind, error, response);
     } else {
       options.done.call(options.bind, new Error(response.status), response);
     }
