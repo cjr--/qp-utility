@@ -63,6 +63,8 @@ function build_group_list(item_list) {
       group = new_group;
     } else if (item.group && item.footer) {
       group.footer = item;
+      group.header.count = group.item_list.length;
+      group.footer.count = group.item_list.length;
       group = stack.pop();
     } else {
       group.item_list.push(item);
