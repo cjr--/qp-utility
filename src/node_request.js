@@ -62,7 +62,7 @@ function http_request(options) {
     });
   });
   http_request.on('error', (error) => options.done(error, {}));
-  if (options.method === 'POST' && request.data) {
+  if (request.method === 'POST' && request.data) {
     http_request.write(request.data);
   }
   http_request.end();
