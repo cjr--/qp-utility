@@ -71,11 +71,14 @@
   var concat = Array.prototype.concat;
   var to_string = Object.prototype.toString;
   var for_each = Array.prototype.forEach;
-  var class_re = /^\.([\w\-]+)$/;
+  var has_own_property = Object.prototype.hasOwnProperty;
+  var class_re = /^\.([\w-]+)$/;
   
   function noop(o) { return o; }
   
   function noop_callback(data, done) { invoke_next(done, null, data); }
+  
+  function has_property(o, k) { return has_own_property.call(o, k); }
   
   function is_value(o) { return typeof o !== 'undefined' && o !== null; }
   
@@ -97,7 +100,7 @@
   
   function not_defined(o) { return typeof o === 'undefined'; }
   
-  function escape_re(o) { return o.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); }
+  function escape_re(o) { return o.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'); }
   
   function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
   
@@ -2936,6 +2939,7 @@
     noop: noop,
     noop_callback: noop_callback,
     escape_re: escape_re,
+    has_property: has_property,
     is_empty: is_empty,
     is_value: is_value,
     is_boolean: is_boolean,

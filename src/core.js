@@ -3,14 +3,14 @@ var slice = Array.prototype.slice;
 var concat = Array.prototype.concat;
 var to_string = Object.prototype.toString;
 var for_each = Array.prototype.forEach;
-var _hasOwnProperty = Object.prototype.hasOwnProperty;
+var has_own_property = Object.prototype.hasOwnProperty;
 var class_re = /^\.([\w-]+)$/;
 
 function noop(o) { return o; }
 
 function noop_callback(data, done) { invoke_next(done, null, data); }
 
-function has_property(o, k) { return _hasOwnProperty.call(o, key); }
+function has_property(o, k) { return has_own_property.call(o, k); }
 
 function is_value(o) { return typeof o !== 'undefined' && o !== null; }
 
