@@ -27,7 +27,8 @@ module.exports = function(target) {
   css_files = css_files.concat([ ]);
 
   fns = fns.concat([
-    'noop','noop_callback','escape_re','is_empty','is_value','is_boolean','is_number','is_function','is_string','is_array','is_array_like','defined',
+    'noop','noop_callback','escape_re','has_property',
+    'is_empty','is_value','is_boolean','is_number','is_function','is_string','is_array','is_array_like','defined',
     'undefined:not_defined','random','iif','dfault','boolean','number','no:empty','not','is_object','is_null','not_null','empty','not_empty',
     'empty_or_whitespace','upper','lower','trim','items',
     'ltrim','rtrim','split','join','build','escape','unescape','pad','lpad','rpad','starts','clean_whitespace','lines','plural',

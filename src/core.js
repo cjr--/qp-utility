@@ -3,11 +3,14 @@ var slice = Array.prototype.slice;
 var concat = Array.prototype.concat;
 var to_string = Object.prototype.toString;
 var for_each = Array.prototype.forEach;
-var class_re = /^\.([\w\-]+)$/;
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+var class_re = /^\.([\w-]+)$/;
 
 function noop(o) { return o; }
 
 function noop_callback(data, done) { invoke_next(done, null, data); }
+
+function has_property(o, k) { return _hasOwnProperty.call(o, key); }
 
 function is_value(o) { return typeof o !== 'undefined' && o !== null; }
 
@@ -29,7 +32,7 @@ function defined(o) { return !not_defined(o); }
 
 function not_defined(o) { return typeof o === 'undefined'; }
 
-function escape_re(o) { return o.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); }
+function escape_re(o) { return o.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'); }
 
 function random(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
 
