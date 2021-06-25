@@ -2086,7 +2086,7 @@
     { id: 18, code: 'INR', name: 'Indian Rupee',        unit: 'rupee',  symbol: '₹',  decimals: 2, html: '&#20B9;' },
     { id: 19, code: 'BRL', name: 'Brazilian Real',      unit: 'real',   symbol: 'R$', decimals: 2, html: '&#0024;' },
     { id: 20, code: 'ZAR', name: 'South African Rand',  unit: 'rand',   symbol: 'R',  decimals: 2, html: '&#0082;' },
-    { id: 21, code: 'THB', name: 'Thai Baht',           unit: 'baht',   symbol: '฿',  decimals: 2, html: '&#0E3F;' } 
+    { id: 21, code: 'THB', name: 'Thai Baht',           unit: 'baht',   symbol: '฿',  decimals: 2, html: '&#0E3F;' }
   ];
   
   var currency_lookup = { };
@@ -2167,12 +2167,9 @@
         var sign = value.indexOf('-') !== -1 ? '-' : '';
         value = value.replace(/[^0-9.]/g, '');
         var parts = value.split('.');
-        value = sign + (parts[0] || '0') + (this.currency.decimals ? '.' + (parts[1] || '0') : '');
-        value = Number(value);
-        this.int_value = Math.round(value * this.currency.pow);
-      } else {
-        this.int_value = bankers_round(value, this.currency.decimals) * this.currency.pow;
+        value = Number(sign + (parts[0] || '0') + (this.currency.decimals ? '.' + (parts[1] || '0') : ''));
       }
+      this.int_value = bankers_round(value * this.currency.pow);
       this.precision = this.currency.decimals;
       this.value = this.int_value / this.currency.pow;
       this.display = this.value.toLocaleString(this.locale, { style: 'currency', currency: this.currency.code });
