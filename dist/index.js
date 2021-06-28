@@ -9,7 +9,7 @@
   }
   
   function get_locale() {
-    return replace_all(before(process.env.LANG || process.env.LANGUAGE, '.'), '_', '-') || 'en-GB';
+    return 'en-GB';
   }
   
   var is_array = Array.isArray;
