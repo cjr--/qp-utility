@@ -87,7 +87,7 @@ function money(currency_code, value, locale) {
 }
 
 function Money(currency_code, value, o) {
-  o = qp_options(o, { locale: navigator.language });
+  o = qp_options(o, { locale: get_locale() });
   this.input = value;
   this.locale = o.locale;
   if (is(currency_code, 'string')) {

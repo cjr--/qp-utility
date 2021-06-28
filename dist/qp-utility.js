@@ -4,6 +4,10 @@
     return '\n';
   }
   
+  function get_locale() {
+    return navigator.language;
+  }
+  
   function hex_to_rgb(hex, alpha) {
     hex = ltrim(hex, '#');
     alpha = alpha || 1;
@@ -2212,7 +2216,7 @@
   }
   
   function Money(currency_code, value, o) {
-    o = qp_options(o, { locale: navigator.language });
+    o = qp_options(o, { locale: get_locale() });
     this.input = value;
     this.locale = o.locale;
     if (is(currency_code, 'string')) {

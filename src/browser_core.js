@@ -2,6 +2,10 @@ function eol() {
   return '\n';
 }
 
+function get_locale() {
+  return navigator.language;
+}
+
 function hex_to_rgb(hex, alpha) {
   hex = ltrim(hex, '#');
   alpha = alpha || 1;

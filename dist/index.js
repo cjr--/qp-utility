@@ -8,6 +8,10 @@
     return os.EOL;
   }
   
+  function get_locale() {
+    return replace_all(before(process.env.LANG || process.env.LANGUAGE, '.'), '_', '-') || 'en-GB';
+  }
+  
   var is_array = Array.isArray;
   var slice = Array.prototype.slice;
   var concat = Array.prototype.concat;
@@ -2154,7 +2158,7 @@
   }
   
   function Money(currency_code, value, o) {
-    o = qp_options(o, { locale: navigator.language });
+    o = qp_options(o, { locale: get_locale() });
     this.input = value;
     this.locale = o.locale;
     if (is(currency_code, 'string')) {
