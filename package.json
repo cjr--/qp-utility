@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/cjr--/qp-utility",
   "devDependencies": {
-    "node-watch": "^0.5.9",
+    "node-watch": "^0.7.1",
     "qp-library": "^2.1.48",
     "uglify-js": "^3.10.1"
   },
