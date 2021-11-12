@@ -604,7 +604,11 @@
   }
   
   function insert_at(o, index, value) {
-    o.splice(index, 0, value);
+    return o.splice(index, 0, value);
+  }
+  
+  function remove_at(o, index) {
+    return o.splice(index, 1);
   }
   
   function clear(o) {
@@ -2639,6 +2643,7 @@
     flatten: flatten,
     compact: compact,
     insert_at: insert_at,
+    remove_at: remove_at,
     zip: zip,
     unzip: unzip,
     now: now,
