@@ -31,6 +31,34 @@ function round(n, decimals) {
   return Number(Math.round(n + 'e' + decimals) + 'e-' + decimals);
 }
 
+function quartiles(items) {
+  var sorted = items.sort((a, b) => a - b);
+  var o = {
+    q25: quantile(sorted, 0.25),
+    q50: quantile(sorted, 0.50),
+    q75: quantile(sorted, 0.75),
+    q1: [], q2: [], q3: [], q4: []
+  };
+  sorted.forEach(item => {
+    if (item < o.q25) o.q1.push(item);
+    else if (item >= o.q25 && item < o.q50) o.q2.push(item);
+    else if (item >= o.q50 && item < o.q75) o.q3.push(item);
+    else if (item >= o.q75) o.q4.push(item);
+  });
+  return o;
+}
+
+function quantile(sorted, q) {
+  var position = (sorted.length - 1) * q;
+  var base = Math.floor(position);
+  var rest = position - base;
+  if (sorted[base + 1] !== undefined) {
+    return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+  } else {
+    return sorted[base];
+  }
+}
+
 function random(min, max) {
   return Math.round(min + (Math.random() * (max - min)));
 }

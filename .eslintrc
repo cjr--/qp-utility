@@ -15,9 +15,9 @@
     "no-empty": 0
   },
   "env": {
-    "es6": false,
+    "es6": true,
     "browser": true,
-    "node": false
+    "node": true
   },
   "extends": "eslint:recommended"
 }
